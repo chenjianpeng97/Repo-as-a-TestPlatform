@@ -1,4 +1,4 @@
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -61,16 +61,18 @@ flowchart TD
 - DB 只走 `packages.db`，日志只走 `packages.logging`（见对应 rule）。
 - 密钥只放本机 `config/env_local.py` 或环境变量，**任何分支都不得提交**。
 
-## 6. 本仓分支约定（模板 + 试验田）
+## 6. 本仓分支约定（平台 + Plane dogfood）
 
-本仓同时维护平台 DNA 与一个试用场，**不是**把多个被测系统合进 `main`。其它 SUT 在各自项目仓演进，用 `init_repo` 从 `main` 取 DNA。
+本公开仓同时维护平台 DNA 与一个 **Plane dogfood** 试用场，**不是**把多个被测系统合进 `main`。其它 SUT 在各自项目仓演进，用 `init_repo` 从 `main` 取 DNA。
+
+Dogfood：用开源项目管理软件 [Plane](https://github.com/makeplane/plane) 做本测试仓的可视化，同时用本仓回归 Plane 自身。
 
 | 分支 | 职责 | 谁改 |
 | --- | --- | --- |
 | `main` | 平台：`.cursor/**`、`docs/spec/**`、`packages/db\|logging\|api_test\|excel`、action_words 骨架、公共 `apps/`、`INDEX.md` | 框架改动只在这里提交 |
-| `sandbox/jafron` | `main` + 健帆业务资产（`assets/`、业务 objects/words/features、`INDEX.project.md`） | 业务资产；**不改**平台文件 |
+| `plane-dogfood` | `main` + Plane 业务资产（`assets/`、业务 objects/words/features、`INDEX.project.md`） | 业务资产；**不改**平台文件 |
 
-- 只允许 **`main` → `sandbox/jafron`** 的 merge。禁止把 sandbox 合回 main。
-- 试用中发现框架要改：先在 `main` 改并提交，再 merge 进 sandbox 继续试用。
-- sandbox 独有路径（`INDEX.project.md`、`config/env_overlay.py`、业务 `assets/` / `api_objects` / features）main 上不存在，因此合入不会对打。
+- 只允许 **`main` → `plane-dogfood`** 的 merge。禁止把 dogfood 合回 main。
+- 试用中发现框架要改：先在 `main` 改并提交，再 merge 进 `plane-dogfood` 继续试用。
+- dogfood 独有路径（`INDEX.project.md`、`config/env_overlay.py`、业务 `assets/` / `api_objects` / features）main 上不存在，因此合入不会对打。
 - 项目主数据与业务模型放 `params_project.py` / `models_project.py`（main 上的 `params.py` / `models.py` 只做转出）。
