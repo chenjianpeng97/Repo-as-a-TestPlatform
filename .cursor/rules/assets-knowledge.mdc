@@ -1,0 +1,44 @@
+---
+description: assets/ is the knowledge base for humans and the LLM; enforce provenance metadata, raw-vs-curated boundaries, and grounding (consult INDEX before generating)
+globs: assets/**
+alwaysApply: false
+version: 1.0.0
+---
+
+# assets — 知识层硬约束
+
+`assets/` 存放给人和 LLM 阅读、作为生成测试代码/工具依据的知识。完整规范见
+`docs/spec/assets-knowledge-syntax.md`；全局发现入口见根 `INDEX.md`。
+
+## Grounding（生成前必读）
+
+- **生成任何测试 / action word / api·page object / 工具之前**，先查根 `INDEX.md`
+  检索相关 domain 的知识（真实 DDL 列名、`assets/sql` 真实业务 SQL、`usecases` /
+  `domain-notes`），以此为依据，**不要凭空臆造**列名、接口字段、业务规则。
+- 缺知识时先回填：`python apps/dump_ddl.py <table> --datasource <alias>`（DDL）、
+  `python -m apps.recorder`（接口），再进入生成。
+
+## 目录与元数据
+
+- 目录分类固定：`ddl/<datasource>/`、`sql/`、`usecases/<domain>/`、
+  `domain-notes/<domain>/`、`testreport/`（新增类别前先看 spec）。
+- 人工/半自动区文件头必须带元数据：`domain / source / date / version / confidence`
+  （Markdown 用 YAML front-matter，SQL 用顶部 `--` 注释）。
+- `confidence: high` 表示人工核实过——LLM 应优先采信。
+
+## raw vs curated
+
+- **raw**（原始导入物）：**禁止改写语义**，只补元数据头、放对目录。
+- **curated**（加工知识）：可编辑，但必须保留 `source` 指回来源并 bump `version`。
+
+## 变更留痕
+
+- 自动区（`ddl/`）更新由工具写 `assets/CHANGELOG.md`（见 `apps-authoring-syntax.md`）；
+  人不手改自动区语义，要更新就重跑工具。
+- curated 更新 → bump `version` + 正文追加变更说明；随后由 `maintain-index` skill
+  增量更新根 `INDEX.md`。
+
+## 禁止
+
+- 不得写入 token / cookie / 密码 / Authorization / session 等敏感值。
+- 不得在 `assets/` 放置可执行测试代码（那属于 `tests/` 或 `packages/`）。

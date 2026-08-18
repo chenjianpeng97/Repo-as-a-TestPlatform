@@ -1,0 +1,38 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.ci_venv
+
+# pytest cache
+.pytest_cache/
+
+# pdf files
+*.pdf
+
+# report files
+report/
+
+# run-scope logs produced by supports/logging
+logs/
+
+# playwright mcp
+.playwright-mcp/
+
+# temporary agent scratch (exploration scripts, probe logs)
+.agent/
+# but keep tracked skills subfolder
+!.agent/skills/
+!.agent/skills/**
+
+# Local secrets / machine overlay — never commit (any branch, including sandbox)
+.env
+.env.*
+!.env.example
+config/env_local.py

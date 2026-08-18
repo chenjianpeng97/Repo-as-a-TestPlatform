@@ -1,0 +1,22 @@
+#!/bin/sh
+# Warn (non-blocking) when common platform assets drifted from the release
+# manifest without a version bump. Enable with:
+#   git config core.hooksPath tools/git-hooks
+DIR=$(dirname "$0")
+ROOT=$(cd "$DIR/../.." && pwd)
+# Prefer the repo venv (global `python` may be a Windows Store stub / missing).
+if [ -x "$ROOT/.venv/Scripts/python.exe" ]; then
+  PY="$ROOT/.venv/Scripts/python.exe"
+elif [ -x "$ROOT/.venv/bin/python" ]; then
+  PY="$ROOT/.venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+  PY=python3
+elif command -v python >/dev/null 2>&1; then
+  PY=python
+else
+  exit 0
+fi
+# --check exits 1 on drift; we only warn, never block the push.
+( cd "$ROOT" && "$PY" -m apps.init_repo manifest --check ) || \
+  echo "[warn] pre-push: platform assets drifted; consider the release-template skill to bump version." >&2
+exit 0

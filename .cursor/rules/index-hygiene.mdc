@@ -1,0 +1,32 @@
+---
+description: Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail; index is the discovery entry for humans and the LLM
+globs: assets/**,packages/api_objects/**,packages/page_objects/**,apps/**
+alwaysApply: false
+version: 1.1.0
+---
+
+# index-hygiene — 索引与留痕纪律
+
+根 `INDEX.md` 是**平台**能力地图（发现入口）。若存在 `INDEX.project.md`，那是试验田 / 下游项目仓的**业务资产**地图；两份索引都必须与各自职责范围内的仓库状态一致。
+
+## 留痕（changelog trail）
+
+- **自动区**（工具产出：`assets/ddl/`、`packages/api_objects/` 等）：由**生成工具**在写文件时
+  追加 changelog（`assets/CHANGELOG.md` / `packages/api_objects/CHANGELOG.md`），格式见
+  `docs/spec/apps-authoring-syntax.md`。人不手改自动区语义，要更新就重跑工具。
+- **人工/半自动区**（`assets/usecases`、`domain-notes`、`sql`、新 page/api object、新 app）：
+  新增/变更后应在对应索引登记一行（或运行 `maintain-index` skill 增量补齐）：
+  平台工具/公共包 → `INDEX.md`；业务 DDL/用例/api_objects/page_objects/features → 有 `INDEX.project.md` 则写那里，否则写 `INDEX.md`。
+
+## 增量维护（省 token）
+
+- 更新 `INDEX.md` 时**优先读各区 `CHANGELOG` 的 delta**，据此补条目；
+  **不要为维护索引而全量读取 `assets/ddl/*.sql` 正文**。
+- AI 组件区（`.cursor/**`）不手写进 `INDEX.md`：由 `python -m apps.index_ai`
+  确定性生成 `.cursor/REGISTRY.md`，`INDEX.md` 只链接过去。
+
+## 一致性
+
+- 新增/删除工具（`apps/`）→ 更新 `INDEX.md` 第 3 节 + 该工具交接文档。
+- 冻结新的 api_object / page_object → 更新业务索引第 2.1 / 2.2 节（有 `INDEX.project.md` 写那里，否则 `INDEX.md`）。
+- 回填新的 DDL/用例/业务 SQL → 更新业务索引第 1 节（有 `INDEX.project.md` 写那里，否则 `INDEX.md`；或跑 `maintain-index`）。

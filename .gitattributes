@@ -1,0 +1,4 @@
+*.jpg filter=lfs diff=lfs merge=lfs -text
+.excel filter=lfs diff=lfs merge=lfs -text
+.xmind filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text

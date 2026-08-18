@@ -1,0 +1,126 @@
+---
+description: Require all DB access to go through packages.db.DbClient with named datasources (MySQL / SQL Server coexist); forbid direct pymssql/pymysql, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
+globs: **/*.py
+alwaysApply: false
+version: 1.0.0
+---
+
+# packages.db — mandatory multi-datasource surface
+
+Every database interaction in this repo must go through
+`packages.db.DbClient`. Direct `pymssql.connect(...)` / `pymysql.connect(...)`,
+ad-hoc `sqlalchemy.create_engine(...)` calls outside `packages/db`, and
+hardcoded DSNs are forbidden.
+
+The framework supports **MySQL and SQL Server side by side**. Named
+datasources live in `config/env.py` -> `DATABASES` (business alias ->
+connection config incl. `type`); e.g. `"main"` = primary store (MySQL),
+`"sqlserver"` = secondary store (SQL Server). Internally `DbClient` rides a
+pooled SQLAlchemy engine, but that is an implementation detail — callers
+never touch engines or sessions.
+
+(`MySQLClient` is a deprecated alias of `DbClient`; new code must import
+`DbClient`.)
+
+## API to use
+
+```python
+from packages.db import DbClient
+
+# Default datasource ("main", MySQL)
+with DbClient.default() as db:
+    rows   = db.fetch_all(
+        "SELECT id FROM sys_user WHERE position IN (%s, %s) AND del_flag = 0",
+        ("BUH", "DSM"),
+    )
+    row    = db.fetch_one(
+        "SELECT COUNT(*) AS n FROM authorization_result_detail WHERE year = %s",
+        (year,),
+    )
+    scalar = db.fetch_scalar("SELECT COUNT(*) FROM sys_user", ())
+    for r in db.iter_all("SELECT * FROM big_table", (), batch_size=500):
+        ...
+
+# Named datasource (alias from config/env.py DATABASES)
+with DbClient.for_datasource("sqlserver") as db:
+    rows = db.fetch_all("SELECT TOP 10 * FROM inventory WHERE sku = %s", (sku,))
+```
+
+Action words declare their target store as class metadata instead of picking
+connections at call sites (see `docs/spec/action-words-syntax.md`):
+
+```python
+class SeedOnSqlServer(ActionWord):
+    datasource = "sqlserver"   # 第二库在 SQL Server
+    ...
+    def run(self, params):
+        bulk_insert(self.db, "inventory", COLS, rows)
+```
+
+## Hard rules
+
+- Credentials come from `config.env.DATABASES` + env overrides
+  (`ARGON_DB_<ALIAS>_HOST` / `PORT` / `USER` / `PASSWORD` / `NAME`; legacy
+  `ARGON_DB_HOST`/... still override the default `main` alias). Hardcoding any
+  credential in code → **forbidden**.
+- Both drivers use pyformat, so SQL must be parameterised with `%s`
+  placeholders (or named `%(key)s`) on **every** datasource. Building SQL with
+  `f"..."` / `.format()` / `%` string ops for **values** → **forbidden**
+  (SQL injection + quoting bugs). Identifier quoting for whitelist
+  table/column constants uses
+  `packages.action_words._internal.db.quote_ident(name, dialect)`
+  (`[name]` for mssql, `` `name` `` for mysql); `bulk_insert` picks the
+  dialect from `client.dialect` automatically.
+- **Write SQL in the dialect of the target datasource** (check
+  `db.dialect`, `"mssql"` or `"mysql"`):
+  - `main` (MySQL): `LIMIT n`, `NOW()`, `INSERT ... ON DUPLICATE KEY`.
+    Avoid `[ident]`, `TOP`, `GETDATE()`, `MERGE`.
+  - `sqlserver` (T-SQL): `SELECT TOP n ...`, `GETDATE()` / `SYSUTCDATETIME()`,
+    `MERGE` for upsert. Avoid backticks, `LIMIT`, `INSERT IGNORE`,
+    `ON DUPLICATE KEY`, `IFNULL`, `NOW()`.
+- Business SQL lives in a domain service under `packages/<domain>/` or an
+  action word. Do **not** put SQL or `DbClient` calls inside
+  `tests/features/*_steps/*.py`, `tests/features/*_environment.py`, or
+  `packages/page_objects/**`.
+- Mirror every non-trivial SQL as a human-readable copy in
+  `assets/sql/<name>.sql` (existing convention). Docstrings in the service
+  should reference the file. Table DDL references live under
+  `assets/ddl/<alias>/<table>.sql` (`python apps/dump_ddl.py <table>
+  --datasource <alias>`).
+- One `DbClient` per logical unit of work — typically opened in a `Given`
+  step, stored on context, and closed in `after_scenario`. Do not leak
+  connections across scenarios. `ActionContext.get_db(alias)` caches one
+  client per alias per scenario.
+- Every DB operation that drives an assertion (count / sample / negative
+  probe) should be paired with a `packages.logging.log_data_setup(...)` line
+  so the evidence ends up in `logs/`.
+
+## Examples
+
+**Bad**
+
+```python
+import pymysql
+conn = pymysql.connect(host="203.0.113.10", user="root", password="***", db="example")
+cur = conn.cursor()
+cur.execute(f"SELECT * FROM sys_user WHERE position = '{role}'")  # injection
+```
+
+```python
+from sqlalchemy import create_engine
+engine = create_engine("mssql+pymssql://sa:***@10.0.0.8/ssdb")  # ad-hoc engine + hardcoded DSN
+```
+
+**Good**
+
+```python
+from packages.db import DbClient
+from packages.logging import log_data_setup
+
+with DbClient.default() as db:
+    rows = db.fetch_all(
+        "SELECT user_id, position FROM sys_user WHERE position = %s AND del_flag = 0",
+        (role,),
+    )
+log_data_setup("users_by_position", role=role, count=len(rows))
+```

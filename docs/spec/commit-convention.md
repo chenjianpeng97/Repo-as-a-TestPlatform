@@ -1,0 +1,83 @@
+# 提交规范（commit-convention）— 单一事实源
+
+> 采用 **Conventional Commits**，并用一套**对齐六层与资产类别的 scope**，让每次提交
+> 一眼看出"改了什么层/什么资产"。本文件是 type/scope 的唯一事实源，`commit-msg`
+> 校验脚本（`tools/git-hooks/`）与 `.cursor/rules/commit-convention.mdc` 都以此为准。
+
+## 1. 格式
+
+```text
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+- `type(scope): subject` 为首行；不兼容变更加 `!`（如 `feat(api_objects)!: ...`）。
+- 一次提交涉及多层时，scope 可用逗号分隔：`feat(apps,packages): ...`。
+- subject 用祈使句、简洁；中英文皆可。
+
+## 2. type（允许集合）
+
+| type | 含义 |
+| --- | --- |
+| `feat` | 新增能力（新工具、新资产、新用例、录制新接口） |
+| `fix` | 修复缺陷 |
+| `refactor` | 重构，不改行为 |
+| `docs` | 文档/规范 |
+| `test` | 测试代码 |
+| `perf` | 性能 |
+| `chore` | 杂项（依赖、刷新自动区资产等） |
+| `build` / `ci` | 构建 / CI |
+| `style` | 纯格式 |
+| `revert` | 回滚 |
+
+## 3. scope（对齐六层与资产类别）
+
+| scope | 对应路径 | 典型场景 |
+| --- | --- | --- |
+| `assets` | `assets/**` | 更新 DDL/用例/业务 SQL/报告 |
+| `apps` | `apps/**` | 新增/修改工具 |
+| `packages` | `packages/**`（通用层） | db/logging/api_test/excel/config |
+| `api_objects` | `packages/api_objects/**` | 录制/冻结接口资产 |
+| `page_objects` | `packages/page_objects/**` | UI 资产 |
+| `action_words` | `packages/action_words/**` | 业务动作 |
+| `tests` | `tests/**` | feature/steps/pytest |
+| `docs` | `docs/**` | 规范/说明 |
+| `rules` | `.cursor/rules/**` | 规则 |
+| `skills` | `.cursor/skills/**` | 技能 |
+| `agents` | `.cursor/agents/**` | 编排 |
+| `hooks` | `.cursor/hooks*`、`tools/git-hooks/**` | 钩子 |
+| `init_repo` | `apps/init_repo/**` | 初始化工具与 release |
+| `index` | `INDEX.md`、`INDEX.project.md`、`.cursor/REGISTRY.md` | 索引/注册表 |
+
+> `packages` 视为 `api_objects` / `page_objects` / `action_words` 的**上位 scope**：
+> 声明 `packages` 可覆盖这三者的改动。
+
+## 4. 示例
+
+```text
+feat(api_objects): record login and checkout routes
+chore(assets): refresh order ddl via dump_ddl
+feat(apps): add data export checker tool
+docs(spec): add apps-authoring-syntax
+chore(rules): scope bdd-pipeline-gates off always-apply
+feat(apps,packages): add init_repo and release manifest surface
+```
+
+## 5. 校验（commit-msg hook）
+
+`tools/git-hooks/commit-msg` 在提交时校验：
+
+1. 首行符合上面的 Conventional Commits 语法，`type`/`scope` 在允许集合内；
+2. **声明的 scope 与实际改动文件一致**：取 `git diff --cached --name-only`，把路径映射到层，
+   断言声明 scope 覆盖了所有被改动且可识别的层（`packages` 覆盖三个子资产层）。
+
+安装（本地一次性；不改全局配置）：
+
+```bash
+git config core.hooksPath tools/git-hooks
+```
+
+CI 可复用同一校验脚本（对齐 `docs/note.md` 里 Ruff+CI 规划）。合并/回滚提交（`Merge`/`Revert` 开头）跳过校验。

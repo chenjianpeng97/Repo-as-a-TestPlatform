@@ -1,0 +1,60 @@
+---
+description: Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages; no selector or request leakage across layers
+globs: **/*.py
+alwaysApply: false
+version: 1.0.0
+---
+
+# Asset Layering — boundary rules per layer
+
+Each layer owns one responsibility. Leakage across layers (e.g. selectors in steps, handcrafted requests in page objects) is forbidden. See per-layer skills in `.cursor/skills/` for the operational details; this rule is the hard-boundary check.
+
+**Framework note**: These layer contracts primarily govern **behave/BDD** assets (`.feature` + `*_steps` + action words + page/api objects). When the user **explicitly** asks for **pytest**, implement pytest tests that call `packages/**` (and action words / page/api objects if useful); do not invent Gherkin/steps solely to satisfy layering.
+
+## Layer contract (hard rules)
+
+- **`tests/features/**/*.feature`** — business language only.
+  - Forbidden: selectors/xpath/css, API urls/headers/tokens, SQL, table/column names, fixed sleeps ("等 5 秒").
+- **`tests/features/{ui,api}_steps/{given,when,then}.py`** — thin orchestration.
+  - Prefer calling **`packages/action_words/`** for DB seed/assert and API request/assert business actions.
+  - UI steps call `packages/page_objects/` methods (or ui_* action words when available); they contain **no** selectors and **no** `page.click(...)`/raw locators.
+  - API steps call action words or `packages/api_objects/` APIModel via `model.set_*(...).execute(...)` only; they contain **no** URL/header/token/body assembly.
+  - No `sleep(...)` — waits belong inside page objects / action words; no direct DB access in steps — use action words or `packages.<domain>.*` services.
+- **`packages/action_words/**`** — reusable business actions (see `docs/spec/action-words-syntax.md`).
+  - Categories: `db_seed` / `db_assert` / `api_request` / `api_assert` / `ui_action` / `ui_assert`.
+  - API words **only orchestrate** frozen `packages/api_objects/**`; no handcrafted request contracts.
+  - Seed words register `cleanup` rows; assert words raise `AssertionError` on failure.
+- **`packages/page_objects/**`** — UI locators & interactions.
+  - Owns all `get_by_role / get_by_test_id / CSS / XPath`; exposes only business-level actions (`open/login/submit/...`) and assertions (`assert_*`).
+  - No business data fetching, no API requests, no SQL.
+- **`packages/api_objects/**`** — route-aligned APIModel definitions.
+  - One asset per `method + normalized_path` (versioned `V1/V2` only when incompatible). `path` contains **no host**.
+  - Executes only via `APIModel.execute()` after `set_*` / `override_*`; no custom executor patterns.
+  - Asserts are stable/observable (`http status`, `$.code`, key-exists). **Never** hardcode scenario-specific constants (e.g. expected `total=12`) inside APIModel asserts.
+- **`packages/**`** — framework base capabilities (DB, logging, config, generic http client).
+  - No UI actions, no feature-level business rules. See `packages-logging.mdc` and `packages-db.mdc` for the two mandatory component surfaces.
+  - **`packages/excel`**: read xlsx/CSV from bytes or path; returns stringified cells and `list[dict]` records. **No domain**; call sites map columns. **Dependency**: `openpyxl` (declared in `pyproject.toml`).
+  - **`packages.api_test`**: `ApiResponse` always includes **`content: bytes`** (raw body) in addition to `json` / `text`. JSON APIs populate `json`; file-download routes often leave `json is None` — use **`execute()` 返回的 `resp.content`** 交给 `packages.excel` 或业务层解析。`APIModel.body_format` 支持 **`"json"`**（默认）与 **`"form"`**（`application/x-www-form-urlencoded`）；仍仅通过 `set_json(...).execute()` 传 body，禁止在 steps 里手写 `requests`。
+
+## Cross-cutting
+
+- **No secrets in repo**, ever: `Authorization`, `Cookie`, `Set-Cookie`, `*token*`, `*secret*`, `*password*`, `*session*`. Also applies to captures under `report/` / `testcase/`.
+- **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `apps.recorder` captures, or run_summary findings; avoid locator/path guesses.
+
+## Examples
+
+**Bad (selector leaking into step)**
+
+```python
+@when("点击登录")
+def step_click_login(context):
+    context._page.locator("#login-btn").click()   # selector in step
+```
+
+**Good**
+
+```python
+@when("点击登录")
+def step_click_login(context):
+    context.pages.login.submit()                  # page object owns the locator
+```

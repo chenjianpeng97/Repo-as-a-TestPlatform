@@ -1,0 +1,53 @@
+---
+description: Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Given/When/Then file granularity
+globs: tests/features/**/*.py
+alwaysApply: false
+version: 1.0.0
+---
+
+# `behave --stage` — directory & file-granularity rules
+
+Applies only to **behave** assets under `tests/features/`. User-explicit **pytest** suites are outside this layout — do not reshape pytest tests into `*_steps` / `*_environment.py` solely to satisfy this rule.
+
+behave's `--stage <name>` switch changes discovery to `<features_path>/<name>_steps/` and `<features_path>/<name>_environment.py`. This repo sets `paths=tests/features` in `behave.ini` and runs `--stage ui` / `--stage api` as **two separate processes** — the layout must honour both.
+
+## Hard rules
+
+- **Two stages, in pairs**:
+  - UI: `tests/features/ui_steps/**` paired with `tests/features/ui_environment.py`
+  - API: `tests/features/api_steps/**` paired with `tests/features/api_environment.py`
+  - Both environments must be maintained together; adding/removing a hook in one without the other is forbidden.
+- **G/W/T file granularity only**:
+  - Each stage must expose exactly `given.py`, `when.py`, `then.py` at the top of its `*_steps/` folder.
+  - Behave's `--stage` only auto-imports top-level `*.py`. If you must organise by submodules, provide a top-level loader (e.g. `steps.py`) that imports them — but **prefer consolidating** into the standard three files.
+- **Do not create domain-split step files** such as `auth_api_then.py`, `order_when.py`, `user_profile_given.py`.
+  - Reuse is achieved via **stable step phrases and shared helper functions**, not by multiplying files.
+- **Gherkin semantics inside files**:
+  - `Given` = state setup (queries/login/fixtures) — no actions/assertions.
+  - `When` = action (UI interaction or API call) — no final business assertion.
+  - `Then` = assertion only — no actions.
+- **Same step phrase must resolve per stage**: If a step is needed on both stages (e.g. `"admin 登录系统"`), implement it in both `ui_steps/given.py` and `api_steps/given.py` with stage-appropriate internals — not in a shared module.
+- **Both environments must wire the logging-kit lifecycle hooks** (see `packages-logging.mdc`): `on_run_begin/end`, `on_feature_begin/end`, `on_scenario_begin/end`, `on_step_begin/end`.
+
+## Examples
+
+**Bad — domain-split step files**
+
+```
+tests/features/ui_steps/auth_given.py        # forbidden
+tests/features/ui_steps/order_when.py        # forbidden
+tests/features/api_steps/user_profile.py     # forbidden
+```
+
+**Good — per-stage × G/W/T**
+
+```
+tests/features/ui_steps/given.py
+tests/features/ui_steps/when.py
+tests/features/ui_steps/then.py
+tests/features/api_steps/given.py
+tests/features/api_steps/when.py
+tests/features/api_steps/then.py
+tests/features/ui_environment.py
+tests/features/api_environment.py
+```

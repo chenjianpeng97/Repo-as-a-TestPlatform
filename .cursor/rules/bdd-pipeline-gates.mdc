@@ -1,0 +1,53 @@
+---
+description: Three non-negotiable gates for the BDD asset pipeline (Playwright MCP capture, API-object freeze, stage regression); scoped to BDD assets, skipped when user explicitly requests pytest
+globs: tests/features/**,packages/api_objects/**,packages/page_objects/**
+alwaysApply: false
+version: 2.0.0
+---
+
+# BDD Pipeline — three non-negotiable gates
+
+> **Scope**: this rule only governs **behave/BDD** asset work and auto-attaches
+> when editing `tests/features/**`, `packages/api_objects/**`,
+> `packages/page_objects/**`. It is **not** a platform-wide default. Task routing
+> lives in the neutral top-level [`AGENTS.md`](../../AGENTS.md); the BDD branch is
+> orchestrated end-to-end by [`bdd-asset-pipeline`](../agents/bdd-asset-pipeline.md),
+> which owns these same gates. Do not treat BDD as the default for every task.
+
+## Framework selection (read first)
+
+- **Default** for UI/API business-flow automation assets is the behave BDD pipeline below.
+- **Exception — user-explicit pytest**: If the user **explicitly** asks to implement with **pytest** (including performance, DB/data checks, or other non-BDD suites), implement with **pytest**. Do **not** force `.feature` / behave steps / `behave --stage` / this pipeline’s three gates.
+- When in doubt and the user did **not** name a framework, prefer behave for scenario-style UI/API flows; prefer asking once only if the task is clearly performance/DB-centric and framework is unspecified.
+- Pytest tests should still reuse `packages/**` (db, api_objects, logging, etc.) where useful; they are not required to go through Gherkin.
+
+This repo’s BDD path follows `.cursor/agents/bdd-asset-pipeline.md`:
+**Feature → Playwright MCP Run/Capture → Reuse analysis → Freeze API Objects → Update Page Objects → Implement Steps → `behave --stage` regression**.
+
+Whenever you generate or maintain **behave/BDD** automation assets (`.feature`, `*_steps`, page/api objects for those scenarios), the three gates below **must** hold. Skipping any gate means the BDD task is not done. These gates do **not** apply to user-explicit pytest work.
+
+## Gate 1 — MCP Run/Capture is mandatory
+
+- "Generate automation assets" tasks for **behave features** must run the target scenario(s) via Playwright MCP and produce a **sanitized** `run_summary` (under `report/`).
+- Do **not** substitute MCP with local `sync_playwright` just because UI steps pass; MCP is what sources network evidence for the freeze step.
+- If MCP is blocked (captcha, SSO, manual OTP, permission prompts, unreachable env) → **stop**, and report: where it blocked, what human action is needed, what evidence was collected, what assets can/cannot proceed without capture. Do not write API assets as if capture existed.
+
+## Gate 2 — Freeze API Objects when capture has eligible routes
+
+- If MCP captured **any non-static** route related to the scenarios, you **must** freeze them into `packages/api_objects/**` following `freeze-api-objects` skill (route-aligned, deduped, sanitized).
+- If you create zero API Objects, you **must** state why in the output (pure SPA / all static / blocked before login / etc.). Silence is not acceptable.
+- Never commit real tokens, cookies, Authorization/Set-Cookie headers, or sensitive values — neither in source code nor in any capture bundle.
+
+## Gate 3 — Prove stage separation via regression
+
+- After any **behave/BDD** asset change under `tests/features/`, `packages/api_objects/`, `packages/page_objects/`, or related `packages/`, run and report:
+  - `behave --stage ui <feature>`
+  - `behave --stage api <feature>` (or `--dry-run` with an explicit TODO if API feature not yet authored)
+- Both stages must either pass or be explicitly `--dry-run`-clean. "Only ran one stage" is a Gate-3 failure.
+- For user-explicit **pytest** work, prove with `pytest <path>` (or the path the user named) instead — do not require `behave --stage`.
+
+## Enforcement summary
+
+- **BDD/behave tasks** are not done unless: sanitized run_summary exists, eligible routes are frozen (or explicit zero-freeze justification), and both `--stage ui` / `--stage api` are exercised.
+- **User-explicit pytest tasks** are done when the requested pytest suite runs successfully and reuses `packages/**` appropriately; do not invent a parallel behave feature unless the user asks.
+- When any applicable gate would be violated, **stop and report the blocker** instead of generating partial/unsourced assets.

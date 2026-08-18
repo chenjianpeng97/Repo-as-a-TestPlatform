@@ -1,0 +1,33 @@
+---
+description: apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api); no reinventing wheels, no secrets, not imported by tests
+globs: apps/**
+alwaysApply: false
+version: 1.0.0
+---
+
+# apps — 创建期约束
+
+`apps/` 存放可独立运行的测试工具。完整规范见 `docs/spec/apps-authoring-syntax.md`。
+
+## 必须
+
+- **可独立运行**：包形式提供 `__main__.py`，支持 `python -m apps.<name>`；参数用 `argparse`。
+- **复用 packages，不重造轮子**：
+  - DB → `packages.db.DbClient`（禁止直连驱动 / 硬编码 DSN / SQL 拼接）。
+  - 日志 → `packages.logging`（禁止 `print` / stdlib logging / 自建日志文件）。
+  - 配置凭据 → `config/env.py` + 环境变量覆盖（不写死）。
+  - HTTP/表格 → `packages.api_test` / `packages.api_objects` / `packages.excel`。
+- **产出去向**：原始知识回填 `assets/`；可复用资源落 `packages/`。
+- **自动区留痕**：覆盖式生成 `assets/**` 或 `packages/api_objects/**` 的工具，运行结束必须
+  调用 `apps._shared.changelog.append_entry(...)` 追加该区 `CHANGELOG.md`（供 `maintain-index`）。
+
+## 禁止
+
+- 不得被 `tests/` import（复用逻辑下沉到 `packages/`）。
+- 不得写入 token / cookie / 密码 / Authorization / session 等敏感值。
+- 破坏性操作无开关、默认非 dry-run/只读 → 禁止。
+
+## 相关
+
+- 工具做好后的交接文档要求见 `apps-handover.mdc`。
+- 新造工具优先用 `create-app` skill 脚手架。
