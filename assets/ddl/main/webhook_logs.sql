@@ -26,3 +26,4 @@ CREATE INDEX webhook_logs_updated_by_id_3d9bad04 ON webhook_logs USING btree (up
 
 CREATE INDEX webhook_logs_workspace_id_ffcd0e31 ON webhook_logs USING btree (workspace_id);
 
+-- （webhook_logs 暂无数据，无示例 INSERT）

@@ -8,3 +8,5 @@ create table django_migrations
     applied timestamptz  not null
 );
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "django_migrations" ("id", "app", "name", "applied") VALUES (171, 'testhub', '0003_testhub_session', '2026-08-17 11:42:59.470060+00:00');

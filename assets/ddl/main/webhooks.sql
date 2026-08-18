@@ -31,3 +31,4 @@ CREATE UNIQUE INDEX webhook_url_unique_url_when_deleted_at_null ON webhooks USIN
 
 CREATE UNIQUE INDEX webhooks_workspace_id_url_deleted_at_ea7a1429_uniq ON webhooks USING btree (workspace_id, url, deleted_at);
 
+-- （webhooks 暂无数据，无示例 INSERT）

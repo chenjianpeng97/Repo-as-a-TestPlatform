@@ -7,3 +7,5 @@ create table django_celery_beat_intervalschedule
     period varchar(24) not null
 );
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "django_celery_beat_intervalschedule" ("id", "every", "period") VALUES (1, 21600, 'seconds');

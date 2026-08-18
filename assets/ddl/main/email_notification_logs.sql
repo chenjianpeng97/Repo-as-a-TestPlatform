@@ -28,3 +28,4 @@ CREATE INDEX email_notification_logs_triggered_by_id_b551e727 ON email_notificat
 
 CREATE INDEX email_notification_logs_updated_by_id_5d99c798 ON email_notification_logs USING btree (updated_by_id);
 
+-- （email_notification_logs 暂无数据，无示例 INSERT）

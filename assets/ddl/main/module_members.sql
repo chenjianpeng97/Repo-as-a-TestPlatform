@@ -30,3 +30,4 @@ CREATE UNIQUE INDEX module_member_unique_module_member_when_deleted_at_null ON m
 
 CREATE UNIQUE INDEX module_members_module_id_member_id_deleted_at_bb7a6f00_uniq ON module_members USING btree (module_id, member_id, deleted_at);
 
+-- （module_members 暂无数据，无示例 INSERT）

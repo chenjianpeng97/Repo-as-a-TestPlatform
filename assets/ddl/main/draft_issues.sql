@@ -44,3 +44,5 @@ CREATE INDEX draft_issues_updated_by_id_1ca3cd4e ON draft_issues USING btree (up
 
 CREATE INDEX draft_issues_workspace_id_9d8512c8 ON draft_issues USING btree (workspace_id);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "draft_issues" ("created_at", "updated_at", "deleted_at", "id", "name", "description_json", "description_html", "description_stripped", "description_binary", "priority", "start_date", "target_date", "sort_order", "completed_at", "external_source", "external_id", "created_by_id", "estimate_point_id", "parent_id", "project_id", "state_id", "type_id", "updated_by_id", "workspace_id") VALUES ('2026-07-14 08:55:31.919640+00:00', '2026-07-14 08:55:31.919859+00:00', NULL, '6c4d0909-29cc-4f0c-b6ae-391f4251cc43', '测试', '{}', '<p class="editor-paragraph-block" data-id="7268892e-9f74-4b00-ac1c-7466ab07b115">第一篇</p>', '第一篇', NULL, 'none', '2026-07-15', '2026-07-19', 65535.0, NULL, NULL, NULL, '9d1f264d-7dee-48c5-ab98-087db907b8a1', NULL, NULL, 'ec840712-e7ae-41f7-bc45-ff324bee0248', '23441ef1-5c6a-4029-99fc-55e298004cd9', NULL, NULL, '6f2f3ff8-62de-4127-978b-54991c166df3');

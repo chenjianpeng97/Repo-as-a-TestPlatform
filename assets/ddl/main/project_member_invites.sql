@@ -26,3 +26,4 @@ CREATE INDEX project_member_invite_updated_by_id_5aa55c96 ON project_member_invi
 
 CREATE INDEX project_member_invite_workspace_id_64e2dc4c ON project_member_invites USING btree (workspace_id);
 
+-- （project_member_invites 暂无数据，无示例 INSERT）

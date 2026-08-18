@@ -30,3 +30,4 @@ CREATE INDEX workspace_integrations_workspace_id_27ebeb6b ON workspace_integrati
 
 CREATE UNIQUE INDEX workspace_integrations_workspace_id_integration_fa041c22_uniq ON workspace_integrations USING btree (workspace_id, integration_id);
 
+-- （workspace_integrations 暂无数据，无示例 INSERT）

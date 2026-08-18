@@ -38,3 +38,5 @@ CREATE UNIQUE INDEX state_unique_name_project_when_deleted_at_null ON states USI
 
 CREATE UNIQUE INDEX states_name_project_id_deleted_at_02f90488_uniq ON states USING btree (name, project_id, deleted_at);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "states" ("created_at", "updated_at", "id", "name", "description", "color", "slug", "created_by_id", "project_id", "updated_by_id", "workspace_id", "sequence", "group", "default", "external_id", "external_source", "is_triage", "deleted_at") VALUES ('2026-08-03 12:54:47.379508+00:00', '2026-08-03 12:54:47.379510+00:00', 'ffd5480e-95a2-4521-b052-a7a78a02c3da', 'Todo', '', '#60646C', '', 'bb96a7c2-ef4b-466f-a2af-92315b642787', '9214eb9d-bc37-4cae-8a26-ea557b47d172', NULL, '82345500-e469-419d-843d-92902ffac9db', 25000.0, 'unstarted', FALSE, NULL, NULL, FALSE, NULL);

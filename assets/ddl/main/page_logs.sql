@@ -36,3 +36,4 @@ CREATE INDEX pagelog_type_id_idx ON page_logs USING btree (entity_type, entity_i
 
 CREATE UNIQUE INDEX page_logs_page_id_transaction_9ab05334_uniq ON page_logs USING btree (page_id, transaction);
 
+-- （page_logs 暂无数据，无示例 INSERT）

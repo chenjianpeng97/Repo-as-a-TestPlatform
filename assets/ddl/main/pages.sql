@@ -40,3 +40,4 @@ CREATE INDEX pages_updated_by_id_6c42de3e ON pages USING btree (updated_by_id);
 
 CREATE INDEX pages_workspace_id_c6c51010 ON pages USING btree (workspace_id);
 
+-- （pages 最新一行过长，已省略示例 INSERT；常见于 stdout / jsonb。需要样例时对该表单独查询）

@@ -31,3 +31,4 @@ CREATE UNIQUE INDEX comment_reaction_unique_comment_actor_reaction_when_deleted_
 
 CREATE UNIQUE INDEX comment_reactions_comment_id_actor_id_reac_24dc2de6_uniq ON comment_reactions USING btree (comment_id, actor_id, reaction, deleted_at);
 
+-- （comment_reactions 暂无数据，无示例 INSERT）

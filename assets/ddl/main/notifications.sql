@@ -55,3 +55,4 @@ CREATE INDEX notifications_updated_by_id_8a651e96 ON notifications USING btree (
 
 CREATE INDEX notifications_workspace_id_b2f09ef7 ON notifications USING btree (workspace_id);
 
+-- （notifications 暂无数据，无示例 INSERT）

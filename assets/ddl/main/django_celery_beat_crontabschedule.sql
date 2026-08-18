@@ -11,3 +11,5 @@ create table django_celery_beat_crontabschedule
     timezone      varchar(63)  not null
 );
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "django_celery_beat_crontabschedule" ("id", "minute", "hour", "day_of_week", "day_of_month", "month_of_year", "timezone") VALUES (12, '45', '3', '*', '*', '*', 'UTC');

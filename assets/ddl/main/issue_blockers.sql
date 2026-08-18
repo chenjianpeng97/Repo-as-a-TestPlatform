@@ -26,3 +26,4 @@ CREATE INDEX issue_blocker_updated_by_id_4af87d63 ON issue_blockers USING btree 
 
 CREATE INDEX issue_blocker_workspace_id_419a1c71 ON issue_blockers USING btree (workspace_id);
 
+-- （issue_blockers 暂无数据，无示例 INSERT）

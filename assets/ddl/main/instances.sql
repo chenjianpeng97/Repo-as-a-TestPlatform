@@ -34,3 +34,5 @@ CREATE INDEX instances_updated_by_id_cce8fcdf ON instances USING btree (updated_
 
 CREATE UNIQUE INDEX instances_instance_id_key ON instances USING btree (instance_id);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "instances" ("created_at", "updated_at", "id", "instance_name", "whitelist_emails", "instance_id", "current_version", "last_checked_at", "namespace", "is_telemetry_enabled", "is_support_required", "is_setup_done", "is_signup_screen_visited", "is_verified", "created_by_id", "updated_by_id", "domain", "latest_version", "edition", "deleted_at", "is_test", "is_current_version_deprecated") VALUES ('2026-07-10 12:26:12.456300+00:00', '2026-08-18 07:42:27.424724+00:00', 'c46dfded-9d14-4abe-9cf5-79ebe07f8149', 'Chen', NULL, 'bcfc4268f6116a8120184ad9', '1.4.1', '2026-08-18 07:42:27.424140+00:00', NULL, TRUE, TRUE, TRUE, FALSE, FALSE, NULL, NULL, '', '1.4.1', 'PLANE_COMMUNITY', NULL, FALSE, FALSE);

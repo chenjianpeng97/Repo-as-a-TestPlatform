@@ -26,3 +26,4 @@ CREATE INDEX issue_types_updated_by_id_4919203b ON issue_types USING btree (upda
 
 CREATE INDEX issue_types_workspace_id_591c6f3b ON issue_types USING btree (workspace_id);
 
+-- （issue_types 暂无数据，无示例 INSERT）

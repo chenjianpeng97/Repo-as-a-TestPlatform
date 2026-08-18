@@ -29,3 +29,4 @@ CREATE INDEX github_comment_syncs_workspace_id_b54528c8 ON github_comment_syncs 
 
 CREATE UNIQUE INDEX github_comment_syncs_issue_sync_id_comment_id_38c82e7b_uniq ON github_comment_syncs USING btree (issue_sync_id, comment_id);
 
+-- （github_comment_syncs 暂无数据，无示例 INSERT）

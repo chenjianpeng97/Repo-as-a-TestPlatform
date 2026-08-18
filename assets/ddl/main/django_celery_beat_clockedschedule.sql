@@ -6,3 +6,4 @@ create table django_celery_beat_clockedschedule
     clocked_time timestamptz not null
 );
 
+-- （django_celery_beat_clockedschedule 暂无数据，无示例 INSERT）

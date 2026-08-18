@@ -30,3 +30,4 @@ CREATE UNIQUE INDEX draft_issue_cycle_when_deleted_at_null ON draft_issue_cycles
 
 CREATE UNIQUE INDEX draft_issue_cycles_draft_issue_id_cycle_id__e133e097_uniq ON draft_issue_cycles USING btree (draft_issue_id, cycle_id, deleted_at);
 
+-- （draft_issue_cycles 暂无数据，无示例 INSERT）

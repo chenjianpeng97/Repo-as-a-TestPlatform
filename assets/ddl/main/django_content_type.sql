@@ -9,3 +9,5 @@ create table django_content_type
 
 CREATE UNIQUE INDEX django_content_type_app_label_model_76bd3d3b_uniq ON django_content_type USING btree (app_label, model);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "django_content_type" ("id", "app_label", "model") VALUES (114, 'testhub', 'testhubsession');

@@ -26,3 +26,4 @@ CREATE INDEX workspace_user_links_updated_by_id_bd0b017f ON workspace_user_links
 
 CREATE INDEX workspace_user_links_workspace_id_1b0a8e22 ON workspace_user_links USING btree (workspace_id);
 
+-- （workspace_user_links 暂无数据，无示例 INSERT）

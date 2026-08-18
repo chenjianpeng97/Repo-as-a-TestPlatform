@@ -35,3 +35,4 @@ CREATE INDEX exporters_workspace_id_11a04317 ON exporters USING btree (workspace
 
 CREATE UNIQUE INDEX exporters_token_key ON exporters USING btree (token);
 
+-- （exporters 暂无数据，无示例 INSERT）

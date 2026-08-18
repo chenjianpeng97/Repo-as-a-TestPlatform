@@ -27,3 +27,4 @@ CREATE UNIQUE INDEX project_public_member_unique_project_member_when_deleted_at_
 
 CREATE UNIQUE INDEX project_public_members_project_id_member_id_del_9acd89b5_uniq ON project_public_members USING btree (project_id, member_id, deleted_at);
 
+-- （project_public_members 暂无数据，无示例 INSERT）

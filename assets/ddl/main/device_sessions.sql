@@ -27,3 +27,4 @@ CREATE INDEX device_sessions_session_id_5382b02b_like ON device_sessions USING b
 
 CREATE INDEX device_sessions_updated_by_id_d0bd0c76 ON device_sessions USING btree (updated_by_id);
 
+-- （device_sessions 暂无数据，无示例 INSERT）

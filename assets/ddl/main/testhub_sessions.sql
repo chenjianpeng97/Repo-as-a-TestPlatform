@@ -35,3 +35,4 @@ CREATE INDEX testhub_sessions_updated_by_id_8156f3ce ON testhub_sessions USING b
 
 CREATE INDEX testhub_sessions_workspace_id_205188a3 ON testhub_sessions USING btree (workspace_id);
 
+-- （testhub_sessions 暂无数据，无示例 INSERT）

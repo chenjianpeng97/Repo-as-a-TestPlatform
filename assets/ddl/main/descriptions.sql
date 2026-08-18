@@ -24,3 +24,4 @@ CREATE INDEX descriptions_updated_by_id_af519c4d ON descriptions USING btree (up
 
 CREATE INDEX descriptions_workspace_id_767279bf ON descriptions USING btree (workspace_id);
 
+-- （descriptions 暂无数据，无示例 INSERT）

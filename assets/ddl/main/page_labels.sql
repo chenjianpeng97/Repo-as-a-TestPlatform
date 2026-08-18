@@ -23,3 +23,4 @@ CREATE INDEX page_labels_updated_by_id_d9fddbff ON page_labels USING btree (upda
 
 CREATE INDEX page_labels_workspace_id_078bb01c ON page_labels USING btree (workspace_id);
 
+-- （page_labels 暂无数据，无示例 INSERT）

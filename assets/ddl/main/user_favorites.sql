@@ -41,3 +41,4 @@ CREATE UNIQUE INDEX user_favorite_unique_entity_type_entity_identifier_user_when
 
 CREATE UNIQUE INDEX user_favorites_entity_type_user_id_enti_22b103ff_uniq ON user_favorites USING btree (entity_type, user_id, entity_identifier, deleted_at);
 
+-- （user_favorites 暂无数据，无示例 INSERT）

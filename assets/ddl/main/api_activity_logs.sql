@@ -24,3 +24,4 @@ CREATE INDEX api_activity_logs_created_by_id_7f5c4ca8 ON api_activity_logs USING
 
 CREATE INDEX api_activity_logs_updated_by_id_9ba0d417 ON api_activity_logs USING btree (updated_by_id);
 
+-- （api_activity_logs 暂无数据，无示例 INSERT）

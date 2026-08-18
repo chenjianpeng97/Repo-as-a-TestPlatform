@@ -31,3 +31,4 @@ CREATE UNIQUE INDEX issue_vote_unique_issue_actor_when_deleted_at_null ON issue_
 
 CREATE UNIQUE INDEX issue_votes_issue_id_actor_id_deleted_at_886f34e8_uniq ON issue_votes USING btree (issue_id, actor_id, deleted_at);
 
+-- （issue_votes 暂无数据，无示例 INSERT）

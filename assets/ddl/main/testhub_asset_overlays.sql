@@ -27,3 +27,4 @@ CREATE INDEX testhub_ove_project_idx ON testhub_asset_overlays USING btree (proj
 
 CREATE UNIQUE INDEX testhub_overlay_project_asset_kind_uniq ON testhub_asset_overlays USING btree (project_id, asset_ref, kind);
 
+-- （testhub_asset_overlays 暂无数据，无示例 INSERT）

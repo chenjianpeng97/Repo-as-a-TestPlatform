@@ -33,3 +33,4 @@ CREATE INDEX api_tokens_workspace_id_6791c7bd ON api_tokens USING btree (workspa
 
 CREATE UNIQUE INDEX api_tokens_token_key ON api_tokens USING btree (token);
 
+-- （api_tokens 暂无数据，无示例 INSERT）

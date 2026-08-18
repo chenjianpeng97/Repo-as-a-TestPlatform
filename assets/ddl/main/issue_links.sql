@@ -26,3 +26,4 @@ CREATE INDEX issue_links_updated_by_id_a771cce4 ON issue_links USING btree (upda
 
 CREATE INDEX issue_links_workspace_id_ff9038e7 ON issue_links USING btree (workspace_id);
 
+-- （issue_links 暂无数据，无示例 INSERT）

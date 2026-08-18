@@ -40,3 +40,5 @@ CREATE UNIQUE INDEX deploy_boards_anchor_key ON deploy_boards USING btree (ancho
 
 CREATE UNIQUE INDEX deploy_boards_entity_name_entity_ident_800ce160_uniq ON deploy_boards USING btree (entity_name, entity_identifier, deleted_at);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "deploy_boards" ("created_at", "updated_at", "id", "entity_identifier", "entity_name", "anchor", "is_comments_enabled", "is_reactions_enabled", "is_votes_enabled", "view_props", "created_by_id", "intake_id", "project_id", "updated_by_id", "workspace_id", "deleted_at", "is_activity_enabled", "is_disabled") VALUES ('2026-07-14 08:58:55.386045+00:00', '2026-07-14 08:58:55.394786+00:00', '1001d6a4-2c9b-420b-a22c-99d120d45ec8', 'ec840712-e7ae-41f7-bc45-ff324bee0248', 'project', '3e0394e8ed454422ab8b233e181f6817', FALSE, FALSE, FALSE, '{''list'': True, ''gantt'': True, ''kanban'': True, ''calendar'': True, ''spreadsheet'': True}', '9d1f264d-7dee-48c5-ab98-087db907b8a1', NULL, 'ec840712-e7ae-41f7-bc45-ff324bee0248', '9d1f264d-7dee-48c5-ab98-087db907b8a1', '6f2f3ff8-62de-4127-978b-54991c166df3', NULL, TRUE, FALSE);

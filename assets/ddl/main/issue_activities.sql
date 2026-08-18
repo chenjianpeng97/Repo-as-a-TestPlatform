@@ -38,3 +38,5 @@ CREATE INDEX issue_activity_updated_by_id_0075f9bd ON issue_activities USING btr
 
 CREATE INDEX issue_activity_workspace_id_65acaf73 ON issue_activities USING btree (workspace_id);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "issue_activities" ("created_at", "updated_at", "id", "verb", "field", "old_value", "new_value", "comment", "attachments", "created_by_id", "issue_id", "issue_comment_id", "project_id", "updated_by_id", "workspace_id", "actor_id", "new_identifier", "old_identifier", "epoch", "deleted_at") VALUES ('2026-07-10 12:37:56.420226+00:00', '2026-07-10 12:37:56.420232+00:00', 'fe069738-0faf-4d5d-935b-bbf2309b2c07', 'created', NULL, NULL, NULL, 'created the issue', '[]', NULL, '75270633-9c1b-4931-a6ed-cf2c6c80da2c', NULL, 'dc06dab7-13f5-40de-9d63-79d71315d44b', NULL, '6f2f3ff8-62de-4127-978b-54991c166df3', '7f979bbb-cc06-4739-a6bb-0348e80efda7', NULL, NULL, 1783687076.4189389, NULL);

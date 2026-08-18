@@ -30,3 +30,4 @@ CREATE UNIQUE INDEX draft_issue_assignee_unique_issue_assignee_when_deleted_at_n
 
 CREATE UNIQUE INDEX draft_issue_assignees_draft_issue_id_assignee__7cd49721_uniq ON draft_issue_assignees USING btree (draft_issue_id, assignee_id, deleted_at);
 
+-- （draft_issue_assignees 暂无数据，无示例 INSERT）

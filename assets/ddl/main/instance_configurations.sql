@@ -22,3 +22,5 @@ CREATE INDEX instance_configurations_updated_by_id_f0d7542e ON instance_configur
 
 CREATE UNIQUE INDEX instance_configurations_key_key ON instance_configurations USING btree (key);
 
+-- 最新一条数据示例（latest id），已排除生成列，已排除密钥列 value，仅供数据构造参考
+-- INSERT INTO "instance_configurations" ("created_at", "updated_at", "id", "key", "category", "is_encrypted", "created_by_id", "updated_by_id", "deleted_at") VALUES ('2026-07-10 12:26:22.632111+00:00', '2026-07-10 12:26:22.635975+00:00', 'f973b24b-f298-4f8e-aa65-499ec191e204', 'ENABLE_MAGIC_LINK_LOGIN', 'AUTHENTICATION', FALSE, NULL, NULL, NULL);

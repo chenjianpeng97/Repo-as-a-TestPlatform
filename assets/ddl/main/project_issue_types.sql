@@ -29,3 +29,4 @@ CREATE UNIQUE INDEX project_issue_type_unique_project_issue_type_when_deleted_at
 
 CREATE UNIQUE INDEX project_issue_types_project_id_issue_type_id_2287e5dc_uniq ON project_issue_types USING btree (project_id, issue_type_id, deleted_at);
 
+-- （project_issue_types 暂无数据，无示例 INSERT）

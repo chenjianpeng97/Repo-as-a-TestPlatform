@@ -37,3 +37,4 @@ CREATE INDEX testhub_jobs_updated_by_id_5900b9da ON testhub_jobs USING btree (up
 
 CREATE INDEX testhub_jobs_workspace_id_663c24bb ON testhub_jobs USING btree (workspace_id);
 
+-- （testhub_jobs 最新一行过长，已省略示例 INSERT；常见于 stdout / jsonb。需要样例时对该表单独查询）

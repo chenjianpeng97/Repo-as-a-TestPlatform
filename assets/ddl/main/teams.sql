@@ -24,3 +24,4 @@ CREATE UNIQUE INDEX team_unique_name_workspace_when_deleted_at_null ON teams USI
 
 CREATE UNIQUE INDEX teams_name_workspace_id_deleted_at_4b131aa2_uniq ON teams USING btree (name, workspace_id, deleted_at);
 
+-- （teams 暂无数据，无示例 INSERT）

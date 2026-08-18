@@ -27,3 +27,4 @@ CREATE INDEX description_versions_updated_by_id_8b5179ae ON description_versions
 
 CREATE INDEX description_versions_workspace_id_52857186 ON description_versions USING btree (workspace_id);
 
+-- （description_versions 暂无数据，无示例 INSERT）

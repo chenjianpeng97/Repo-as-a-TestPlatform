@@ -21,3 +21,4 @@ CREATE INDEX devices_updated_by_id_ee20dc3c ON devices USING btree (updated_by_i
 
 CREATE INDEX devices_user_id_9a5cca49 ON devices USING btree (user_id);
 
+-- （devices 暂无数据，无示例 INSERT）

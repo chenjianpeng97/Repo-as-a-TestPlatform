@@ -27,3 +27,4 @@ CREATE INDEX issue_attachments_updated_by_id_47dceec1 ON issue_attachments USING
 
 CREATE INDEX issue_attachments_workspace_id_c456a532 ON issue_attachments USING btree (workspace_id);
 
+-- （issue_attachments 暂无数据，无示例 INSERT）

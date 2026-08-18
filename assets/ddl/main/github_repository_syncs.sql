@@ -35,3 +35,4 @@ CREATE UNIQUE INDEX github_repository_syncs_project_id_repository_id_0f3705e6_un
 
 CREATE UNIQUE INDEX github_repository_syncs_repository_id_key ON github_repository_syncs USING btree (repository_id);
 
+-- （github_repository_syncs 暂无数据，无示例 INSERT）

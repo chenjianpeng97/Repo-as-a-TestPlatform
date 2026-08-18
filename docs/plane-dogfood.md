@@ -44,7 +44,7 @@
 | schema | `public` |
 | overlay | `config/env_overlay.py` 把 `main` 声明为 `type: postgres` |
 
-拉全库 DDL：`/dump-ddl` 或 `python apps/dump_ddl.py --all --datasource main --no-sample`。
+拉全库 DDL：`/dump-ddl` 或 `python apps/dump_ddl.py --all --datasource main`（默认带注释样例 INSERT；密钥列由工具剔除）。
 
 **不要**把 `env_local.py` 或 `.env` 提交到任何分支。
 

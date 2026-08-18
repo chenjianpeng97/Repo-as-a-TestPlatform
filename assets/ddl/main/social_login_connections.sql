@@ -22,3 +22,4 @@ CREATE INDEX social_login_connection_updated_by_id_c13deb42 ON social_login_conn
 
 CREATE INDEX social_login_connection_user_id_0e26c0c5 ON social_login_connections USING btree (user_id);
 
+-- （social_login_connections 暂无数据，无示例 INSERT）

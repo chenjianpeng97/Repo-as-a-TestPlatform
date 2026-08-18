@@ -54,3 +54,5 @@ CREATE INDEX file_assets_user_id_ce1818dc ON file_assets USING btree (user_id);
 
 CREATE INDEX file_assets_workspace_id_fa50b9c5 ON file_assets USING btree (workspace_id);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "file_assets" ("created_at", "updated_at", "id", "attributes", "asset", "created_by_id", "updated_by_id", "workspace_id", "is_deleted", "deleted_at", "is_archived", "comment_id", "entity_type", "external_id", "external_source", "is_uploaded", "issue_id", "page_id", "project_id", "size", "storage_metadata", "user_id", "draft_issue_id", "entity_identifier") VALUES ('2026-08-18 06:25:14.279558+00:00', '2026-08-18 06:25:14.279586+00:00', 'f12e2f02-868d-4443-979b-849629e0c655', '{''name'': ''image_14.jpg'', ''size'': 186911, ''type'': ''image/jpeg''}', '82345500-e469-419d-843d-92902ffac9db/be0738a5a5514f229ff387bc746eafb0-image_14.jpg', 'bb96a7c2-ef4b-466f-a2af-92315b642787', NULL, '82345500-e469-419d-843d-92902ffac9db', FALSE, NULL, FALSE, NULL, 'PROJECT_COVER', NULL, NULL, TRUE, NULL, NULL, NULL, 186911.0, '{}', NULL, NULL, NULL);

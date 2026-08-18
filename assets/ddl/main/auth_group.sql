@@ -10,3 +10,4 @@ CREATE INDEX auth_group_name_a6ea08ec_like ON auth_group USING btree (name varch
 
 CREATE UNIQUE INDEX auth_group_name_key ON auth_group USING btree (name);
 
+-- （auth_group 暂无数据，无示例 INSERT）

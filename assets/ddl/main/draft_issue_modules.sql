@@ -30,3 +30,4 @@ CREATE UNIQUE INDEX draft_issue_modules_draft_issue_id_module_id_634e1f1a_uniq O
 
 CREATE UNIQUE INDEX module_draft_issue_unique_issue_module_when_deleted_at_null ON draft_issue_modules USING btree (draft_issue_id, module_id) WHERE (deleted_at IS NULL);
 
+-- （draft_issue_modules 暂无数据，无示例 INSERT）

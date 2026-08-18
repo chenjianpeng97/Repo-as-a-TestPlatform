@@ -19,7 +19,7 @@
 
 | datasource | 表文件数 | 路径 | 备注 |
 | --- | --- | --- | --- |
-| `main` | 118 | `assets/ddl/main/` | Plane 本地 PostgreSQL `public`（`dump_ddl --all --no-sample`，2026-08-18） |
+| `main` | 118 | `assets/ddl/main/` | Plane 本地 PostgreSQL `public`（`dump_ddl --all`，注释样例 INSERT；密钥列已剔除，2026-08-18） |
 
 ### 1.2 业务 SQL 副本（assets/sql/）
 

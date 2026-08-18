@@ -21,3 +21,4 @@ CREATE INDEX analytic_views_updated_by_id_b6d827e1 ON analytic_views USING btree
 
 CREATE INDEX analytic_views_workspace_id_ca6e5c0b ON analytic_views USING btree (workspace_id);
 
+-- （analytic_views 暂无数据，无示例 INSERT）

@@ -26,3 +26,4 @@ CREATE INDEX module_links_updated_by_id_4da419e7 ON module_links USING btree (up
 
 CREATE INDEX module_links_workspace_id_0521c11c ON module_links USING btree (workspace_id);
 
+-- （module_links 暂无数据，无示例 INSERT）

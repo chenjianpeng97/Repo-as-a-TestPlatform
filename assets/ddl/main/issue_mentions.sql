@@ -30,3 +30,4 @@ CREATE UNIQUE INDEX issue_mention_unique_issue_mention_when_deleted_at_null ON i
 
 CREATE UNIQUE INDEX issue_mentions_issue_id_mention_id_deleted_at_f6ecd6ed_uniq ON issue_mentions USING btree (issue_id, mention_id, deleted_at);
 
+-- （issue_mentions 暂无数据，无示例 INSERT）

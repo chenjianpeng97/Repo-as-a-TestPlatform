@@ -34,3 +34,4 @@ CREATE UNIQUE INDEX project_deploy_boards_anchor_key ON project_deploy_boards US
 
 CREATE UNIQUE INDEX project_deploy_boards_project_id_anchor_893d365a_uniq ON project_deploy_boards USING btree (project_id, anchor);
 
+-- （project_deploy_boards 暂无数据，无示例 INSERT）

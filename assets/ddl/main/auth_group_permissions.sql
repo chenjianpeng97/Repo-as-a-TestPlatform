@@ -13,3 +13,4 @@ CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON auth_group_permiss
 
 CREATE UNIQUE INDEX auth_group_permissions_group_id_permission_id_0cd325b0_uniq ON auth_group_permissions USING btree (group_id, permission_id);
 
+-- （auth_group_permissions 暂无数据，无示例 INSERT）

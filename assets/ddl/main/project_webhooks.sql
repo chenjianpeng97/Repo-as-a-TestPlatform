@@ -27,3 +27,4 @@ CREATE UNIQUE INDEX project_webhook_unique_project_webhook_when_deleted_at_null 
 
 CREATE UNIQUE INDEX project_webhooks_project_id_webhook_id_deleted_at_dcfdb35d_uniq ON project_webhooks USING btree (project_id, webhook_id, deleted_at);
 
+-- （project_webhooks 暂无数据，无示例 INSERT）

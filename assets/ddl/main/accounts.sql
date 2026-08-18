@@ -21,3 +21,4 @@ CREATE INDEX accounts_user_id_7f1e1f1e ON accounts USING btree (user_id);
 
 CREATE UNIQUE INDEX accounts_provider_provider_account_id_daac1f10_uniq ON accounts USING btree (provider, provider_account_id);
 
+-- （accounts 暂无数据，无示例 INSERT）

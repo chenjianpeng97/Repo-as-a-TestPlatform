@@ -29,3 +29,4 @@ CREATE INDEX page_versions_updated_by_id_72d5e579 ON page_versions USING btree (
 
 CREATE INDEX page_versions_workspace_id_8330a200 ON page_versions USING btree (workspace_id);
 
+-- （page_versions 暂无数据，无示例 INSERT）

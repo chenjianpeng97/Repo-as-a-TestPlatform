@@ -29,3 +29,5 @@ CREATE UNIQUE INDEX project_identifiers_name_workspace_id_deleted_at_d332e701_un
 
 CREATE UNIQUE INDEX unique_name_workspace_when_deleted_at_null ON project_identifiers USING btree (name, workspace_id) WHERE (deleted_at IS NULL);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "project_identifiers" ("id", "created_at", "updated_at", "name", "created_by_id", "project_id", "updated_by_id", "workspace_id", "deleted_at") VALUES (3, '2026-08-18 06:25:25.064061+00:00', '2026-08-18 06:25:25.064089+00:00', 'PLANE', NULL, 'c274e293-9c4a-4b37-94d8-51afccc1e1d5', NULL, '82345500-e469-419d-843d-92902ffac9db', NULL);

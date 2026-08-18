@@ -32,3 +32,4 @@ CREATE INDEX importers_updated_by_id_3915139e ON importers USING btree (updated_
 
 CREATE INDEX importers_workspace_id_795b8985 ON importers USING btree (workspace_id);
 
+-- （importers 暂无数据，无示例 INSERT）

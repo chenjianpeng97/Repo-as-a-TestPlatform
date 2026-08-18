@@ -13,3 +13,4 @@ CREATE INDEX user_groups_user_id_abaea130 ON users_groups USING btree (user_id);
 
 CREATE UNIQUE INDEX user_groups_user_id_group_id_40beef00_uniq ON users_groups USING btree (user_id, group_id);
 
+-- （users_groups 暂无数据，无示例 INSERT）

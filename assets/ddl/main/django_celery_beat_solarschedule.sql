@@ -10,3 +10,4 @@ create table django_celery_beat_solarschedule
 
 CREATE UNIQUE INDEX django_celery_beat_solar_event_latitude_longitude_ba64999a_uniq ON django_celery_beat_solarschedule USING btree (event, latitude, longitude);
 
+-- （django_celery_beat_solarschedule 暂无数据，无示例 INSERT）

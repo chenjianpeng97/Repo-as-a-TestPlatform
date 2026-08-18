@@ -51,3 +51,4 @@ CREATE INDEX issue_versions_updated_by_id_dcae6dd2 ON issue_versions USING btree
 
 CREATE INDEX issue_versions_workspace_id_b8c48b7c ON issue_versions USING btree (workspace_id);
 
+-- （issue_versions 暂无数据，无示例 INSERT）

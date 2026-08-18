@@ -27,3 +27,5 @@ CREATE UNIQUE INDEX workspace_user_preferenc_workspace_id_user_id_key_79341493_u
 
 CREATE UNIQUE INDEX workspace_user_preferences_unique_workspace_user_key_when_delet ON workspace_user_preferences USING btree (workspace_id, user_id, key) WHERE (deleted_at IS NULL);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "workspace_user_preferences" ("created_at", "updated_at", "deleted_at", "id", "key", "is_pinned", "sort_order", "created_by_id", "updated_by_id", "user_id", "workspace_id") VALUES ('2026-08-03 12:45:43.675700+00:00', '2026-08-03 12:45:43.675701+00:00', NULL, 'fbcebac0-1201-4480-a570-5f59d8961334', 'stickies', TRUE, 125535.0, NULL, NULL, 'bb96a7c2-ef4b-466f-a2af-92315b642787', '82345500-e469-419d-843d-92902ffac9db');

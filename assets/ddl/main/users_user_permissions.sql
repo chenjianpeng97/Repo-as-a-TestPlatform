@@ -13,3 +13,4 @@ CREATE INDEX user_user_permissions_user_id_ed4a47ea ON users_user_permissions US
 
 CREATE UNIQUE INDEX user_user_permissions_user_id_permission_id_7dc6e2e0_uniq ON users_user_permissions USING btree (user_id, permission_id);
 
+-- （users_user_permissions 暂无数据，无示例 INSERT）

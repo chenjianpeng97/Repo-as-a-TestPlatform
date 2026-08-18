@@ -28,3 +28,5 @@ CREATE UNIQUE INDEX workspace_home_preferenc_workspace_id_user_id_key_75ea36d3_u
 
 CREATE UNIQUE INDEX workspace_user_home_preferences_unique_workspace_user_key_when_ ON workspace_home_preferences USING btree (workspace_id, user_id, key) WHERE (deleted_at IS NULL);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "workspace_home_preferences" ("created_at", "updated_at", "deleted_at", "id", "key", "is_enabled", "config", "created_by_id", "updated_by_id", "user_id", "workspace_id", "sort_order") VALUES ('2026-08-03 12:45:43.750310+00:00', '2026-08-03 12:45:43.750349+00:00', NULL, 'd93197c2-4c8c-4e82-938c-773873ca7c5f', 'quick_links', TRUE, '{}', NULL, NULL, 'bb96a7c2-ef4b-466f-a2af-92315b642787', '82345500-e469-419d-843d-92902ffac9db', 999.0);

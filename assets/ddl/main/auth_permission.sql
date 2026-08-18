@@ -12,3 +12,5 @@ CREATE INDEX auth_permission_content_type_id_2f476e4b ON auth_permission USING b
 
 CREATE UNIQUE INDEX auth_permission_content_type_id_codename_01ab375a_uniq ON auth_permission USING btree (content_type_id, codename);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "auth_permission" ("id", "name", "content_type_id", "codename") VALUES (456, 'Can view Testhub session', 114, 'view_testhubsession');

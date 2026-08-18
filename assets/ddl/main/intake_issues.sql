@@ -36,3 +36,4 @@ CREATE INDEX inbox_issues_updated_by_id_d1b2b70f ON intake_issues USING btree (u
 
 CREATE INDEX inbox_issues_workspace_id_4a61a7bd ON intake_issues USING btree (workspace_id);
 
+-- （intake_issues 暂无数据，无示例 INSERT）

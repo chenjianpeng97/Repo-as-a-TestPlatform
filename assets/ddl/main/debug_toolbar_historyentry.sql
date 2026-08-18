@@ -7,3 +7,4 @@ create table debug_toolbar_historyentry
     created_at timestamptz not null
 );
 
+-- （debug_toolbar_historyentry 暂无数据，无示例 INSERT）

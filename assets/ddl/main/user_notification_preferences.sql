@@ -28,3 +28,5 @@ CREATE INDEX user_notification_preferences_user_id_9dccc056 ON user_notification
 
 CREATE INDEX user_notification_preferences_workspace_id_a2321c58 ON user_notification_preferences USING btree (workspace_id);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "user_notification_preferences" ("created_at", "updated_at", "id", "property_change", "state_change", "comment", "mention", "issue_completed", "created_by_id", "project_id", "updated_by_id", "user_id", "workspace_id", "deleted_at") VALUES ('2026-07-10 12:35:44.200544+00:00', '2026-07-10 12:35:44.200554+00:00', 'c63defe5-6c2d-4ac4-9ab6-76ed926270c3', TRUE, TRUE, TRUE, TRUE, TRUE, NULL, NULL, NULL, '9d1f264d-7dee-48c5-ab98-087db907b8a1', NULL, NULL);

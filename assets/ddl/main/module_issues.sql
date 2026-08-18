@@ -30,3 +30,5 @@ CREATE UNIQUE INDEX module_issue_unique_issue_module_when_deleted_at_null ON mod
 
 CREATE UNIQUE INDEX module_issues_issue_id_module_id_deleted_at_f944f7c9_uniq ON module_issues USING btree (issue_id, module_id, deleted_at);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "module_issues" ("created_at", "updated_at", "id", "created_by_id", "issue_id", "module_id", "project_id", "updated_by_id", "workspace_id", "deleted_at") VALUES ('2026-07-10 12:37:56.404883+00:00', '2026-07-10 12:37:56.404888+00:00', 'fdc52a3d-4a65-4104-abaa-c6c559e83216', NULL, '34b8be98-89c5-4bbf-ac85-1a1e7445050c', '4f9a5eb0-949c-47e9-9a97-738eba209bd2', 'dc06dab7-13f5-40de-9d63-79d71315d44b', NULL, '6f2f3ff8-62de-4127-978b-54991c166df3', NULL);

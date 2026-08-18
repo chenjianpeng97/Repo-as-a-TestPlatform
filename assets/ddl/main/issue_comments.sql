@@ -40,3 +40,4 @@ CREATE INDEX issue_comments_parent_id_d8db10b1 ON issue_comments USING btree (pa
 
 CREATE UNIQUE INDEX issue_comments_description_id_key ON issue_comments USING btree (description_id);
 
+-- （issue_comments 暂无数据，无示例 INSERT）

@@ -30,3 +30,5 @@ CREATE UNIQUE INDEX cycle_issue_when_deleted_at_null ON cycle_issues USING btree
 
 CREATE UNIQUE INDEX cycle_issues_issue_id_cycle_id_deleted_at_93e8fecd_uniq ON cycle_issues USING btree (issue_id, cycle_id, deleted_at);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "cycle_issues" ("created_at", "updated_at", "id", "created_by_id", "cycle_id", "issue_id", "project_id", "updated_by_id", "workspace_id", "deleted_at") VALUES ('2026-07-10 12:37:56.446713+00:00', '2026-07-10 12:37:56.446731+00:00', 'c93ab442-3ff6-495d-88b6-e7b635d260b8', NULL, '2b651f63-062f-4632-83cf-267dee34a667', '3505a9d6-ff51-43bb-b419-82e9bfb13bd4', 'dc06dab7-13f5-40de-9d63-79d71315d44b', NULL, '6f2f3ff8-62de-4127-978b-54991c166df3', NULL);

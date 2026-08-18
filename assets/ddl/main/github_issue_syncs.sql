@@ -31,3 +31,4 @@ CREATE INDEX github_issue_syncs_workspace_id_eae020ad ON github_issue_syncs USIN
 
 CREATE UNIQUE INDEX github_issue_syncs_repository_sync_id_issue_id_4b34427e_uniq ON github_issue_syncs USING btree (repository_sync_id, issue_id);
 
+-- （github_issue_syncs 暂无数据，无示例 INSERT）

@@ -20,3 +20,4 @@ CREATE INDEX changelogs_created_by_id_16dd944a ON changelogs USING btree (create
 
 CREATE INDEX changelogs_updated_by_id_e0989861 ON changelogs USING btree (updated_by_id);
 
+-- （changelogs 暂无数据，无示例 INSERT）

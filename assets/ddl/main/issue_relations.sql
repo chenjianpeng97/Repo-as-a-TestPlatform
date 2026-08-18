@@ -31,3 +31,4 @@ CREATE UNIQUE INDEX issue_relation_unique_issue_related_issue_when_deleted_at_nu
 
 CREATE UNIQUE INDEX issue_relations_issue_id_related_issue_i_cc724584_uniq ON issue_relations USING btree (issue_id, related_issue_id, deleted_at);
 
+-- （issue_relations 暂无数据，无示例 INSERT）

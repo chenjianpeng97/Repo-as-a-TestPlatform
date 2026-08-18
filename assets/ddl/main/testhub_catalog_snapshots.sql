@@ -24,3 +24,4 @@ CREATE INDEX testhub_catalog_snapshots_updated_by_id_12bfaf8d ON testhub_catalog
 
 CREATE INDEX testhub_catalog_snapshots_workspace_id_be1e5cba ON testhub_catalog_snapshots USING btree (workspace_id);
 
+-- （testhub_catalog_snapshots 最新一行过长，已省略示例 INSERT；常见于 stdout / jsonb。需要样例时对该表单独查询）

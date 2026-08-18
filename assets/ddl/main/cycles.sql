@@ -36,3 +36,5 @@ CREATE INDEX cycle_updated_by_id_93baee43 ON cycles USING btree (updated_by_id);
 
 CREATE INDEX cycle_workspace_id_a199e8e1 ON cycles USING btree (workspace_id);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "cycles" ("created_at", "updated_at", "id", "name", "description", "start_date", "end_date", "created_by_id", "owned_by_id", "project_id", "updated_by_id", "workspace_id", "view_props", "sort_order", "external_id", "external_source", "progress_snapshot", "archived_at", "logo_props", "deleted_at", "timezone", "version") VALUES ('2026-08-03 12:45:41.785112+00:00', '2026-08-03 12:45:41.785126+00:00', 'e87d4ff3-a5f7-469a-bb7f-fe741e87214d', 'Cycle 1: Getting Started with Plane', '', '2026-08-03 12:45:41.780922+00:00', '2026-08-17 12:45:41.780922+00:00', '284b6766-d3bb-4a5d-a14f-de5d364cc3c4', '284b6766-d3bb-4a5d-a14f-de5d364cc3c4', '20f8ab45-bce1-44c8-854c-78972f51ed62', NULL, '82345500-e469-419d-843d-92902ffac9db', '{}', 1.0, NULL, NULL, '{}', NULL, '{}', NULL, 'UTC', 1);

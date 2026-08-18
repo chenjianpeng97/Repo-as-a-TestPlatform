@@ -31,3 +31,4 @@ CREATE UNIQUE INDEX issue_reaction_unique_issue_actor_reaction_when_deleted_at_n
 
 CREATE UNIQUE INDEX issue_reactions_issue_id_actor_id_reacti_7da73ced_uniq ON issue_reactions USING btree (issue_id, actor_id, reaction, deleted_at);
 
+-- （issue_reactions 暂无数据，无示例 INSERT）

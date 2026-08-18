@@ -40,3 +40,5 @@ CREATE UNIQUE INDEX module_unique_name_project_when_deleted_at_null ON modules U
 
 CREATE UNIQUE INDEX modules_name_project_id_deleted_at_328e2346_uniq ON modules USING btree (name, project_id, deleted_at);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "modules" ("created_at", "updated_at", "id", "name", "description", "description_text", "description_html", "start_date", "target_date", "status", "created_by_id", "lead_id", "project_id", "updated_by_id", "workspace_id", "view_props", "sort_order", "external_id", "external_source", "archived_at", "logo_props", "deleted_at") VALUES ('2026-08-03 12:45:41.807292+00:00', '2026-08-03 12:45:41.807302+00:00', 'eb61034e-cb9e-4182-95a1-a19f3b41f6db', 'Onboarding Flow (Feature)', 'Everything about getting started - creating a project, inviting teammates.', NULL, NULL, '2026-08-05', '2026-08-19', 'backlog', '284b6766-d3bb-4a5d-a14f-de5d364cc3c4', NULL, '20f8ab45-bce1-44c8-854c-78972f51ed62', NULL, '82345500-e469-419d-843d-92902ffac9db', '{}', -9999.0, NULL, NULL, NULL, '{}', NULL);

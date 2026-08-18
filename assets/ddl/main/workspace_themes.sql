@@ -26,3 +26,4 @@ CREATE UNIQUE INDEX workspace_theme_unique_workspace_name_when_deleted_at_null O
 
 CREATE UNIQUE INDEX workspace_themes_workspace_id_name_deleted_at_b536ffd3_uniq ON workspace_themes USING btree (workspace_id, name, deleted_at);
 
+-- （workspace_themes 暂无数据，无示例 INSERT）

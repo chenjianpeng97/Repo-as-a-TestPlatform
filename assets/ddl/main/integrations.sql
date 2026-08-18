@@ -29,3 +29,4 @@ CREATE INDEX integrations_updated_by_id_d6d00d15 ON integrations USING btree (up
 
 CREATE UNIQUE INDEX integrations_provider_key ON integrations USING btree (provider);
 
+-- （integrations 暂无数据，无示例 INSERT）

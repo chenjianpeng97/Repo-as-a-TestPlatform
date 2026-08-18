@@ -25,3 +25,4 @@ CREATE INDEX github_repositories_updated_by_id_8aa4d772 ON github_repositories U
 
 CREATE INDEX github_repositories_workspace_id_c4de7326 ON github_repositories USING btree (workspace_id);
 
+-- （github_repositories 暂无数据，无示例 INSERT）

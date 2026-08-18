@@ -32,3 +32,4 @@ CREATE INDEX slack_project_syncs_workspace_integration_id_d89c9b40 ON slack_proj
 
 CREATE UNIQUE INDEX slack_project_syncs_team_id_project_id_50a144a7_uniq ON slack_project_syncs USING btree (team_id, project_id);
 
+-- （slack_project_syncs 暂无数据，无示例 INSERT）

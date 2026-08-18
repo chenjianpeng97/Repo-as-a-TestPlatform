@@ -27,3 +27,4 @@ CREATE UNIQUE INDEX workspace_member_invite_unique_email_workspace_when_deleted_
 
 CREATE UNIQUE INDEX workspace_member_invites_email_workspace_id_delet_2f03573e_uniq ON workspace_member_invites USING btree (email, workspace_id, deleted_at);
 
+-- （workspace_member_invites 暂无数据，无示例 INSERT）

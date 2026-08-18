@@ -39,3 +39,5 @@ CREATE INDEX django_celery_beat_periodictask_solar_id_a87ce72c ON django_celery_
 
 CREATE UNIQUE INDEX django_celery_beat_periodictask_name_key ON django_celery_beat_periodictask USING btree (name);
 
+-- 最新一条数据示例（latest id），已排除生成列，仅供数据构造参考
+-- INSERT INTO "django_celery_beat_periodictask" ("id", "name", "task", "args", "kwargs", "queue", "exchange", "routing_key", "expires", "enabled", "last_run_at", "total_run_count", "date_changed", "description", "crontab_id", "interval_id", "solar_id", "one_off", "start_time", "priority", "headers", "clocked_id", "expire_seconds") VALUES (13, 'check-every-day-to-delete-exporter-history', 'plane.bgtasks.exporter_expired_task.delete_old_s3_link', '[]', '{}', NULL, NULL, NULL, NULL, TRUE, '2026-08-18 03:45:00.004584+00:00', 13, '2026-08-18 03:45:10.053596+00:00', '', 12, NULL, NULL, FALSE, NULL, NULL, '{}', NULL, NULL);
