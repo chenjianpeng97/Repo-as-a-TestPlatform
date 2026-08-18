@@ -1,23 +1,23 @@
 ---
-description: Require all DB access to go through packages.db.DbClient with named datasources (MySQL / SQL Server coexist); forbid direct pymssql/pymysql, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
+description: Require all DB access to go through packages.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL coexist); forbid direct pymssql/pymysql/psycopg, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
 globs: **/*.py
 alwaysApply: false
-version: 1.0.0
+version: 1.1.0
 ---
 
 # packages.db — mandatory multi-datasource surface
 
 Every database interaction in this repo must go through
-`packages.db.DbClient`. Direct `pymssql.connect(...)` / `pymysql.connect(...)`,
-ad-hoc `sqlalchemy.create_engine(...)` calls outside `packages/db`, and
-hardcoded DSNs are forbidden.
+`packages.db.DbClient`. Direct `pymssql.connect(...)` / `pymysql.connect(...)` /
+`psycopg.connect(...)`, ad-hoc `sqlalchemy.create_engine(...)` calls outside
+`packages/db`, and hardcoded DSNs are forbidden.
 
-The framework supports **MySQL and SQL Server side by side**. Named
+The framework supports **MySQL, SQL Server, and PostgreSQL side by side**. Named
 datasources live in `config/env.py` -> `DATABASES` (business alias ->
-connection config incl. `type`); e.g. `"main"` = primary store (MySQL),
-`"sqlserver"` = secondary store (SQL Server). Internally `DbClient` rides a
-pooled SQLAlchemy engine, but that is an implementation detail — callers
-never touch engines or sessions.
+connection config incl. `type`); e.g. `"main"` = primary store, `"sqlserver"` /
+`"postgres"` = additional stores. Internally `DbClient` rides a pooled
+SQLAlchemy engine, but that is an implementation detail — callers never touch
+engines or sessions.
 
 (`MySQLClient` is a deprecated alias of `DbClient`; new code must import
 `DbClient`.)
@@ -69,15 +69,18 @@ class SeedOnSqlServer(ActionWord):
   (SQL injection + quoting bugs). Identifier quoting for whitelist
   table/column constants uses
   `packages.action_words._internal.db.quote_ident(name, dialect)`
-  (`[name]` for mssql, `` `name` `` for mysql); `bulk_insert` picks the
-  dialect from `client.dialect` automatically.
+  (`[name]` for mssql, `` `name` `` for mysql, `"name"` for postgresql);
+  `bulk_insert` picks the dialect from `client.dialect` automatically.
 - **Write SQL in the dialect of the target datasource** (check
-  `db.dialect`, `"mssql"` or `"mysql"`):
-  - `main` (MySQL): `LIMIT n`, `NOW()`, `INSERT ... ON DUPLICATE KEY`.
-    Avoid `[ident]`, `TOP`, `GETDATE()`, `MERGE`.
-  - `sqlserver` (T-SQL): `SELECT TOP n ...`, `GETDATE()` / `SYSUTCDATETIME()`,
-    `MERGE` for upsert. Avoid backticks, `LIMIT`, `INSERT IGNORE`,
-    `ON DUPLICATE KEY`, `IFNULL`, `NOW()`.
+  `db.dialect`, `"mssql"` / `"mysql"` / `"postgresql"`):
+  - MySQL (`type: mysql`): `LIMIT n`, `NOW()`, `INSERT ... ON DUPLICATE KEY`.
+    Avoid `[ident]`, `TOP`, `GETDATE()`, `MERGE`, double-quoted identifiers.
+  - SQL Server (`type: sqlserver`): `SELECT TOP n ...`, `GETDATE()` /
+    `SYSUTCDATETIME()`, `MERGE` for upsert. Avoid backticks, `LIMIT`,
+    `INSERT IGNORE`, `ON DUPLICATE KEY`, `IFNULL`, `NOW()`.
+  - PostgreSQL (`type: postgres`): `LIMIT n`, `NOW()` / `CURRENT_TIMESTAMP`,
+    `INSERT ... ON CONFLICT`. Avoid `[ident]`, backticks, `TOP`,
+    `ON DUPLICATE KEY`. Default application schema is `public`.
 - Business SQL lives in a domain service under `packages/<domain>/` or an
   action word. Do **not** put SQL or `DbClient` calls inside
   `tests/features/*_steps/*.py`, `tests/features/*_environment.py`, or

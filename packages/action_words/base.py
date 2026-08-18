@@ -73,8 +73,8 @@ class ActionWord(ABC):
     #: 依赖的环境资源："db" / "api"；ActionContext 按需惰性初始化
     requires: ClassVar[frozenset[str]] = frozenset()
     #: 目标数据源别名（config/env.py 的 ``DATABASES`` 键）。框架支持
-    #: MySQL / SQL Server 共存，DB 类 word 在此显式声明去影响哪个库
-    #: （如主业务在 "main"/MySQL、第二库在 "sqlserver"），
+    #: MySQL / SQL Server / PostgreSQL 共存，DB 类 word 在此显式声明去影响哪个库
+    #: （如主业务在 "main"、第二库在 "sqlserver" / "postgres"），
     #: 数据库具体类型只写在配置里。
     datasource: ClassVar[str] = DEFAULT_ALIAS
     #: 可直接运行的入参样例（必须能通过 Params 校验）

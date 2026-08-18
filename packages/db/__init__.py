@@ -1,6 +1,6 @@
 """Generic multi-dialect DB utilities used by higher-level service layers.
 
-The framework supports MySQL and SQL Server side by side; named
+The framework supports MySQL, SQL Server, and PostgreSQL side by side; named
 datasources are declared in ``config.env.DATABASES`` (business alias ->
 connection config incl. ``type``). Use ``DbClient.for_datasource(alias)`` to
 target a specific one; ``DbClient.default()`` targets the ``"main"`` alias.

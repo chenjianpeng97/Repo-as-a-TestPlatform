@@ -1,12 +1,12 @@
-"""DB 造数共用原语 — 参数化批量 INSERT（多方言：SQL Server / MySQL）。
+"""DB 造数共用原语 — 参数化批量 INSERT（多方言：SQL Server / MySQL / PostgreSQL）。
 
 注入安全说明：表名与列名是各 action word 模块内代码定义的常量（固定白名单），
 从不接受外部输入；只有**值**经 ``%s`` 占位符传递，因此拼接列名/占位符
 不构成注入面。
 
-方言说明：pymssql 与 pymysql 参数风格同为 ``%s``，两库仅标识符引用不同
-（``[name]`` vs `` `name` ``）；``bulk_insert`` 从 ``client.dialect`` 自动
-选择，调用方无感。
+方言说明：pymssql / pymysql / psycopg 参数风格同为 ``%s``，各库仅标识符引用
+不同（``[name]`` / `` `name` `` / ``"name"``）；``bulk_insert`` 从
+``client.dialect`` 自动选择，调用方无感。
 """
 from __future__ import annotations
 
@@ -19,6 +19,8 @@ def quote_ident(name: str, dialect: str = "mysql") -> str:
     """Quote an identifier for the given SQL dialect."""
     if dialect == "mysql":
         return f"`{name}`"
+    if dialect == "postgresql":
+        return '"' + name.replace('"', '""') + '"'
     return f"[{name}]"
 
 

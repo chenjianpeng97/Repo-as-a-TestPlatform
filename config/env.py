@@ -32,6 +32,15 @@ DATABASES: dict[str, dict[str, Any]] = {
         "password": "CHANGE_ME",
         "database": "example",
     },
+    # 第三数据源占位 — PostgreSQL（Plane 等；需要时填入真实连接）
+    "postgres": {
+        "type": "postgres",
+        "host": "127.0.0.1",
+        "port": 5432,
+        "user": "postgres",
+        "password": "CHANGE_ME",
+        "database": "example",
+    },
 }
 
 # API 执行的网关地址（仅 host，不带路径！）。

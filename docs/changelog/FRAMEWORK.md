@@ -36,6 +36,26 @@
 
 ---
 
+## 2026-08-18 — PostgreSQL 数据源 + dump_ddl pg_catalog + /dump-ddl skill
+
+- **commit**: `TBD`
+- **目的**: 让平台能对接 Plane 等 PostgreSQL 库：`packages.db` 增加 `type: postgres`（psycopg3）；`dump_ddl` 从 `pg_catalog` 导出 DDL；新增 on-demand skill `/dump-ddl` 固化「配 env → 拉表结构 → 更新索引」流程。
+- **路径**:
+  - `packages/db/**`（`connection` / `client` / `__init__`）
+  - `packages/action_words/_internal/db.py` / `base.py`
+  - `packages/tests/test_db_multidatasource.py`
+  - `apps/dump_ddl.py` / `apps/README.md`
+  - `config/env.py` / `config/env_local.py.example`
+  - `pyproject.toml`（`psycopg[binary]>=3.2`，version 2.1.0）
+  - `.cursor/rules/packages-db.mdc`
+  - `.cursor/skills/dump-ddl/SKILL.md`
+  - `.cursor/skills/create-action-word/SKILL.md`
+  - `docs/spec/action-words-syntax.md` / `docs/spec/apps-authoring-syntax.md`
+  - `INDEX.md`
+  - `docs/changelog/FRAMEWORK.md`（本条目）
+- **不在同步范围**: 业务 `assets/ddl` 内容、`config/env_local.py`、`config/env_overlay.py`（试验田覆盖）
+- **验证**: `uv run pytest packages/tests/test_db_multidatasource.py -q`；有 Plane 本地库时 `python apps/dump_ddl.py --all --datasource main`
+
 ## 2026-08-14 — 多数据源 SQLAlchemy（packages.db + dump_ddl + action word datasource）
 
 - **commit**: `642abf7`

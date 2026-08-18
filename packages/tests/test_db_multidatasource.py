@@ -1,4 +1,4 @@
-"""多数据源（MySQL / SQL Server 共存）配置解析与方言分支的单元测试。
+"""多数据源（MySQL / SQL Server / PostgreSQL 共存）配置解析与方言分支的单元测试。
 
 不依赖真实数据库连接：只覆盖 URL 构造、别名解析、环境变量覆盖、
 标识符方言引用与 ActionWord 的 datasource 声明。
@@ -29,6 +29,14 @@ _FAKE_DATABASES = {
         "password": "p2",
         "database": "ssdb",
     },
+    "postgres": {
+        "type": "postgres",
+        "host": "pg.example.com",
+        "port": 5432,
+        "user": "u3",
+        "password": "p3",
+        "database": "pgdb",
+    },
 }
 
 
@@ -53,6 +61,12 @@ class TestBuildUrl:
             host="h", port=3306, user="u", password="p", database="d", db_type="mysql"
         )
         assert build_url(s) == "mysql+pymysql://u:p@h:3306/d?charset=utf8mb4"
+
+    def test_postgres_url(self):
+        s = ConnectionSettings(
+            host="h", port=5432, user="u", password="p", database="d", db_type="postgres"
+        )
+        assert build_url(s) == "postgresql+psycopg://u:p@h:5432/d"
 
     def test_credentials_are_url_quoted(self):
         s = ConnectionSettings(
@@ -82,6 +96,12 @@ class TestDialect:
             host="h", port=1, user="u", password="p", database="d", db_type="mysql"
         )
         assert s.dialect == "mysql"
+
+    def test_postgres_maps_to_postgresql(self):
+        s = ConnectionSettings(
+            host="h", port=1, user="u", password="p", database="d", db_type="postgres"
+        )
+        assert s.dialect == "postgresql"
 
     def test_unknown_type_raises(self):
         s = ConnectionSettings(
@@ -137,6 +157,10 @@ class TestQuoteDialect:
     def test_quote_ident_mssql(self):
         assert quote_ident("col", "mssql") == "[col]"
 
+    def test_quote_ident_postgresql(self):
+        assert quote_ident("col", "postgresql") == '"col"'
+        assert quote_ident('a"b', "postgresql") == '"a""b"'
+
     def test_insert_sql_mysql(self):
         assert insert_sql("t", ["a", "b"]) == "INSERT INTO `t` (`a`, `b`) VALUES (%s, %s)"
 
@@ -144,6 +168,12 @@ class TestQuoteDialect:
         assert (
             insert_sql("t", ["a", "b"], "mssql")
             == "INSERT INTO [t] ([a], [b]) VALUES (%s, %s)"
+        )
+
+    def test_insert_sql_postgresql(self):
+        assert (
+            insert_sql("t", ["a", "b"], "postgresql")
+            == 'INSERT INTO "t" ("a", "b") VALUES (%s, %s)'
         )
 
 
