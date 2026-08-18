@@ -38,7 +38,7 @@
 
 ## 2026-08-18 — PostgreSQL 数据源 + dump_ddl pg_catalog + /dump-ddl skill
 
-- **commit**: `TBD`
+- **commit**: `48eb39d`
 - **目的**: 让平台能对接 Plane 等 PostgreSQL 库：`packages.db` 增加 `type: postgres`（psycopg3）；`dump_ddl` 从 `pg_catalog` 导出 DDL；新增 on-demand skill `/dump-ddl` 固化「配 env → 拉表结构 → 更新索引」流程。
 - **路径**:
   - `packages/db/**`（`connection` / `client` / `__init__`）
