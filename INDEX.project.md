@@ -31,7 +31,10 @@
 
 | 路径 | 一句话用途 |
 | --- | --- |
-| _(暂无)_ | |
+| `assets/domain-notes/plane/官方开源能力.md` | Plane CE：工作项 / 周期 / 模块 / 视图 / 页面 / 分析（来源 [makeplane/plane](https://github.com/makeplane/plane)） |
+| `assets/domain-notes/plane/testcopilot-overlay.md` | tuner fork 已落地：配置绑定、Formulation、环境、TestCopilot、作业；P3/P4 暂缓 |
+| `assets/usecases/plane/官方核心路径.md` | 对应 `tests/features/plane/**` 的场景提纲 |
+| `assets/usecases/testcopilot/项目成分与绑定.md` | 对应 `tests/features/testcopilot/**` 的场景提纲 |
 
 ## 2. 组件层（业务资产）
 
@@ -48,7 +51,7 @@
 
 | 页面/组件 | 文件 | 备注 |
 | --- | --- | --- |
-| _(暂无)_ | | |
+| _(暂无)_ | | 待 Playwright MCP 对已登录会话跑通场景后再维护 |
 
 ### 2.3 Action Words
 
@@ -66,6 +69,9 @@
 
 | 类型 | 路径 | 说明 |
 | --- | --- | --- |
-| _(暂无)_ | | 业务 `.feature` / pytest 落在本分支；步骤夹具仍用平台 `tests/features/*_steps` |
+| 官方 CE | `tests/features/plane/` | 登录与工作区、工作项、周期、模块、视图、页面 |
+| TestCopilot | `tests/features/testcopilot/` | 配置与数据源、Formulation、环境、测程与目录、作业 |
+
+步骤夹具仍用平台 `tests/features/*_steps`。当前仅落地 Gherkin；UI/API 步骤、page/api objects 需 MCP 捕获后再补。
 
 变更纪律见 `.cursor/rules/index-hygiene.mdc`。
