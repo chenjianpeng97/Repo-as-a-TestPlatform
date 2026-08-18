@@ -38,7 +38,7 @@
 
 ## 2026-08-18 — dump_ddl 样例 INSERT 剔除密钥列并限制体积
 
-- **commit**: `TBD`
+- **commit**: `72e2a7d`
 - **目的**: 恢复默认「注释掉的最新一行 INSERT」，同时避免 password/token/session 与超长 stdout 进入 `assets/ddl`。
 - **路径**:
   - `apps/dump_ddl.py`
