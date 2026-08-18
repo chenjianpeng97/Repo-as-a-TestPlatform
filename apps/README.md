@@ -17,7 +17,8 @@
     - `python apps/dump_ddl.py --all --datasource sqlserver`（指定别名）
     - `python apps/dump_ddl.py --all --datasource postgres --schema public`
     - `python apps/dump_ddl.py some_table --datasource sqlserver --no-sample`
-  - Agent 入口：仓库 skill `/dump-ddl`（`.cursor/skills/dump-ddl/`）
+  - 默认在每个 `.sql` 末尾追加**注释掉的最新一行 INSERT**（造数参考）。工具会剔除
+    `password` / `token` / `session_*` 等密钥列，过长行改为省略说明。只要结构时加 `--no-sample`
 - （已迁移）data_factory 造数工厂已重构为 `packages/action_words` 下的 db_seed 类 action words，
   独立运行入口见 `python -m packages.action_words --help`
 - recorder/: 终端 HTTP(S) 代理抓包，按 api-objects-syntax 自动维护 packages/api_objects（跳过 .js/.css）

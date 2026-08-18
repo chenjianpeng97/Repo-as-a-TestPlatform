@@ -29,7 +29,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `create-action-word` | on-demand | - | 1.1.0 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
 | `create-app` | on-demand | - | 1.0.0 | Scaffolds a new standalone tool under apps/ that reuses packages (db/logging/config/api) and assets, following apps-aut… | `.cursor/skills/create-app/SKILL.md` |
-| `dump-ddl` | on-demand | - | 1.0.0 | Dumps live table DDL into assets/ddl/<datasource>/ via apps/dump_ddl.py, then updates the knowledge index from CHANGELOG | `.cursor/skills/dump-ddl/SKILL.md` |
+| `dump-ddl` | on-demand | - | 1.1.0 | Dumps live table DDL into assets/ddl/<datasource>/ via apps/dump_ddl.py, then updates the knowledge index from CHANGELOG | `.cursor/skills/dump-ddl/SKILL.md` |
 | `feature-authoring` | on-demand | - | 1.0.0 | Creates or rewrites behave Gherkin .feature files following behave-gerkin-syntax.md | `.cursor/skills/feature-authoring/SKILL.md` |
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.0.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |

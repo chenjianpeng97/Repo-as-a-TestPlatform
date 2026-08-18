@@ -21,8 +21,10 @@ containing:
      secondary indexes emitted from ``pg_get_indexdef``. Default schema is
      ``public`` (override with ``--schema``).
 2. A commented-out sample ``INSERT`` for the latest-id row, as a reference for
-   data factories. Computed / generated columns are excluded from the column
-   list.
+   data factories. Computed / generated columns and credential columns
+   (``password`` / ``token`` / ``session_*`` / ``*_token`` / …) are omitted
+   from the column list. Rows whose commented SQL would exceed a size cap
+   (large ``stdout`` / jsonb) are replaced with a skip note.
 
 All DB access goes through ``packages.db.DbClient`` (repo rule). Exact
 byte-for-byte parity with DataGrip is not guaranteed; this is a faithful
@@ -74,6 +76,84 @@ def _qb(identifier: str) -> str:
 def _qp(identifier: str) -> str:
     """Double-quote a (already validated) identifier (PostgreSQL)."""
     return '"' + identifier.replace('"', '""') + '"'
+
+
+#: column names that must never appear in commented sample INSERTs
+_SECRET_COL_EXACT = {
+    "password",
+    "passwd",
+    "secret",
+    "token",
+    "cookie",
+    "authorization",
+    "access_token",
+    "refresh_token",
+    "id_token",
+    "api_key",
+    "api_secret",
+    "session_key",
+    "session_data",
+    "session_id",
+    "token_data",
+}
+_SECRET_COL_SUFFIXES = (
+    "_password",
+    "_passwd",
+    "_secret",
+    "_token",
+    "_cookie",
+    "_api_key",
+)
+#: skip the whole sample when the commented INSERT would exceed this
+_SAMPLE_MAX_CHARS = 4000
+
+
+def _is_secret_column(name: str) -> bool:
+    n = str(name).lower()
+    if n in _SECRET_COL_EXACT:
+        return True
+    return any(n.endswith(suffix) for suffix in _SECRET_COL_SUFFIXES)
+
+
+def _secret_column_names(column_names: list[str]) -> list[str]:
+    names = [str(n) for n in column_names]
+    secret = [n for n in names if _is_secret_column(n)]
+    lower_map = {n.lower(): n for n in names}
+    # encrypted KV stores (e.g. Plane instance_configurations): never dump value
+    if "is_encrypted" in lower_map and "value" in lower_map:
+        value_name = lower_map["value"]
+        if value_name not in secret:
+            secret.append(value_name)
+    return secret
+
+
+def _commented_sample_insert(
+    *,
+    table: str,
+    order_col: str,
+    insert_cols: list[str],
+    secret_omitted: list[str],
+    rendered: str,
+    excluded_kind: str,
+) -> str:
+    """Format the commented sample block, or a skip note."""
+    if not insert_cols:
+        return f"-- （{table} 可插入列均为{excluded_kind}或密钥列，无示例 INSERT）"
+    if len(rendered) > _SAMPLE_MAX_CHARS:
+        return (
+            f"-- （{table} 最新一行过长，已省略示例 INSERT；"
+            "常见于 stdout / jsonb。需要样例时对该表单独查询）"
+        )
+    bits = [f"已排除{excluded_kind}"]
+    if secret_omitted:
+        bits.append("已排除密钥列 " + ", ".join(secret_omitted))
+    header = (
+        f"-- 最新一条数据示例（latest {order_col}），"
+        + "，".join(bits)
+        + "，仅供数据构造参考"
+    )
+    commented = "\n".join("-- " + line for line in rendered.splitlines())
+    return header + "\n" + commented
 
 
 def _lower_keys(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -407,16 +487,31 @@ def _build_sample_insert(
         for c in columns
         if "generated" in (c.get("extra") or "").lower()
     }
-    insert_cols = [c for c in column_names if c not in generated]
+    secret_omitted = _secret_column_names(column_names)
+    skip = generated | set(secret_omitted)
+    insert_cols = [c for c in column_names if c not in skip]
+    if not insert_cols:
+        return _commented_sample_insert(
+            table=table,
+            order_col=order_col,
+            insert_cols=[],
+            secret_omitted=secret_omitted,
+            rendered="",
+            excluded_kind="生成列",
+        )
     cols_joined = ", ".join(_q(c) for c in insert_cols)
     placeholders = ", ".join(["%s"] * len(insert_cols))
     insert_sql = f"INSERT INTO {_q(table)} ({cols_joined}) VALUES ({placeholders})"
     values = tuple(row[c] for c in insert_cols)
     rendered = db.mogrify(insert_sql, values) + ";"
-
-    header = f"-- 最新一条数据示例（latest {order_col}），已排除生成列，仅供数据构造参考"
-    commented = "\n".join("-- " + line for line in rendered.splitlines())
-    return header + "\n" + commented
+    return _commented_sample_insert(
+        table=table,
+        order_col=order_col,
+        insert_cols=insert_cols,
+        secret_omitted=secret_omitted,
+        rendered=rendered,
+        excluded_kind="生成列",
+    )
 
 
 def _dump_one_mysql(
@@ -700,16 +795,31 @@ def _build_sample_insert_mssql(
         return f"-- （{table} 暂无数据，无示例 INSERT）"
 
     computed = {str(c["column_name"]) for c in columns if c.get("is_computed")}
-    insert_cols = [c for c in column_names if c not in computed]
+    secret_omitted = _secret_column_names(column_names)
+    skip = computed | set(secret_omitted)
+    insert_cols = [c for c in column_names if c not in skip]
+    if not insert_cols:
+        return _commented_sample_insert(
+            table=table,
+            order_col=order_col,
+            insert_cols=[],
+            secret_omitted=secret_omitted,
+            rendered="",
+            excluded_kind="计算列",
+        )
     cols_joined = ", ".join(_qb(c) for c in insert_cols)
     placeholders = ", ".join(["%s"] * len(insert_cols))
     insert_sql = f"INSERT INTO {_qb(table)} ({cols_joined}) VALUES ({placeholders})"
     values = tuple(row[c] for c in insert_cols)
     rendered = db.mogrify(insert_sql, values) + ";"
-
-    header = f"-- 最新一条数据示例（latest {order_col}），已排除计算列，仅供数据构造参考"
-    commented = "\n".join("-- " + line for line in rendered.splitlines())
-    return header + "\n" + commented
+    return _commented_sample_insert(
+        table=table,
+        order_col=order_col,
+        insert_cols=insert_cols,
+        secret_omitted=secret_omitted,
+        rendered=rendered,
+        excluded_kind="计算列",
+    )
 
 
 def _dump_one_mssql(
@@ -1148,16 +1258,31 @@ def _build_sample_insert_postgres(
         for c in columns
         if str(c.get("generated_kind") or "")
     }
-    insert_cols = [c for c in column_names if c not in generated]
+    secret_omitted = _secret_column_names(column_names)
+    skip = generated | set(secret_omitted)
+    insert_cols = [c for c in column_names if c not in skip]
+    if not insert_cols:
+        return _commented_sample_insert(
+            table=table,
+            order_col=order_col,
+            insert_cols=[],
+            secret_omitted=secret_omitted,
+            rendered="",
+            excluded_kind="生成列",
+        )
     cols_joined = ", ".join(_qp(c) for c in insert_cols)
     placeholders = ", ".join(["%s"] * len(insert_cols))
     insert_sql = f"INSERT INTO {_qp(table)} ({cols_joined}) VALUES ({placeholders})"
     values = tuple(row[c] for c in insert_cols)
     rendered = db.mogrify(insert_sql, values) + ";"
-
-    header = f"-- 最新一条数据示例（latest {order_col}），已排除生成列，仅供数据构造参考"
-    commented = "\n".join("-- " + line for line in rendered.splitlines())
-    return header + "\n" + commented
+    return _commented_sample_insert(
+        table=table,
+        order_col=order_col,
+        insert_cols=insert_cols,
+        secret_omitted=secret_omitted,
+        rendered=rendered,
+        excluded_kind="生成列",
+    )
 
 
 def _dump_one_postgres(
