@@ -1,9 +1,9 @@
 """Named-datasource settings and SQLAlchemy engine factory.
 
-The framework supports MySQL and SQL Server side by side. Each logical
-datasource is declared in ``config.env.DATABASES`` under a business alias
-(e.g. ``"main"`` for the primary MySQL store, ``"sqlserver"`` for a secondary
-SQL Server store); the concrete engine type lives only in that config.
+The framework supports MySQL, SQL Server, and PostgreSQL side by side. Each
+logical datasource is declared in ``config.env.DATABASES`` under a business
+alias (e.g. ``"main"`` for the primary store, ``"sqlserver"`` / ``"postgres"``
+for additional stores); the concrete engine type lives only in that config.
 
 Credentials resolution precedence (first wins):
     1. Explicit ``ConnectionSettings`` instance passed by the caller
@@ -27,6 +27,7 @@ DEFAULT_ALIAS = "main"
 _DB_TYPE_TO_DIALECT = {
     "sqlserver": "mssql",
     "mysql": "mysql",
+    "postgres": "postgresql",
 }
 
 
@@ -44,7 +45,7 @@ class ConnectionSettings:
 
     @property
     def dialect(self) -> str:
-        """SQLAlchemy dialect name (``mssql`` / ``mysql``) for this settings."""
+        """SQLAlchemy dialect name (``mssql`` / ``mysql`` / ``postgresql``)."""
         try:
             return _DB_TYPE_TO_DIALECT[self.db_type]
         except KeyError:
@@ -105,7 +106,11 @@ def build_url(settings: ConnectionSettings) -> str:
         return f"mssql+pymssql://{user}:{password}@{host}:{port}/{name}?charset=utf8"
     if settings.db_type == "mysql":
         return f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}?charset=utf8mb4"
-    raise ValueError(f"暂不支持该数据库类型：{settings.db_type!r}（支持 sqlserver / mysql）")
+    if settings.db_type == "postgres":
+        return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{name}"
+    raise ValueError(
+        f"暂不支持该数据库类型：{settings.db_type!r}（支持 sqlserver / mysql / postgres）"
+    )
 
 
 def create_engine_for(settings: ConnectionSettings):
@@ -122,7 +127,7 @@ def create_engine_for(settings: ConnectionSettings):
             "login_timeout": settings.login_timeout,
             "timeout": settings.connect_timeout,
         }
-    elif settings.db_type == "mysql":
+    elif settings.db_type in ("mysql", "postgres"):
         connect_args = {"connect_timeout": settings.connect_timeout}
     return create_engine(
         build_url(settings),

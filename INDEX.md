@@ -18,7 +18,7 @@
 
 | datasource | 表 | 更新 | 备注 |
 | --- | --- | --- | --- |
-| _(暂无)_ | | | 运行 `python apps/dump_ddl.py <table> --datasource <alias>` 生成 |
+| _(暂无平台内置 DDL)_ | | | 运行 `python apps/dump_ddl.py --all --datasource <alias>`；MySQL / SQL Server / PostgreSQL。业务库 DDL 写 `INDEX.project.md` |
 
 变更流水：`assets/CHANGELOG.md`
 
@@ -38,7 +38,7 @@
 
 | 包 | 用途 | 规范 |
 | --- | --- | --- |
-| `packages/db` | 多数据源 DB 访问（MySQL / SQL Server） | `.cursor/rules/packages-db.mdc` |
+| `packages/db` | 多数据源 DB 访问（MySQL / SQL Server / PostgreSQL） | `.cursor/rules/packages-db.mdc` |
 | `packages/logging` | 统一日志 | `.cursor/rules/packages-logging.mdc`，`packages/logging/README.md` |
 | `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |
 | `packages/excel` | xlsx/CSV 解析 | — |
@@ -64,7 +64,7 @@
 
 | 工具 | 运行 | 用途 | 交接文档 |
 | --- | --- | --- | --- |
-| `dump_ddl` | `python apps/dump_ddl.py <table> --datasource <alias>` | 拉取表结构到 `assets/ddl/` | `apps/README.md` |
+| `dump_ddl` | `python apps/dump_ddl.py <table> --datasource <alias>` 或 `--all` | 拉取表结构到 `assets/ddl/<alias>/`（mysql / sqlserver / postgres） | `apps/README.md`；skill `/dump-ddl` |
 | `recorder` | `python -m apps.recorder` | 代理抓包生成 `packages/api_objects` | `apps/recorder/README.md` |
 | `index_ai` | `python -m apps.index_ai` | 扫描 `.cursor/**` frontmatter 生成 `.cursor/REGISTRY.md` | `apps/index_ai/README.md` |
 | `init_repo` | `python -m apps.init_repo --help` | 生成/更新项目仓骨架（携带 release manifest） | `apps/init_repo/README.md` |

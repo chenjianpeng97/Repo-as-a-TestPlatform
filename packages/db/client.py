@@ -7,10 +7,10 @@ Design:
     - Datasources are named in ``config.env.DATABASES``; use
       ``DbClient.for_datasource("sqlserver")`` to target a specific one.
       ``DbClient.default()`` targets the ``"main"`` alias.
-    - Both pymssql (SQL Server) and pymysql (MySQL) use the ``%s`` / ``%(key)s``
-      pyformat parameter style, and all SQL goes through
-      ``Connection.exec_driver_sql``, so query code is identical across
-      dialects apart from the SQL text itself.
+    - pymssql (SQL Server), pymysql (MySQL) and psycopg (PostgreSQL) all use
+      the ``%s`` / ``%(key)s`` pyformat parameter style, and all SQL goes
+      through ``Connection.exec_driver_sql``, so query code is identical
+      across dialects apart from the SQL text itself.
     - No table names or column names are hardcoded here.
 """
 from __future__ import annotations
@@ -20,6 +20,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Iterable, Iterator, Mapping, Sequence
+from uuid import UUID
 
 from .connection import (
     ConnectionSettings,
@@ -31,20 +32,29 @@ from .connection import (
 _ParamType = Sequence[Any] | Mapping[str, Any] | None
 
 
-def _sql_literal(value: Any) -> str:
+def _sql_literal(value: Any, *, dialect: str = "mysql") -> str:
     """Render a Python value as a SQL literal (diagnostics / mogrify only)."""
     if value is None:
         return "NULL"
     if isinstance(value, bool):
+        if dialect == "postgresql":
+            return "TRUE" if value else "FALSE"
         return "1" if value else "0"
     if isinstance(value, (int, float, Decimal)):
         return str(value)
     if isinstance(value, datetime):
+        if dialect == "postgresql":
+            return "'" + value.isoformat(sep=" ") + "'"
         return "'" + value.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3] + "'"
     if isinstance(value, date):
         return "'" + value.isoformat() + "'"
-    if isinstance(value, (bytes, bytearray)):
-        return "0x" + bytes(value).hex()
+    if isinstance(value, UUID):
+        return f"'{value}'"
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        blob = bytes(value)
+        if dialect == "postgresql":
+            return r"'\x" + blob.hex() + "'"
+        return "0x" + blob.hex()
     text = str(value).replace("'", "''")
     return f"'{text}'"
 
@@ -67,7 +77,7 @@ class DbClient:
 
     @property
     def dialect(self) -> str:
-        """SQL dialect of the target datasource: ``"mssql"`` or ``"mysql"``."""
+        """SQL dialect: ``"mssql"`` / ``"mysql"`` / ``"postgresql"``."""
         return self.settings.dialect
 
     def __enter__(self) -> "DbClient":
@@ -199,7 +209,9 @@ class DbClient:
         if isinstance(params, Mapping):
             rendered = sql
             for key, value in params.items():
-                rendered = rendered.replace(f"%({key})s", _sql_literal(value))
+                rendered = rendered.replace(
+                    f"%({key})s", _sql_literal(value, dialect=self.dialect)
+                )
             return rendered
         parts = sql.split("%s")
         if len(parts) - 1 != len(params):
@@ -209,7 +221,7 @@ class DbClient:
             )
         out: list[str] = [parts[0]]
         for i, value in enumerate(params):
-            out.append(_sql_literal(value))
+            out.append(_sql_literal(value, dialect=self.dialect))
             out.append(parts[i + 1])
         return "".join(out)
 
@@ -224,6 +236,8 @@ class DbClient:
     def fetch_last_identity(self) -> int | None:
         if self.dialect == "mysql":
             value = self.fetch_scalar("SELECT LAST_INSERT_ID() AS id")
+        elif self.dialect == "postgresql":
+            value = self.fetch_scalar("SELECT lastval() AS id")
         else:
             value = self.fetch_scalar("SELECT CAST(SCOPE_IDENTITY() AS BIGINT) AS id")
         return int(value) if value is not None else None

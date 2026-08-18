@@ -27,8 +27,8 @@ apps/
 
 ## 2. 必须复用 packages（不得重造轮子）
 
-- **DB** → `packages.db.DbClient`（多数据源，`config/env.py` 的别名）。禁止 `pymysql/pymssql.connect`、
-  硬编码 DSN、SQL 字符串拼接。见 `.cursor/rules/packages-db.mdc`。
+- **DB** → `packages.db.DbClient`（多数据源，`config/env.py` 的别名）。禁止 `pymysql` /
+  `pymssql` / `psycopg.connect`、硬编码 DSN、SQL 字符串拼接。见 `.cursor/rules/packages-db.mdc`。
 - **日志** → `packages.logging`（`log_info/log_warn/log_error/log_data_setup/...`）。禁止 `print`、
   stdlib `logging`、自建日志文件。见 `.cursor/rules/packages-logging.mdc`。
 - **配置/凭据** → `config/env.py`（+ 环境变量覆盖），不在代码里写死。

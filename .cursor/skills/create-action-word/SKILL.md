@@ -1,6 +1,6 @@
 ---
 name: create-action-word
-version: 1.0.0
+version: 1.1.0
 description: Creates or updates action words under packages/action_words/ following action-words-syntax.md. Use when adding DB seed/assert, API request/assert, or UI action/assert business actions, or when migrating ad-hoc test logic (SQL scripts, step bodies) into reusable action words.
 ---
 
@@ -20,12 +20,12 @@ description: Creates or updates action words under packages/action_words/ follow
    优先扩展其 Params（兼容性新增），而不是新建。
 2. 明确类别与 `word_id = "<category>.<snake_name>"`；一个模块默认一个 word，
    同一聚合的强相关 word 可同模块。
-3. **确定目标数据源**：框架支持 MySQL / SQL Server 共存，业务数据长期
-   存在哪个库就在类上声明哪个别名（`datasource = "main"`（主库/MySQL）
-   / `"sqlserver"`（第二库/SQL Server）/ ...，别名与类型见 `config/env.py`
+3. **确定目标数据源**：框架支持 MySQL / SQL Server / PostgreSQL 共存，业务数据长期
+   存在哪个库就在类上声明哪个别名（`datasource = "main"` /
+   `"sqlserver"` / `"postgres"` / ...，别名与类型见 `config/env.py`
    `DATABASES`）；默认 `"main"`。
 4. 造数类：先在 `assets/ddl/<别名>/<table>.sql` 核对列名（generated/computed
-   列**不得**出现在插入列表；缺 DDL 时先
+   列**不得**出现在插入列表；缺 DDL 时先走 `/dump-ddl` 或
    `python apps/dump_ddl.py <table> --datasource <别名>`），列名固化为模块级
    `*_COLUMNS` 元组。
 5. API 类：只编排 `packages/api_objects/**` 冻结资产（`_internal/api.load_api`），
@@ -59,13 +59,14 @@ description: Creates or updates action words under packages/action_words/ follow
   `Params(...)`（关键业务字段逐个列出，带行内注释），`with ActionContext()`
   执行并打印 Result JSON，保证 `python -m <module>` 可独立造数。
 - **DB 方言跟随 `datasource` 声明**（`packages.db.DbClient`，底层 SQLAlchemy
-  引擎自动路由 pymssql / pymysql，值一律 `%s` 占位）：
+  引擎自动路由 pymssql / pymysql / psycopg，值一律 `%s` 占位）：
   - 造数走 `_internal/db.bulk_insert`（标识符按 `client.dialect` 自动
-    `[table]` / `` `table` ``）；
-  - `datasource = "main"`（MySQL）：禁止 `[ident]`、`TOP`、`GETDATE()`、
-    `MERGE`；探测用 `LIMIT`，时间用 `NOW()`；
-  - `datasource = "sqlserver"`（SQL Server）：禁止反引号、`LIMIT`、`INSERT IGNORE`、
-    `ON DUPLICATE KEY`、`NOW()` / `IFNULL`；探测用 `TOP`，时间用 `GETDATE()`。
+    `[table]` / `` `table` `` / `"table"`）；
+  - MySQL：禁止 `[ident]`、`TOP`、`GETDATE()`、`MERGE`；探测用 `LIMIT`，时间用 `NOW()`；
+  - SQL Server：禁止反引号、`LIMIT`、`INSERT IGNORE`、`ON DUPLICATE KEY`、
+    `NOW()` / `IFNULL`；探测用 `TOP`，时间用 `GETDATE()`；
+  - PostgreSQL：禁止 `[ident]`、反引号、`TOP`、`ON DUPLICATE KEY`；探测用 `LIMIT`，
+    时间用 `NOW()` / `CURRENT_TIMESTAMP`，冲突用 `ON CONFLICT`。
 
 ## Verify (must pass)
 

@@ -1,9 +1,10 @@
 """Dump table DDL (DataGrip "auto-generated definition" style) into ``assets/ddl``.
 
-The framework supports MySQL and SQL Server side by side; datasources are
-named in ``config/env.py`` -> ``DATABASES`` (business alias -> connection
-config incl. ``type``). Pick the target with ``--datasource`` (default
-``main``); output is grouped per datasource under ``assets/ddl/<alias>/``.
+The framework supports MySQL, SQL Server, and PostgreSQL side by side;
+datasources are named in ``config/env.py`` -> ``DATABASES`` (business alias ->
+connection config incl. ``type``). Pick the target with ``--datasource``
+(default ``main``); output is grouped per datasource under
+``assets/ddl/<alias>/``.
 
 For each requested table this writes ``assets/ddl/<alias>/<table>.sql``
 containing:
@@ -15,6 +16,10 @@ containing:
      ``create index`` statements, lowercased table options).
    - SQL Server: reconstructed from ``sys.*`` catalog views + ``MS_Description``
      extended properties (comments rendered as trailing ``--`` line comments).
+   - PostgreSQL: reconstructed from ``pg_catalog`` (``format_type``, identity /
+     generated columns, comments via ``obj_description`` / ``col_description``);
+     secondary indexes emitted from ``pg_get_indexdef``. Default schema is
+     ``public`` (override with ``--schema``).
 2. A commented-out sample ``INSERT`` for the latest-id row, as a reference for
    data factories. Computed / generated columns are excluded from the column
    list.
@@ -30,6 +35,7 @@ Run from the repo root::
     python apps/dump_ddl.py some_table --datasource sqlserver
     python apps/dump_ddl.py --all                 # every base table in the schema
     python apps/dump_ddl.py --all --datasource sqlserver --no-sample
+    python apps/dump_ddl.py --all --datasource postgres --schema public
 """
 from __future__ import annotations
 
@@ -63,6 +69,11 @@ def _q(identifier: str) -> str:
 def _qb(identifier: str) -> str:
     """Bracket-quote a (already validated) identifier (SQL Server)."""
     return f"[{identifier}]"
+
+
+def _qp(identifier: str) -> str:
+    """Double-quote a (already validated) identifier (PostgreSQL)."""
+    return '"' + identifier.replace('"', '""') + '"'
 
 
 def _lower_keys(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -770,7 +781,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--db",
         default=None,
-        help="override database/schema name within the datasource instance",
+        help="override database name within the datasource instance",
+    )
+    parser.add_argument(
+        "--schema",
+        default=None,
+        help="PostgreSQL schema to dump (default: public). Ignored for MySQL / SQL Server.",
     )
     parser.add_argument(
         "--output-dir",
@@ -806,12 +822,26 @@ def main(argv: list[str] | None = None) -> int:
     written: list[str] = []
     with DbClient(settings=settings) as db:
         dialect = db.dialect
+        collation_to_charset: dict[str, str] = {}
+        charset_default_collate: dict[str, str] = {}
+        schema_default_collation: str | None = None
         if dialect == "mysql":
             collation_to_charset, charset_default_collate = _load_charset_maps(db)
             schema_default_collation = _fetch_schema_default_collation(db, schema)
             tables = _fetch_all_tables_mysql(db, schema) if args.all else args.tables
-        else:
+        elif dialect == "mssql":
             tables = _fetch_all_tables_mssql(db) if args.all else args.tables
+        elif dialect == "postgresql":
+            schema = args.schema or "public"
+            if not _DB_RE.fullmatch(schema):
+                log_error("dump_ddl invalid --schema", schema=schema)
+                return 2
+            tables = (
+                _fetch_all_tables_postgres(db, schema) if args.all else args.tables
+            )
+        else:
+            log_error("dump_ddl unsupported dialect", dialect=dialect)
+            return 2
 
         log_info(
             "dump_ddl start",
@@ -847,8 +877,16 @@ def main(argv: list[str] | None = None) -> int:
                         charset_default_collate=charset_default_collate,
                         schema_default_collation=schema_default_collation,
                     )
-                else:
+                elif dialect == "mssql":
                     done = _dump_one_mssql(
+                        db,
+                        schema,
+                        table,
+                        output_dir,
+                        with_sample=not args.no_sample,
+                    )
+                else:
+                    done = _dump_one_postgres(
                         db,
                         schema,
                         table,
@@ -882,6 +920,290 @@ def main(argv: list[str] | None = None) -> int:
     else:
         log_info("dump_ddl finished", ok=ok)
     return 0 if failed == 0 else 1
+
+
+# ---------------------------------------------------------------------------
+# PostgreSQL builder (pg_catalog based)
+# ---------------------------------------------------------------------------
+
+
+def _fetch_all_tables_postgres(db: DbClient, schema: str) -> list[str]:
+    rows = db.fetch_all(
+        "SELECT c.relname AS table_name "
+        "FROM pg_class c "
+        "JOIN pg_namespace n ON n.oid = c.relnamespace "
+        "WHERE n.nspname = %s AND c.relkind = 'r' "
+        "ORDER BY c.relname",
+        (schema,),
+    )
+    return [str(r["table_name"]) for r in rows]
+
+
+def _fetch_table_meta_postgres(
+    db: DbClient, schema: str, table: str
+) -> dict[str, Any] | None:
+    return db.fetch_one(
+        "SELECT c.relname AS table_name, "
+        "obj_description(c.oid) AS table_comment "
+        "FROM pg_class c "
+        "JOIN pg_namespace n ON n.oid = c.relnamespace "
+        "WHERE n.nspname = %s AND c.relname = %s AND c.relkind = 'r'",
+        (schema, table),
+    )
+
+
+def _fetch_columns_postgres(
+    db: DbClient, schema: str, table: str
+) -> list[dict[str, Any]]:
+    return db.fetch_all(
+        "SELECT a.attname AS column_name, "
+        "pg_catalog.format_type(a.atttypid, a.atttypmod) AS formatted_type, "
+        "NOT a.attnotnull AS is_nullable, "
+        "pg_get_expr(ad.adbin, ad.adrelid) AS default_expr, "
+        "a.attidentity AS identity_kind, "
+        "a.attgenerated AS generated_kind, "
+        "col_description(c.oid, a.attnum) AS column_comment "
+        "FROM pg_attribute a "
+        "JOIN pg_class c ON c.oid = a.attrelid "
+        "JOIN pg_namespace n ON n.oid = c.relnamespace "
+        "LEFT JOIN pg_attrdef ad "
+        "  ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum "
+        "WHERE n.nspname = %s AND c.relname = %s "
+        "  AND a.attnum > 0 AND NOT a.attisdropped "
+        "ORDER BY a.attnum",
+        (schema, table),
+    )
+
+
+def _fetch_pk_columns_postgres(db: DbClient, schema: str, table: str) -> list[str]:
+    rows = db.fetch_all(
+        "SELECT a.attname AS column_name "
+        "FROM pg_index i "
+        "JOIN pg_class t ON t.oid = i.indrelid "
+        "JOIN pg_namespace n ON n.oid = t.relnamespace "
+        "JOIN LATERAL unnest(i.indkey) WITH ORDINALITY AS x(attnum, ord) ON true "
+        "JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = x.attnum "
+        "WHERE n.nspname = %s AND t.relname = %s AND i.indisprimary "
+        "ORDER BY x.ord",
+        (schema, table),
+    )
+    return [str(r["column_name"]) for r in rows]
+
+
+def _fetch_secondary_indexdefs_postgres(
+    db: DbClient, schema: str, table: str
+) -> list[str]:
+    rows = db.fetch_all(
+        "SELECT pg_get_indexdef(i.indexrelid) AS indexdef "
+        "FROM pg_index i "
+        "JOIN pg_class t ON t.oid = i.indrelid "
+        "JOIN pg_namespace n ON n.oid = t.relnamespace "
+        "WHERE n.nspname = %s AND t.relname = %s AND NOT i.indisprimary "
+        "ORDER BY pg_get_indexdef(i.indexrelid)",
+        (schema, table),
+    )
+    return [str(r["indexdef"]) for r in rows if r.get("indexdef")]
+
+
+def _fmt_type_postgres(formatted_type: str) -> str:
+    t = (formatted_type or "").strip()
+    t = t.replace("character varying", "varchar")
+    t = t.replace("timestamp with time zone", "timestamptz")
+    t = t.replace("timestamp without time zone", "timestamp")
+    t = t.replace("time with time zone", "timetz")
+    t = t.replace("time without time zone", "time")
+    t = t.replace("character(", "char(")
+    return t
+
+
+def _default_clause_postgres(default_expr: Any) -> str:
+    if default_expr is None:
+        return ""
+    s = str(default_expr).strip()
+    if not s or s.upper() == "NULL":
+        return ""
+    return f"default {s}"
+
+
+def _normalize_pg_indexdef(indexdef: str, schema: str) -> str:
+    text = indexdef.strip().rstrip(";")
+    needle = f" ON {schema}."
+    if needle in text:
+        text = text.replace(needle, " ON ", 1)
+    return text + ";"
+
+
+def _build_ddl_postgres(
+    table: str,
+    columns: list[dict[str, Any]],
+    pk_columns: list[str],
+    indexdefs: list[str],
+    table_meta: dict[str, Any],
+    schema: str,
+) -> str:
+    rendered: list[dict[str, Any]] = []
+    for col in columns:
+        comment = col.get("column_comment") or ""
+        identity_kind = str(col.get("identity_kind") or "")
+        generated_kind = str(col.get("generated_kind") or "")
+        if generated_kind:
+            expr = str(col.get("default_expr") or "").strip()
+            type_seg = f"{_fmt_type_postgres(str(col.get('formatted_type') or ''))} generated always as ({expr}) stored"
+            default_seg = ""
+            tail_null = None
+        else:
+            type_seg = _fmt_type_postgres(str(col.get("formatted_type") or ""))
+            if identity_kind == "a":
+                type_seg += " generated always as identity"
+                default_seg = ""
+                tail_null = None
+            elif identity_kind == "d":
+                type_seg += " generated by default as identity"
+                default_seg = ""
+                tail_null = None
+            else:
+                default_seg = _default_clause_postgres(col.get("default_expr"))
+                tail_null = "null" if col.get("is_nullable") else "not null"
+        rendered.append(
+            {
+                "name": str(col["column_name"]),
+                "type_seg": type_seg,
+                "default_seg": default_seg,
+                "tail_null": tail_null,
+                "comment": str(comment),
+            }
+        )
+
+    name_width = max((len(r["name"]) for r in rendered), default=0) + 1
+    normal = [r for r in rendered if r["tail_null"] is not None]
+    with_default = [r for r in normal if r["default_seg"]]
+    type_col_w = max((len(r["type_seg"]) for r in with_default), default=0)
+    type_col_w = type_col_w + 1 if type_col_w else 0
+    def_col_w = max((len(r["default_seg"]) for r in with_default), default=0)
+    def_col_w = def_col_w + 1 if def_col_w else 0
+    max_type_only = max((len(r["type_seg"]) for r in normal), default=0)
+    null_off = max(type_col_w + def_col_w, max_type_only + 1)
+
+    single_pk = pk_columns[0] if len(pk_columns) == 1 else None
+    entries: list[str] = []
+    for r in rendered:
+        if r["tail_null"] is None:
+            body = r["type_seg"]
+        else:
+            if r["default_seg"]:
+                seg = f"{r['type_seg']:<{type_col_w}}{r['default_seg']:<{def_col_w}}"
+            else:
+                seg = r["type_seg"]
+            body = f"{seg:<{null_off}}{r['tail_null']}"
+        if r["comment"]:
+            body += f" -- {r['comment']}"
+        line = f"    {r['name']:<{name_width}}{body}"
+        if single_pk is not None and r["name"] == single_pk:
+            line += "\n        primary key"
+        entries.append(line)
+
+    if len(pk_columns) > 1:
+        entries.append(f"    primary key ({', '.join(pk_columns)})")
+
+    body = ",\n".join(entries)
+    lines = ["-- auto-generated definition"]
+    table_comment = table_meta.get("table_comment") or ""
+    if table_comment:
+        lines.append(f"-- {table_comment}")
+    lines += [f"create table {table}", "(", body, ");"]
+    ddl = "\n".join(lines)
+
+    for indexdef in indexdefs:
+        ddl += f"\n\n{_normalize_pg_indexdef(indexdef, schema)}"
+    return ddl
+
+
+def _build_sample_insert_postgres(
+    db: DbClient,
+    schema: str,
+    table: str,
+    columns: list[dict[str, Any]],
+    pk_columns: list[str],
+) -> str:
+    column_names = [str(c["column_name"]) for c in columns]
+    if len(pk_columns) == 1:
+        order_col = pk_columns[0]
+    elif "id" in column_names:
+        order_col = "id"
+    elif pk_columns:
+        order_col = pk_columns[0]
+    else:
+        order_col = column_names[0]
+
+    qualified = f"{_qp(schema)}.{_qp(table)}"
+    select_sql = (
+        f"SELECT * FROM {qualified} ORDER BY {_qp(order_col)} DESC LIMIT 1"
+    )
+    row = db.fetch_one(select_sql)
+    if not row:
+        return f"-- （{table} 暂无数据，无示例 INSERT）"
+
+    generated = {
+        str(c["column_name"])
+        for c in columns
+        if str(c.get("generated_kind") or "")
+    }
+    insert_cols = [c for c in column_names if c not in generated]
+    cols_joined = ", ".join(_qp(c) for c in insert_cols)
+    placeholders = ", ".join(["%s"] * len(insert_cols))
+    insert_sql = f"INSERT INTO {_qp(table)} ({cols_joined}) VALUES ({placeholders})"
+    values = tuple(row[c] for c in insert_cols)
+    rendered = db.mogrify(insert_sql, values) + ";"
+
+    header = f"-- 最新一条数据示例（latest {order_col}），已排除生成列，仅供数据构造参考"
+    commented = "\n".join("-- " + line for line in rendered.splitlines())
+    return header + "\n" + commented
+
+
+def _dump_one_postgres(
+    db: DbClient,
+    schema: str,
+    table: str,
+    output_dir: pathlib.Path,
+    *,
+    with_sample: bool,
+) -> bool:
+    table_meta = _fetch_table_meta_postgres(db, schema, table)
+    if table_meta is None:
+        log_error("dump_ddl table not found", schema=schema, table=table)
+        return False
+
+    columns = _fetch_columns_postgres(db, schema, table)
+    if not columns:
+        log_error("dump_ddl table has no columns", schema=schema, table=table)
+        return False
+
+    pk_columns = _fetch_pk_columns_postgres(db, schema, table)
+    indexdefs = _fetch_secondary_indexdefs_postgres(db, schema, table)
+    ddl = _build_ddl_postgres(
+        table, columns, pk_columns, indexdefs, table_meta, schema
+    )
+
+    content = ddl + "\n\n"
+    has_sample = False
+    if with_sample:
+        sample = _build_sample_insert_postgres(
+            db, schema, table, columns, pk_columns
+        )
+        content += sample + "\n"
+        has_sample = "INSERT INTO" in sample
+
+    out_path = output_dir / f"{table}.sql"
+    out_path.write_text(content, encoding="utf-8", newline="\n")
+    log_data_setup(
+        "ddl_dump",
+        schema=schema,
+        table=table,
+        columns=len(columns),
+        sample=has_sample,
+        path=str(out_path),
+    )
+    return True
 
 
 if __name__ == "__main__":

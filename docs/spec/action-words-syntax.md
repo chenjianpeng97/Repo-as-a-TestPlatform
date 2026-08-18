@@ -94,17 +94,16 @@ class CreateInOut(ActionWord):
 
 - `run(params)` 是唯一业务入口；`run_from_dict(dict)` 是统一接入点
   （behave / pytest / CLI / 平台在线执行都走它）；
-- **数据源声明**：框架支持 MySQL / SQL Server 共存。DB 类 word 通过类
+- **数据源声明**：框架支持 MySQL / SQL Server / PostgreSQL 共存。DB 类 word 通过类
   元数据 `datasource = "<别名>"` **显式声明去影响哪个库**（别名即
   `config/env.py` 的 `DATABASES` 键，数据库具体类型只写在配置里）；默认
   `"main"`。word 内经 `self.db` 取连接（等价
   `self.ctx.get_db(cls.datasource)`），**不要**在 word 内自建连接，也不要
   把连接细节写进业务代码。
 - 造数落库用 `_internal/db.bulk_insert`（标识符引用按 `client.dialect`
-  自动选方言：`[ident]` vs `` `ident` ``；值一律 `%s`）；业务 SQL 按目标库
-  写对应方言——`main` 走 MySQL（`LIMIT n`、`NOW()`；禁用 `[ident]`、`TOP`），
-  `sqlserver` 走 T-SQL（`SELECT TOP n`、`GETDATE()`；禁用反引号、`LIMIT`、
-  `INSERT IGNORE`、`ON DUPLICATE KEY`）。
+  自动选方言：`[ident]` / `` `ident` `` / `"ident"`；值一律 `%s`）；业务 SQL 按目标库
+  写对应方言——MySQL 用 `LIMIT n`、`NOW()`；SQL Server 用 `SELECT TOP n`、`GETDATE()`；
+  PostgreSQL 用 `LIMIT n`、`NOW()` / `CURRENT_TIMESTAMP`、`ON CONFLICT`。
 - 通过 `self.ctx`（`ActionContext`）取资源：`self.db` / `ctx.get_db(alias)`、
   `ctx.api_token`（惰性登录并缓存）；**不要**在 word 内自建连接。
 
