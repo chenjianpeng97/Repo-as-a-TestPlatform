@@ -36,6 +36,18 @@
 
 ---
 
+## 2026-08-18 — dump_ddl 样例 INSERT 剔除密钥列并限制体积
+
+- **commit**: `TBD`
+- **目的**: 恢复默认「注释掉的最新一行 INSERT」，同时避免 password/token/session 与超长 stdout 进入 `assets/ddl`。
+- **路径**:
+  - `apps/dump_ddl.py`
+  - `.cursor/skills/dump-ddl/SKILL.md`
+  - `apps/README.md`
+  - `docs/changelog/FRAMEWORK.md`（本条目）
+- **不在同步范围**: 业务 `assets/ddl` 正文
+- **验证**: `python apps/dump_ddl.py --all --datasource main` 后 `.sql` 末尾有 `-- INSERT` 或省略说明，且不含 `password`/`token` 字面量
+
 ## 2026-08-18 — PostgreSQL 数据源 + dump_ddl pg_catalog + /dump-ddl skill
 
 - **commit**: `48eb39d`

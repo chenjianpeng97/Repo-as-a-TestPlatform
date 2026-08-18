@@ -1,6 +1,6 @@
 ---
 name: dump-ddl
-version: 1.0.0
+version: 1.1.0
 description: Dumps live table DDL into assets/ddl/<datasource>/ via apps/dump_ddl.py, then updates the knowledge index from CHANGELOG. Use when the user says /dump-ddl, dump DDL, 拉取 DDL, 导出表结构, or needs schema files before writing action words / SQL.
 ---
 
@@ -47,25 +47,32 @@ Task Progress:
    - 用户指定了表名 → 传表名；否则 `--all`（排除视图）。
    - PostgreSQL 需要非 `public` schema 时加 `--schema <name>`。
    - 只要结构、不要示例 INSERT → `--no-sample`。
-     **有 password / token / session / cookie 列的库必须加 `--no-sample`**（本仓禁止把这些写进
-     `assets/`）。Plane 本地库一律 `--no-sample`。
+   - **默认带注释掉的最新一行 INSERT**（造数参考）。`dump_ddl` 会从样例中去掉
+     `password` / `token` / `session_*` / `*_token` 等密钥列；过长行（stdout/jsonb）
+     改写为省略说明。不要为了“怕泄密”对整库加 `--no-sample`，除非用户只要结构。
 
 2. **执行**（仓库根目录）
 
    ```bash
-   uv run python apps/dump_ddl.py --all --datasource main --no-sample
+   uv run python apps/dump_ddl.py --all --datasource main
    ```
 
    指定表：
 
    ```bash
-   uv run python apps/dump_ddl.py issues cycles --datasource main --no-sample
+   uv run python apps/dump_ddl.py issues cycles --datasource main
    ```
 
    PostgreSQL 显式 schema：
 
    ```bash
-   uv run python apps/dump_ddl.py --all --datasource main --schema public --no-sample
+   uv run python apps/dump_ddl.py --all --datasource main --schema public
+   ```
+
+   只要结构：
+
+   ```bash
+   uv run python apps/dump_ddl.py --all --datasource main --no-sample
    ```
 
 3. **留痕**：工具会 `append_entry` 到 `assets/CHANGELOG.md`。不要手改 `assets/ddl/**`
