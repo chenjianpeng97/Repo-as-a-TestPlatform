@@ -19,7 +19,7 @@
 
 | datasource | 表文件数 | 路径 | 备注 |
 | --- | --- | --- | --- |
-| _(暂无)_ | | | 运行 `python apps/dump_ddl.py <table> --datasource <alias>` 生成 |
+| `main` | 118 | `assets/ddl/main/` | Plane 本地 PostgreSQL `public`（`dump_ddl --all --no-sample`，2026-08-18） |
 
 ### 1.2 业务 SQL 副本（assets/sql/）
 

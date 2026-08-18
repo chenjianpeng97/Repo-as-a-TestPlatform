@@ -30,8 +30,21 @@
 ## 密钥（必做，否则跑不了）
 
 1. 复制 `config/env_local.py.example` → `config/env_local.py`（已被 gitignore）。
-2. 填入真实 `DATABASES`、`TEST_BASE_URL`（Plane 网关）、`TEST_ACCOUNT`。
+2. 填入真实 `DATABASES`、`TEST_BASE_URL`（Plane API 网关，本地默认 `http://localhost:8000`）、`TEST_ACCOUNT`。
 3. 也可只用环境变量：`ARGON_DB_<ALIAS>_*`、`TEST_BASE_URL`、`TEST_USERNAME` / `TEST_PASSWORD`。
+
+本试验田主库是 Plane 本地 PostgreSQL：
+
+| 项 | 值 |
+| --- | --- |
+| compose 服务 | `plane-db`（`docker-compose-local.yml`） |
+| 容器内 host | `plane-db`（API 容器用） |
+| **宿主机 dump / 本仓连接** | `127.0.0.1:5432` |
+| 库 / 用户 | 与 Plane 根 `.env` 的 `POSTGRES_DB` / `POSTGRES_USER` 一致（默认 `plane`） |
+| schema | `public` |
+| overlay | `config/env_overlay.py` 把 `main` 声明为 `type: postgres` |
+
+拉全库 DDL：`/dump-ddl` 或 `python apps/dump_ddl.py --all --datasource main --no-sample`。
 
 **不要**把 `env_local.py` 或 `.env` 提交到任何分支。
 
