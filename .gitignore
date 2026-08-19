@@ -8,6 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+.venv-win
 .ci_venv
 
 # pytest cache

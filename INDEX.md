@@ -64,10 +64,12 @@
 
 | 工具 | 运行 | 用途 | 交接文档 |
 | --- | --- | --- | --- |
-| `dump_ddl` | `python apps/dump_ddl.py <table> --datasource <alias>` 或 `--all` | 拉取表结构到 `assets/ddl/<alias>/`（mysql / sqlserver / postgres） | `apps/README.md`；skill `/dump-ddl` |
-| `recorder` | `python -m apps.recorder` | 代理抓包生成 `packages/api_objects` | `apps/recorder/README.md` |
-| `index_ai` | `python -m apps.index_ai` | 扫描 `.cursor/**` frontmatter 生成 `.cursor/REGISTRY.md` | `apps/index_ai/README.md` |
-| `init_repo` | `python -m apps.init_repo --help` | 生成/更新项目仓骨架（携带 release manifest） | `apps/init_repo/README.md` |
+| `dump_ddl` | `python apps/dump_ddl.py <table> --datasource <alias>` 或 `--all` | **本地**拉取表结构到 `assets/ddl/<alias>/`（不上 Plane） | `apps/README.md`；skill `/dump-ddl` |
+| `recorder` | `python -m apps.recorder` | **本地**代理抓包生成 `packages/api_objects`（不上 Plane） | `apps/recorder/README.md` |
+| `index_ai` | `python -m apps.index_ai` | **本地**扫描 `.cursor/**` 生成 `.cursor/REGISTRY.md`（不上 Plane） | `apps/index_ai/README.md` |
+| `init_repo` | `python -m apps.init_repo --help` | **本地**生成/更新项目仓骨架（不上 Plane） | `apps/init_repo/README.md` |
+| `index_platform` | `python -m apps.index_platform --out -` | **Plane Sync** 扫描 catalog JSON（不写 git） | `apps/index_platform/README.md` |
+| `action_runner` | `python -m apps.action_runner run --expect-category <cat> <word_id>` | **Plane Job** 浅封装 `packages.action_words`（BDD 勿引用） | `apps/action_runner/README.md` |
 
 ## 4. 测试层（tests/）
 

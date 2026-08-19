@@ -13,6 +13,9 @@
   - `packages/excel/**`
   - `apps/recorder/**`
   - `apps/dump_ddl.py`
+  - `apps/_shared/**`
+  - `apps/action_runner/**`
+  - `apps/index_platform/**`
   - `docs/spec/**`（框架规范）
   - `.cursor/skills/**` / `.cursor/rules/**`
   - 本文件 `docs/changelog/FRAMEWORK.md`
@@ -35,6 +38,23 @@
 ```
 
 ---
+
+## 2026-08-19 — Plane Job 协议：@plane_app + action_runner + index_platform
+
+- **commit**: `TBD`
+- **目的**: 本地维护工具（dump_ddl / recorder / init_repo / index_ai）不上 Plane；造数/API 动作经 `apps.action_runner` 浅封装 `packages.action_words`；Sync 用 `apps.index_platform` 导出 catalog。BDD/pytest 仍只引用 packages。
+- **路径**:
+  - `apps/_shared/plane_app.py`
+  - `apps/action_runner/**`
+  - `apps/index_platform/**`
+  - `apps/init_repo/manifest.py`（PLATFORM_PATHS）
+  - `docs/spec/apps-authoring-syntax.md` / `docs/spec/action-words-syntax.md`
+  - `.cursor/rules/apps-authoring.mdc` / `.cursor/rules/bdd-asset-layering.mdc`
+  - `INDEX.md` / `apps/README.md`
+  - `pyproject.toml`（version 2.2.0）
+  - `docs/changelog/FRAMEWORK.md`（本条目）
+- **不在同步范围**: 业务 action words 实现、具体 `.feature`
+- **验证**: `uv run pytest apps/action_runner/tests apps/index_platform/tests -q`；`python -m apps.index_platform --out -` 的 tools 含 `db_seed` 不含 `dump_ddl`
 
 ## 2026-08-18 — dump_ddl 样例 INSERT 剔除密钥列并限制体积
 

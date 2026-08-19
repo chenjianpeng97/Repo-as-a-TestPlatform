@@ -57,7 +57,9 @@ confidence: high
 
 - 总览：绑定仓名称/分支/工作目录、HEAD、同步状态，以及测程 / Apps / 常用 SQL / pytest / 作业入口卡片。
 - **测程**：引用 Formulation 场景（路径 + git sha），可选环境；创建后报告在关联运行之前保持为空（状态为待执行）。本阶段 **不会** 自动跑 behave。
-- **工具**：展示 catalog 中的 apps；白名单内（如 `dump_ddl`、`index_ai`、`index_platform`）可运行并跳转到作业详情。`dump_ddl` 未填表名时应提示至少需要一张表。不在白名单的工具显示「不在 P2 白名单」。
+- **工具**：展示 catalog 中已向 Plane 注册的 apps（`plane_runnable`）。本轮即
+  `db_seed` / `db_assert` / `api_request` 等 action_runner 类别。`dump_ddl`、
+  `index_ai`、`recorder` 是本地维护工具，不出现在可运行列表。
 - **常用 SQL**：列出 `assets/sql` 索引，可筛选与预览，不是任意 SQL 控制台。
 - **pytest**：只读展示收集到的节点，本阶段不在此页直接执行。
 
@@ -70,8 +72,10 @@ confidence: high
 
 ## 白名单（当前已实现的作业类型）
 
-- `index_platform`、`dump_ddl`、`index_ai`、`action_words`
-- `action_words` 中以造数/写接口为前缀的视为破坏性，需要确认。
+- 唯一硬编码 kind：`index_platform`（Sync，stdout catalog JSON）
+- 其余 kind = catalog `tools[].app_id`（本轮：`db_seed` / `db_assert` / `api_request` / `api_assert` / `ui_action` / `ui_assert`），由测试仓 `@plane_app` 注册
+- 破坏性以工具的 `destructive` 为准（造数 / API 请求 / UI 操作需确认）
+- `dump_ddl` / `index_ai` / `recorder` / `init_repo` **不在** Plane Runner 白名单
 
 ## 明确暂缓（feature 里用 @skip 并写原因）
 
