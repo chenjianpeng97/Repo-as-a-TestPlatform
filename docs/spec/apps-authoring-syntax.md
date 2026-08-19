@@ -11,6 +11,7 @@
 
 ```text
 apps/
+├── __init__.py                 # 常规包，保证 python -m apps.<name> 可导入
 ├── dump_ddl.py                 # 本地维护：python apps/dump_ddl.py <args>
 ├── recorder/                   # 本地维护：python -m apps.recorder
 ├── action_runner/              # Plane 门面：plane.py + run.py
@@ -27,7 +28,8 @@ apps/
     └── tests/
 ```
 
-- 包形式必须支持 `python -m apps.<name>`（提供 `__main__.py`）。
+- 包形式必须支持 `python -m apps.<name>`（提供 `__main__.py`）。仓库根须有
+  `apps/__init__.py`，否则 uv 把项目装进 venv 后可能出现 `No module named apps.*`。
 - 需要在仓库根外可运行时，脚本顶部把 `REPO_ROOT` 注入 `sys.path`（见 `apps/dump_ddl.py`）。
 
 ## 2. 必须复用 packages（不得重造轮子）

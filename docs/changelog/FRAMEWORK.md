@@ -39,6 +39,21 @@
 
 ---
 
+## 2026-08-19 — apps 作为常规包，保证 python -m 可导入
+
+- **commit**: `TBD`
+- **目的**: 补 `apps/__init__.py`，避免 uv 安装后 `python -m apps.index_platform` 找不到模块。mitmproxy 移到 `recorder` extra，Runner 的 `uv sync --no-dev` 不再拉 cryptography。
+- **路径**:
+  - `apps/__init__.py`
+  - `pyproject.toml`（`namespaces = true`；mitmproxy 仅 recorder extra）
+  - `uv.lock`
+  - `apps/init_repo/manifest.py`
+  - `docs/spec/apps-authoring-syntax.md`
+  - `.cursor/rules/apps-authoring.mdc`
+  - `docs/changelog/FRAMEWORK.md`（本条目）
+- **不在同步范围**: 业务 action words、具体 `.feature`
+- **验证**: `python -m apps.index_platform --out -` 在干净 venv 中可启动
+
 ## 2026-08-19 — Plane Job 协议：@plane_app + action_runner + index_platform
 
 - **commit**: `03c3bc2`
