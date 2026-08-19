@@ -41,7 +41,7 @@
 
 ## 2026-08-19 — Plane Job 协议：@plane_app + action_runner + index_platform
 
-- **commit**: `TBD`
+- **commit**: `03c3bc2`
 - **目的**: 本地维护工具（dump_ddl / recorder / init_repo / index_ai）不上 Plane；造数/API 动作经 `apps.action_runner` 浅封装 `packages.action_words`；Sync 用 `apps.index_platform` 导出 catalog。BDD/pytest 仍只引用 packages。
 - **路径**:
   - `apps/_shared/plane_app.py`
