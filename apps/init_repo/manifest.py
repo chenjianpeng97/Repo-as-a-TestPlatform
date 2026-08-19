@@ -27,6 +27,7 @@ PLATFORM_PATHS: tuple[str, ...] = (
     "packages",
     "config",
     "apps/_shared",
+    "apps/__init__.py",
     "apps/dump_ddl.py",
     "apps/recorder",
     "apps/index_ai",
