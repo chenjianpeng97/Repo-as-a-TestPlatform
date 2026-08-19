@@ -41,7 +41,7 @@
 
 ## 2026-08-19 — apps 作为常规包，保证 python -m 可导入
 
-- **commit**: `TBD`
+- **commit**: `64bf0be`
 - **目的**: 补 `apps/__init__.py`，避免 uv 安装后 `python -m apps.index_platform` 找不到模块。mitmproxy 移到 `recorder` extra，Runner 的 `uv sync --no-dev` 不再拉 cryptography。
 - **路径**:
   - `apps/__init__.py`
