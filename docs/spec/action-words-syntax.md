@@ -11,8 +11,8 @@ description: Action Words spec for unified test-asset management. Covers the bas
 - **目标**：把测试资产收敛为**最小可复用业务动作单元**（action word），统一管理
   DB 造数 / DB 断言 / 接口请求 / 接口断言 / 页面操作 / 页面断言六类工作，做到：
   - 每个 word **独立可运行**（CLI 一键执行），也可被 behave 步骤或 pytest 直接调用；
-  - 入参/出参有**统一数据契约**（pydantic v2），可导出 JSON Schema 供未来平台
-    做可视化表单与一键执行；
+  - 入参/出参有**统一数据契约**（pydantic v2），可导出 JSON Schema 供 Plane
+    Formulation 做可视化表单与一键执行；
   - 造数产生的行**按表登记 cleanup**，测试夹具场景后精确删除。
 - **边界**：
   - action word 是**业务动作**，不是技术封装——`packages/db`、`packages/api_test`、
@@ -128,6 +128,7 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
 
 - `run` 输出 `Result` 的 JSON（含 cleanup 登记），退出码 0/1 对应成功/失败；
 - 手工造数后需要清理时，按输出的 cleanup 逐表 `DELETE ... WHERE id IN (...)`。
+- `catalog` 供本机 / `apps.index_platform` 调用 `export_catalog()` 同源数据；**Plane Job 不跑本 CLI**。
 
 ## 与 BDD / pytest 的集成
 
@@ -137,6 +138,16 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
   `after_scenario` 按表删除。别名解析（`prd1`/`经销商D`/`inv1`）留在步骤层。
 - **pytest**：直接 `with ActionContext() as ctx: Word(ctx).run(...)`；
   纯构建函数（`build_*_rows` / `build_links`）可离线断言列集与关联键。
+- **禁止**：`tests/**` import `apps.*` 或调用 `python -m apps.action_runner`。
+  Plane 作业走 `apps.action_runner`（协议浅封装）；组合层永远是本包。
+
+## 与 Plane（TestCopilot）
+
+- 词条目录：`apps.index_platform` 调用 `export_catalog()` 写入 catalog
+  `components.action_words`（Formulation 列表 + 每词 schema）。
+- 运行：`python -m apps.action_runner run --expect-category <category> <word_id>`。
+  包内 **零 Plane 知识**（无 `@plane_app`、无 argv_plan）。
+
 
 ## 敏感信息
 

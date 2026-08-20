@@ -12,10 +12,10 @@
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
-| `apps-authoring` | glob | apps/** | 1.0.0 | apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api) | `.cursor/rules/apps-authoring.mdc` |
+| `apps-authoring` | glob | apps/** | 1.1.0 | apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api) | `.cursor/rules/apps-authoring.mdc` |
 | `apps-handover` | glob | apps/** | 1.0.0 | When an apps/ tool is created or changed, it must ship a handover doc (requirement background, trial scenarios, run met… | `.cursor/rules/apps-handover.mdc` |
 | `assets-knowledge` | glob | assets/** | 1.0.0 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
-| `bdd-asset-layering` | glob | **/*.py | 1.0.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages | `.cursor/rules/bdd-asset-layering.mdc` |
+| `bdd-asset-layering` | glob | **/*.py | 1.1.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages | `.cursor/rules/bdd-asset-layering.mdc` |
 | `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/** | 2.0.0 | Three non-negotiable gates for the BDD asset pipeline (Playwright MCP capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
 | `commit-convention` | always | all files | 1.0.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |

@@ -2,7 +2,7 @@
 description: apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api); no reinventing wheels, no secrets, not imported by tests
 globs: apps/**
 alwaysApply: false
-version: 1.0.0
+version: 1.1.0
 ---
 
 # apps — 创建期约束
@@ -26,6 +26,18 @@ version: 1.0.0
 - 不得被 `tests/` import（复用逻辑下沉到 `packages/`）。
 - 不得写入 token / cookie / 密码 / Authorization / session 等敏感值。
 - 破坏性操作无开关、默认非 dry-run/只读 → 禁止。
+- 不得为了「被 Plane 看见」而给本地维护工具加 `@plane_app`（dump_ddl / recorder /
+  init_repo / index_ai 保持本机 CLI，产物进 git）。
+
+## Plane 可运行 vs 本地维护
+
+- **本地维护**（工程师跑完再 commit）：不必 `plane.py`，Plane Runner 不会执行。
+- **Plane Job**：必须提供 import-safe 的 `apps/<name>/plane.py`，用
+  `apps._shared.plane_app.@plane_app` / `register_plane_app` 登记；CLI 形态为
+  `python -m apps.<name>`。领域逻辑在 `packages/`，apps 只做协议适配。
+  样例：`apps/action_runner` 浅封装 `packages.action_words`。
+- 发现器只 import 存在 `plane.py` 的包；`cli.py` 可以较重，但 `plane.py` 禁止
+  顶层 import DB / mitmproxy。
 
 ## 相关
 

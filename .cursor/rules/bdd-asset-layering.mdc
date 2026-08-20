@@ -2,7 +2,7 @@
 description: Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages; no selector or request leakage across layers
 globs: **/*.py
 alwaysApply: false
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Asset Layering — boundary rules per layer
@@ -40,6 +40,8 @@ Each layer owns one responsibility. Leakage across layers (e.g. selectors in ste
 
 - **No secrets in repo**, ever: `Authorization`, `Cookie`, `Set-Cookie`, `*token*`, `*secret*`, `*password*`, `*session*`. Also applies to captures under `report/` / `testcase/`.
 - **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `apps.recorder` captures, or run_summary findings; avoid locator/path guesses.
+- **`tests/**` must not import `apps.*`**. Action words for BDD/pytest stay in
+  `packages.action_words`. `apps.action_runner` is a Plane Job facade only.
 
 ## Examples
 

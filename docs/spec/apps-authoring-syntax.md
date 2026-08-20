@@ -1,8 +1,9 @@
 # apps 工具编写规范（apps-authoring-syntax）
 
-> `apps/` 存放**可独立运行**的测试工具（公用：`dump_ddl`、`recorder`、`index_ai`、
-> `init_repo`；项目特定：造数/核对等）。本规范把 `dump_ddl` / `recorder` 的隐性约定
-> 显性化，供 `apps-authoring.mdc`（创建期）与 `apps-handover.mdc`（完成期）两条规则引用。
+> `apps/` 存放**可独立运行**的测试工具。分两类：
+> **本地维护**（`dump_ddl`、`recorder`、`index_ai`、`init_repo`）——产物进 git，不上 Plane；
+> **Plane Job 门面**（`index_platform`、`action_runner`）——`plane.py` + `@plane_app`。
+> 供 `apps-authoring.mdc`（创建期）与 `apps-handover.mdc`（完成期）引用。
 
 ## 1. 目录与入口
 
@@ -10,16 +11,20 @@
 
 ```text
 apps/
-├── dump_ddl.py                 # 单文件：python apps/dump_ddl.py <args>
-├── recorder/                   # 包：python -m apps.recorder
-│   ├── __init__.py __main__.py cli.py ...
-│   └── README.md               # 交接文档
-├── _shared/                    # 跨工具共享(如 changelog)，不是独立工具
-└── <your_tool>/                # 新工具
-    ├── __init__.py __main__.py # python -m apps.<your_tool>
-    ├── cli.py                  # argparse 入口
-    ├── README.md               # 交接文档(见第 4 节)
-    └── tests/                  # 该工具的测试
+├── dump_ddl.py                 # 本地维护：python apps/dump_ddl.py <args>
+├── recorder/                   # 本地维护：python -m apps.recorder
+├── action_runner/              # Plane 门面：plane.py + run.py
+│   ├── plane.py                # import-safe；@plane_app / register_plane_app
+│   ├── run.py                  # 惰性调用 packages.action_words
+│   └── README.md
+├── index_platform/             # Plane Sync 引导扫描（expose=False）
+├── _shared/plane_app.py        # 注册器（不是独立工具）
+└── <your_tool>/
+    ├── __init__.py __main__.py
+    ├── plane.py                # 仅当要在 Plane 跑时提供
+    ├── cli.py
+    ├── README.md
+    └── tests/
 ```
 
 - 包形式必须支持 `python -m apps.<name>`（提供 `__main__.py`）。
@@ -58,6 +63,9 @@ apps/
 - 不得写入 token / cookie / 密码 / Authorization / session 等敏感值（含产出文件与日志）。
 - apps 是**独立运行**的工具，**不得被 `tests/` import**（测试复用逻辑应下沉到 `packages/`）。
 - 破坏性操作（写生产库、删除文件）必须显式开关 + 默认 dry-run/只读。
+- **Plane vs 本地**：只有要在 Plane 跑的工具才加 `plane.py` + `@plane_app`。
+  回填 git 的工具（DDL/api_objects/REGISTRY/脚手架）不要注册。领域动作留在
+  `packages/`；`apps.action_runner` 只做协议浅封装。发现器只加载 `plane.py`。
 
 ## 6. 测试
 

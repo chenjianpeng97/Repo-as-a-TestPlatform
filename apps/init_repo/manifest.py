@@ -30,6 +30,8 @@ PLATFORM_PATHS: tuple[str, ...] = (
     "apps/dump_ddl.py",
     "apps/recorder",
     "apps/index_ai",
+    "apps/index_platform",
+    "apps/action_runner",
     "apps/init_repo",
     "tools/git-hooks",
     "AGENTS.md",
