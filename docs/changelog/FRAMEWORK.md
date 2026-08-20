@@ -40,7 +40,8 @@
 
 ## 2026-08-19 — 细分 @plane_* 资产注册，Formulation 不再文件扫描
 
-- **commit**: `TBD`
+- **commit**: `a1f75b5`
+- **来源**: `plane-dogfood@e04974d`
 - **目的**: 能在 Plane 上架的 action words / API / Page 必须 opt-in；执行走 `python -m packages.action_words`，不再把 packages 伪装成 `apps.action_runner`。
 - **路径**:
   - `packages/action_words/plane.py`
@@ -59,7 +60,8 @@
 
 ## 2026-08-19 — apps 作为常规包，保证 python -m 可导入
 
-- **commit**: `TBD`
+- **commit**: `20cbc19`
+- **来源**: `plane-dogfood@64bf0be`
 - **目的**: 补 `apps/__init__.py`，避免 uv 安装后 `python -m apps.index_platform` 找不到模块。mitmproxy 移到 `recorder` extra，Runner 的 `uv sync --no-dev` 不再拉 cryptography。
 - **路径**:
   - `apps/__init__.py`
@@ -74,7 +76,8 @@
 
 ## 2026-08-19 — Plane Job 协议：@plane_app + action_runner + index_platform
 
-- **commit**: `TBD`
+- **commit**: `02dc0f8`
+- **来源**: `plane-dogfood@03c3bc2`
 - **目的**: 本地维护工具（dump_ddl / recorder / init_repo / index_ai）不上 Plane；造数/API 动作经 `apps.action_runner` 浅封装 `packages.action_words`；Sync 用 `apps.index_platform` 导出 catalog。BDD/pytest 仍只引用 packages。
 - **路径**:
   - `apps/_shared/plane_app.py`
