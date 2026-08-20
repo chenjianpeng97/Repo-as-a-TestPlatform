@@ -82,5 +82,12 @@ def discover() -> None:
 
 
 def export_catalog() -> list[dict[str, Any]]:
-    """导出全量目录（元数据 + docstring + 入参 schema + 样例），供平台消费。"""
+    """导出全量目录（元数据 + docstring + 入参 schema + 样例），供本机 CLI。"""
     return [cls.describe() for cls in list_all()]
+
+
+def reset_registry_for_tests() -> None:
+    """Test helper: clear word registration so discover can run again."""
+    global _discovered
+    _REGISTRY.clear()
+    _discovered = False

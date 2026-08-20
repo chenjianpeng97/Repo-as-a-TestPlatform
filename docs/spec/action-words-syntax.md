@@ -30,6 +30,7 @@ packages/action_words/
 ├── base.py              # ActionCategory / TableRows / ActionResult / ActionWord
 ├── context.py           # ActionContext：DB 连接 + API token 惰性初始化
 ├── registry.py          # @register / discover / get / list_all / export_catalog
+├── plane.py             # @plane_db_seed 等 opt-in（Plane Formulation / Job）
 ├── models.py            # 跨 word 共享的业务模型（如 ProductLine）
 ├── _internal/           # 内部工具（ids/generators/params/db/api/wait），不对外
 ├── db_seed/             # 每个造数 word 一个模块
@@ -128,7 +129,7 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
 
 - `run` 输出 `Result` 的 JSON（含 cleanup 登记），退出码 0/1 对应成功/失败；
 - 手工造数后需要清理时，按输出的 cleanup 逐表 `DELETE ... WHERE id IN (...)`。
-- `catalog` 供本机 / `apps.index_platform` 调用 `export_catalog()` 同源数据；**Plane Job 不跑本 CLI**。
+- `catalog` 供本机调用 `export_catalog()`；**Plane 列表只收带 `@plane_*` 的词条**，由 `apps.index_platform` 写入 `components.action_words`。
 
 ## 与 BDD / pytest 的集成
 
@@ -138,15 +139,17 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
   `after_scenario` 按表删除。别名解析（`prd1`/`经销商D`/`inv1`）留在步骤层。
 - **pytest**：直接 `with ActionContext() as ctx: Word(ctx).run(...)`；
   纯构建函数（`build_*_rows` / `build_links`）可离线断言列集与关联键。
-- **禁止**：`tests/**` import `apps.*` 或调用 `python -m apps.action_runner`。
-  Plane 作业走 `apps.action_runner`（协议浅封装）；组合层永远是本包。
+- **禁止**：`tests/**` import `apps.*`。组合层永远是本包。
 
 ## 与 Plane（TestCopilot）
 
-- 词条目录：`apps.index_platform` 调用 `export_catalog()` 写入 catalog
-  `components.action_words`（Formulation 列表 + 每词 schema）。
-- 运行：`python -m apps.action_runner run --expect-category <category> <word_id>`。
-  包内 **零 Plane 知识**（无 `@plane_app`、无 argv_plan）。
+- 仅 `@register` 的 word 供 BDD / 本机 CLI；**不上 Plane**。
+- 要上 Formulation / Job：再加 `@plane_db_seed` / `@plane_db_assert` /
+  `@plane_api_request` / `@plane_api_assert` / `@plane_ui_action` /
+  `@plane_ui_assert`（`from packages.action_words.plane import ...`，内部仍调用 `@register`）。
+- 运行：`python -m packages.action_words run <word_id>`。Plane 不暴露 CLI 的
+  `--username` / `--password` / `--params-file`；Job 只有 `word_id`、`--params` JSON、`--example`。
+- 词条 `params_schema` 仍给 Formulation 业务表单；Job 校验用 `job_params_schema`。
 
 
 ## 敏感信息
@@ -166,3 +169,4 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
 5. `uv run pytest packages/tests/test_action_word_template.py` 通过；
 6. `python -m packages.action_words run <word_id> --example` 冒烟（需要环境时）；
 7. 若供 behave 使用，在步骤层接线并跑 `behave --stage api --dry-run`。
+8. 若要出现在 TestCopilot Formulation：再加对应 `@plane_*` 装饰器。

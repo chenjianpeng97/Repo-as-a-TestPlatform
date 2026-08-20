@@ -42,9 +42,10 @@ confidence: high
 
 ## Formulation
 
-- 绑定后按约定读取场景、action words、API objects、page objects、DDL。
-- 场景页列出 Feature 名称、标签与 Scenario；可预览文件，可「在 TestCopilot 中引用」。
-- Action words 可查看参数模型；真正执行需要 TestCopilot 也已绑定（执行发生在 TestCopilot 工作目录）。
+- Formulation 绑定后读取场景与 DDL（约定扫描）。Action words / API / Page 只展示
+  TestCopilot catalog 里已 `@plane_*` 注册的项；未 Sync 则空列表。
+- Action words 可查看参数模型并执行（`python -m packages.action_words run`）。
+  真正执行需要 TestCopilot 也已绑定。
 - 破坏性 action word（写入被测系统）需要用户确认「我确认此操作会写入被测系统」。
 - 不在 Formulation 里编辑 Gherkin，不回写 git。
 
@@ -57,9 +58,9 @@ confidence: high
 
 - 总览：绑定仓名称/分支/工作目录、HEAD、同步状态，以及测程 / Apps / 常用 SQL / pytest / 作业入口卡片。
 - **测程**：引用 Formulation 场景（路径 + git sha），可选环境；创建后报告在关联运行之前保持为空（状态为待执行）。本阶段 **不会** 自动跑 behave。
-- **工具**：展示 catalog 中已向 Plane 注册的 apps（`plane_runnable`）。本轮即
-  `db_seed` / `db_assert` / `api_request` 等 action_runner 类别。`dump_ddl`、
-  `index_ai`、`recorder` 是本地维护工具，不出现在可运行列表。
+- **工具**：展示 catalog 中已向 Plane 注册的 apps（`@plane_app` / `tools[]`）。
+  `dump_ddl`、`index_ai`、`recorder` 是本地维护工具，不出现在可运行列表。
+  造数 / API 动作在 Formulation Action words（`@plane_db_seed` 等），不出现在 Tools。
 - **常用 SQL**：列出 `assets/sql` 索引，可筛选与预览，不是任意 SQL 控制台。
 - **pytest**：只读展示收集到的节点，本阶段不在此页直接执行。
 
@@ -73,8 +74,9 @@ confidence: high
 ## 白名单（当前已实现的作业类型）
 
 - 唯一硬编码 kind：`index_platform`（Sync，stdout catalog JSON）
-- 其余 kind = catalog `tools[].app_id`（本轮：`db_seed` / `db_assert` / `api_request` / `api_assert` / `ui_action` / `ui_assert`），由测试仓 `@plane_app` 注册
-- 破坏性以工具的 `destructive` 为准（造数 / API 请求 / UI 操作需确认）
+- Tools kind = catalog `tools[].app_id`（真 `@plane_app`）
+- Formulation action-word kind = `components.action_words` 的 `plane_kind`（`db_seed` 等），argv 为 `python -m packages.action_words run`
+- 破坏性以注册项的 `destructive` 为准（造数 / API 请求 / UI 操作需确认）
 - `dump_ddl` / `index_ai` / `recorder` / `init_repo` **不在** Plane Runner 白名单
 
 ## 明确暂缓（feature 里用 @skip 并写原因）

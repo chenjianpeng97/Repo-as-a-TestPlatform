@@ -2,7 +2,7 @@
 description: apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api); no reinventing wheels, no secrets, not imported by tests
 globs: apps/**
 alwaysApply: false
-version: 1.1.0
+version: 1.2.0
 ---
 
 # apps — 创建期约束
@@ -36,7 +36,7 @@ version: 1.1.0
 - **Plane Job**：必须提供 import-safe 的 `apps/<name>/plane.py`，用
   `apps._shared.plane_app.@plane_app` / `register_plane_app` 登记；CLI 形态为
   `python -m apps.<name>`。领域逻辑在 `packages/`，apps 只做协议适配。
-  样例：`apps/action_runner` 浅封装 `packages.action_words`。
+  造数 / API / UI 动作不要再做成伪 app；给 word 加 `@plane_db_seed` 等即可。
 - 发现器只 import 存在 `plane.py` 的包；`cli.py` 可以较重，但 `plane.py` 禁止
   顶层 import DB / mitmproxy。
 
