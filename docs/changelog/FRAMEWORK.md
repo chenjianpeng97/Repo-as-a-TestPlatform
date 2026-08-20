@@ -14,7 +14,6 @@
   - `apps/recorder/**`
   - `apps/dump_ddl.py`
   - `apps/_shared/**`
-  - `apps/action_runner/**`
   - `apps/index_platform/**`
   - `docs/spec/**`（框架规范）
   - `.cursor/skills/**` / `.cursor/rules/**`
@@ -38,6 +37,25 @@
 ```
 
 ---
+
+## 2026-08-19 — 细分 @plane_* 资产注册，Formulation 不再文件扫描
+
+- **commit**: `TBD`
+- **目的**: 能在 Plane 上架的 action words / API / Page 必须 opt-in；执行走 `python -m packages.action_words`，不再把 packages 伪装成 `apps.action_runner`。
+- **路径**:
+  - `packages/action_words/plane.py`
+  - `packages/api_objects/plane.py`
+  - `packages/page_objects/plane.py`
+  - `apps/_shared/plane_asset.py` / `apps/_shared/plane.py`
+  - `apps/index_platform/build.py`
+  - 删除 `apps/action_runner/**`
+  - `docs/spec/action-words-syntax.md` / `docs/spec/apps-authoring-syntax.md`
+  - `.cursor/rules/apps-authoring.mdc` / `.cursor/rules/bdd-asset-layering.mdc`
+  - `INDEX.md` / `apps/README.md`
+  - `pyproject.toml`（version 2.3.0）
+  - `docs/changelog/FRAMEWORK.md`（本条目）
+- **不在同步范围**: 业务 action words 实现、具体 `.feature`
+- **验证**: `pytest apps/_shared/tests apps/index_platform/tests -q`；catalog `tools` 不含 `db_seed`；`components.action_words` 不含 `context`
 
 ## 2026-08-19 — apps 作为常规包，保证 python -m 可导入
 

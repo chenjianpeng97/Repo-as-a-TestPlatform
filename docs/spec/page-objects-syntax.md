@@ -23,6 +23,7 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 
 - **单一职责**：一个对象只描述一个页面或一个组件。
 - **封装**：对外只暴露“业务动作”和“业务断言”，隐藏 locator/等待细节。
+- **Plane**：要出现在 Formulation Page，用 `@plane_pageobject`（`packages.page_objects.plane`）标在类上。未装饰的模块不上架。本期只读展示。
 - **稳定性优先**：优先选择稳定 locator（见下文优先级）。
 - **可审计**：当 locator 不稳定时，必须在实现中体现“风险等级与替代建议”（可通过命名/结构体现，避免在 steps 泄露细节）。
 

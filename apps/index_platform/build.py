@@ -6,13 +6,16 @@ from pathlib import Path
 from typing import Any
 
 from apps._shared.plane_app import export_tools
+from apps._shared.plane_asset import (
+    collect_plane_api_objects,
+    collect_plane_page_objects,
+    export_plane_action_words,
+)
 from apps.index_platform.catalog import (
     read_git_meta,
-    scan_api_objects,
     scan_data_files,
     scan_ddl,
     scan_features,
-    scan_page_objects,
     scan_pytest_nodes,
     scan_sql_files,
 )
@@ -21,11 +24,9 @@ from apps.index_platform.catalog import (
 def build_catalog(root: Path | None = None) -> dict[str, Any]:
     repo = Path(root) if root is not None else Path(__file__).resolve().parents[2]
     tools = export_tools(repo)
-    from packages.action_words import export_catalog as export_action_words
-
-    action_words = export_action_words()
-    api_objects = scan_api_objects(repo)
-    page_objects = scan_page_objects(repo)
+    action_words = export_plane_action_words()
+    api_objects = collect_plane_api_objects(repo)
+    page_objects = collect_plane_page_objects(repo)
     ddl = scan_ddl(repo)
     sql_files = scan_sql_files(repo)
     features = scan_features(repo)

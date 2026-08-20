@@ -6,8 +6,8 @@ Plane Sync 的引导扫描：把测试仓约定资产打成一份 JSON catalog�
 ## 需求背景
 
 Plane API 容器禁止任意 subprocess / git。需要测试仓自己描述：有哪些
-``@plane_app`` 工具、有哪些 action words（schema 来自
-``packages.action_words.export_catalog()``）、feature / pytest / DDL 等索引。
+``@plane_app`` 工具、有哪些 **opt-in** 的 ``@plane_*`` action words / API /
+Page、以及 feature / pytest / DDL 等索引。
 
 ## 试用场景
 
@@ -29,6 +29,6 @@ python -m apps.index_platform --out -
 python -m apps.index_platform --out - | python -c "import json,sys; d=json.load(sys.stdin); print(sorted(t['app_id'] for t in d['tools']))"
 ```
 
-预期 ``tools`` 含 ``db_seed`` 等 action_runner 类别，**不含** ``dump_ddl`` /
-``recorder``。``components.action_words`` 来自 package 注册表，不是经
-``apps.action_runner`` 再导出。
+预期 ``tools`` **不含** ``dump_ddl`` / ``recorder`` / ``db_seed`` 伪 app。
+``components.action_words`` 仅带 ``@plane_db_seed`` 等标记的词条；未装饰的
+``context.py`` / ``__main__.py`` 不会出现。

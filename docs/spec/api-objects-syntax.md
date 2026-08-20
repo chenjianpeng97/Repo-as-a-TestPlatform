@@ -26,6 +26,11 @@ description: API Objects (APIModel) spec for an AI-assisted automation repo. Foc
 - **唯一对齐**：`method + normalized_path` 决定“落到哪个资产”。
 - **禁止**：同一路由为不同场景重复创建多个 API Object（除非重大变更需要升级版本）。
 
+## Plane（TestCopilot）
+
+要出现在 Formulation API：在资产实例上加 `@plane_apiobject`（`from packages.api_objects.plane import plane_apiobject`）。
+`auth.py` 等辅助模块不要装饰。本期只读展示，不在 Plane 发请求。
+
 ## 目录结构与命名规范
 
 > 以“路由树”组织，便于人和 AI 通过路径快速定位。
