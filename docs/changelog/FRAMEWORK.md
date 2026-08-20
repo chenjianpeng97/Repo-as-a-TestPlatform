@@ -40,7 +40,7 @@
 
 ## 2026-08-19 — 细分 @plane_* 资产注册，Formulation 不再文件扫描
 
-- **commit**: `TBD`
+- **commit**: `e04974d`
 - **目的**: 能在 Plane 上架的 action words / API / Page 必须 opt-in；执行走 `python -m packages.action_words`，不再把 packages 伪装成 `apps.action_runner`。
 - **路径**:
   - `packages/action_words/plane.py`
