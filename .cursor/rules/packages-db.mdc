@@ -2,7 +2,7 @@
 description: Require all DB access to go through packages.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL coexist); forbid direct pymssql/pymysql/psycopg, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
 globs: **/*.py
 alwaysApply: false
-version: 1.1.0
+version: 1.2.0
 ---
 
 # packages.db — mandatory multi-datasource surface
@@ -61,8 +61,10 @@ class SeedOnSqlServer(ActionWord):
 
 - Credentials come from `config.env.DATABASES` + env overrides
   (`ARGON_DB_<ALIAS>_HOST` / `PORT` / `USER` / `PASSWORD` / `NAME`; legacy
-  `ARGON_DB_HOST`/... still override the default `main` alias). Hardcoding any
-  credential in code → **forbidden**.
+  `ARGON_DB_HOST`/... still override the default `main` alias). Named
+  prd/uat/dev profiles in gitignored `env_local.ENVIRONMENTS` are resolved by
+  `packages.config` (`ARGON_ENV` > `config/.active_env` > `ACTIVE_ENV`) before
+  those field-level overrides. Hardcoding any credential in code → **forbidden**.
 - Both drivers use pyformat, so SQL must be parameterised with `%s`
   placeholders (or named `%(key)s`) on **every** datasource. Building SQL with
   `f"..."` / `.format()` / `%` string ops for **values** → **forbidden**

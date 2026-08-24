@@ -5,12 +5,18 @@
 #   1. 本文件 DATABASES / TEST_* 占位
 #   2. config/env_overlay.py（可选，项目/试验田提交：额外别名与类型，仍无密钥）
 #   3. config/env_local.py（gitignore，本机真实 host/密码/账号）
+#      - 若定义了非空 ENVIRONMENTS：由 packages.config 按激活名只套用那一套
+#        （ARGON_ENV > config/.active_env > ACTIVE_ENV > 唯一 key）
+#      - 否则按扁平 DATABASES / TEST_* 合并（旧写法）
 #   4. 环境变量 ARGON_DB_<ALIAS>_HOST/PORT/USER/PASSWORD/NAME
 #      （旧的 ARGON_DB_HOST/... 继续覆盖默认别名 "main"）
 #      TEST_BASE_URL / TEST_USERNAME / TEST_PASSWORD 同样优先于本模块。
+#
+# 切换激活环境：python -m packages.config use <name>（写入 gitignore 的 .active_env）。
 
 from __future__ import annotations
 
+import sys
 from typing import Any
 
 DATABASES: dict[str, dict[str, Any]] = {
@@ -51,6 +57,9 @@ TEST_BASE_URL = ""
 # > 环境变量 TEST_USERNAME/TEST_PASSWORD > 此处。
 TEST_ACCOUNT: dict[str, str] | None = None
 
+# 当前套用的命名环境（仅 env_local 使用 ENVIRONMENTS 时由 packages.config 写入）
+ACTIVE_ENV: str | None = None
+
 
 def _merge_databases(overlay: dict[str, Any]) -> None:
     for alias, cfg in overlay.items():
@@ -83,8 +92,19 @@ def _load_overlay(mod_name: str) -> None:
     _apply_module(mod)
 
 
+def _load_env_local() -> None:
+    try:
+        local = __import__("config.env_local", fromlist=["*"])
+    except ImportError:
+        return
+    from packages.config import apply_selected_environment
+
+    if apply_selected_environment(sys.modules[__name__], local) is None:
+        _apply_module(local)
+
+
 _load_overlay("config.env_overlay")
-_load_overlay("config.env_local")
+_load_env_local()
 
 # 向后兼容：历史代码读取的默认库即 main 别名
 DB_CONFIG = DATABASES["main"]

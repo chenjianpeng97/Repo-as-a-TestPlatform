@@ -1,6 +1,6 @@
 ---
 name: dump-ddl
-version: 1.1.0
+version: 1.2.0
 description: Dumps live table DDL into assets/ddl/<datasource>/ via apps/dump_ddl.py, then updates the knowledge index from CHANGELOG. Use when the user says /dump-ddl, dump DDL, 拉取 DDL, 导出表结构, or needs schema files before writing action words / SQL.
 ---
 
@@ -23,6 +23,8 @@ description: Dumps live table DDL into assets/ddl/<datasource>/ via apps/dump_dd
    `type`（`mysql` / `sqlserver` / `postgres`）。**不要把 `env_local.py` 的密码回显到对话。**
 2. 本机真实连接只存在于 `config/env_local.py` 或 `ARGON_DB_<ALIAS>_*`。文件不存在则
    先让用户从 `config/env_local.py.example` 复制并填值，**不要替用户把密钥提交进 git**。
+   多套环境时先 `python -m packages.config show` 确认激活名（`packages.config` 解析
+   `ENVIRONMENTS`）；需要换套则 `python -m packages.config use <name>`。
 3. 缺别名时：试验田/下游仓把无密钥的 `type`/host/库名写进 `env_overlay.py`；密钥仍只放
    `env_local.py`。
 4. PostgreSQL（如 Plane 本地）：容器内 hostname 是 `plane-db`，**从宿主机 dump 必须用

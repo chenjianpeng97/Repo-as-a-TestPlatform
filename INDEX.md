@@ -1,4 +1,4 @@
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -38,6 +38,7 @@
 
 | 包 | 用途 | 规范 |
 | --- | --- | --- |
+| `packages/config` | 命名环境解析与切换（`ENVIRONMENTS` + `.active_env` / `ARGON_ENV`）；API base URL | `python -m packages.config` |
 | `packages/db` | 多数据源 DB 访问（MySQL / SQL Server / PostgreSQL） | `.cursor/rules/packages-db.mdc` |
 | `packages/logging` | 统一日志 | `.cursor/rules/packages-logging.mdc`，`packages/logging/README.md` |
 | `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |

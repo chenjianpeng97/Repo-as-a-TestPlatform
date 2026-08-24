@@ -36,7 +36,8 @@ apps/
   `pymssql` / `psycopg.connect`、硬编码 DSN、SQL 字符串拼接。见 `.cursor/rules/packages-db.mdc`。
 - **日志** → `packages.logging`（`log_info/log_warn/log_error/log_data_setup/...`）。禁止 `print`、
   stdlib `logging`、自建日志文件。见 `.cursor/rules/packages-logging.mdc`。
-- **配置/凭据** → `config/env.py`（+ 环境变量覆盖），不在代码里写死。
+- **配置/凭据** → `config/env.py`（`packages.config` 解析 `env_local` 命名环境；
+  再叠加 `ARGON_DB_*` / `TEST_*` 环境变量），不在代码里写死。
 - **HTTP/API** → 复用 `packages.api_test` / `packages.api_objects`；表格解析用 `packages.excel`。
 
 ## 3. 产出去向
