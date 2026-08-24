@@ -9,6 +9,7 @@
 - **何时写**：改动下列任一可回灌 / 已回灌路径时，同一提交必须追加条目：
   - `packages/api_test/**`
   - `packages/db/**`
+  - `packages/config.py`
   - `packages/logging/**`
   - `packages/excel/**`
   - `apps/recorder/**`
@@ -37,6 +38,18 @@
 ```
 
 ---
+
+## 2026-08-24 — 本机多套环境一键切换（packages.config）
+
+- **commit**: `TBD`
+- **目的**: 在 gitignore 的 `env_local.ENVIRONMENTS` 维护 prd/uat/dev 等目录，用 `.active_env` / `ARGON_ENV` 激活一套，避免注释切换。
+- **路径**:
+  - `packages/config.py`
+  - `config/env.py` / `config/env_local.py.example`
+  - `packages/tests/test_config_env_profiles.py`
+  - `apps/init_repo/manifest.py`（manifest 排除 `env_local.py` / `.active_env`）
+- **不在同步范围**: `config/env_local.py`、`config/.active_env`（本机密钥与激活指针）
+- **验证**: `uv run --extra test pytest packages/tests/test_config_env_profiles.py -q`；模板版本 2.4.0
 
 ## 2026-08-19 — 细分 @plane_* 资产注册，Formulation 不再文件扫描
 

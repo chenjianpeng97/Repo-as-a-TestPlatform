@@ -37,3 +37,4 @@ logs/
 .env.*
 !.env.example
 config/env_local.py
+config/.active_env

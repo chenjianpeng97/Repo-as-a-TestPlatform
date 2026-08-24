@@ -43,7 +43,8 @@ PLATFORM_PATHS: tuple[str, ...] = (
 _EXCLUDE_PARTS = {"__pycache__", ".pytest_cache", ".mypy_cache"}
 _EXCLUDE_SUFFIXES = {".pyc", ".pyo"}
 # Manifest itself is excluded to avoid a self-referential hash.
-_EXCLUDE_NAMES = {"release_manifest.json"}
+# Local secrets / activation pointer must never be hashed into the release artifact.
+_EXCLUDE_NAMES = {"release_manifest.json", "env_local.py", ".active_env"}
 
 
 def read_template_version(root: pathlib.Path = REPO_ROOT) -> str:

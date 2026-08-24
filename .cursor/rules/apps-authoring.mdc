@@ -16,7 +16,7 @@ version: 1.2.0
 - **复用 packages，不重造轮子**：
   - DB → `packages.db.DbClient`（禁止直连驱动 / 硬编码 DSN / SQL 拼接）。
   - 日志 → `packages.logging`（禁止 `print` / stdlib logging / 自建日志文件）。
-  - 配置凭据 → `config/env.py` + 环境变量覆盖（不写死）。
+  - 配置凭据 → `config/env.py`（`packages.config` 解析激活环境）+ 环境变量覆盖（不写死）。
   - HTTP/表格 → `packages.api_test` / `packages.api_objects` / `packages.excel`。
 - **产出去向**：原始知识回填 `assets/`；可复用资源落 `packages/`。
 - **自动区留痕**：覆盖式生成 `assets/**` 或 `packages/api_objects/**` 的工具，运行结束必须
