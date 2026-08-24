@@ -41,7 +41,7 @@
 
 ## 2026-08-24 — 本机多套环境一键切换（packages.config）
 
-- **commit**: `TBD`
+- **commit**: `1acea69`
 - **目的**: 在 gitignore 的 `env_local.ENVIRONMENTS` 维护 prd/uat/dev 等目录，用 `.active_env` / `ARGON_ENV` 激活一套，避免注释切换。
 - **路径**:
   - `packages/config.py`
