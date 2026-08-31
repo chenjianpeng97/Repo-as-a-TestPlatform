@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**25**（rules 10 · skills 12 · agents 1 · hooks 2）
+> 组件总数：**26**（rules 11 · skills 12 · agents 1 · hooks 2）
 
 ## Rules（约束/边界）
 
@@ -15,19 +15,20 @@
 | `apps-authoring` | glob | apps/** | 1.2.0 | apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api) | `.cursor/rules/apps-authoring.mdc` |
 | `apps-handover` | glob | apps/** | 1.0.0 | When an apps/ tool is created or changed, it must ship a handover doc (requirement background, trial scenarios, run met… | `.cursor/rules/apps-handover.mdc` |
 | `assets-knowledge` | glob | assets/** | 1.0.0 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
-| `bdd-asset-layering` | glob | **/*.py | 1.2.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages | `.cursor/rules/bdd-asset-layering.mdc` |
+| `bdd-asset-layering` | glob | **/*.py | 1.2.1 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages | `.cursor/rules/bdd-asset-layering.mdc` |
 | `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/** | 2.0.0 | Three non-negotiable gates for the BDD asset pipeline (Playwright MCP capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
 | `commit-convention` | always | all files | 1.0.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
 | `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/** | 1.1.0 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
 | `packages-db` | glob | **/*.py | 1.2.0 | Require all DB access to go through packages.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL coexis… | `.cursor/rules/packages-db.mdc` |
+| `packages-fake` | glob | **/*.py | 1.0.0 | Require business random/fake values to go through packages.fake | `.cursor/rules/packages-fake.mdc` |
 | `packages-logging` | glob | **/*.py | 1.0.0 | Require all run-time logging to go through packages.logging | `.cursor/rules/packages-logging.mdc` |
 
 ## Skills（操作流程）
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
-| `create-action-word` | on-demand | - | 1.1.0 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
+| `create-action-word` | on-demand | - | 1.1.1 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
 | `create-app` | on-demand | - | 1.0.0 | Scaffolds a new standalone tool under apps/ that reuses packages (db/logging/config/api) and assets, following apps-aut… | `.cursor/skills/create-app/SKILL.md` |
 | `dump-ddl` | on-demand | - | 1.2.0 | Dumps live table DDL into assets/ddl/<datasource>/ via apps/dump_ddl.py, then updates the knowledge index from CHANGELOG | `.cursor/skills/dump-ddl/SKILL.md` |
 | `feature-authoring` | on-demand | - | 1.0.0 | Creates or rewrites behave Gherkin .feature files following behave-gerkin-syntax.md | `.cursor/skills/feature-authoring/SKILL.md` |

@@ -12,6 +12,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "requests>=2.33.1",
     "pydantic>=2",
+    "faker>=37.0.0",
 ]
 
 [project.optional-dependencies]

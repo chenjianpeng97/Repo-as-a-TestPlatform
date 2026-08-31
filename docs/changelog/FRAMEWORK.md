@@ -12,6 +12,7 @@
   - `packages/config.py`
   - `packages/logging/**`
   - `packages/excel/**`
+  - `packages/fake/**`
   - `apps/recorder/**`
   - `apps/dump_ddl.py`
   - `apps/_shared/**`
@@ -66,6 +67,22 @@
   真实起服后用未改动的 `APIModel` 经 `TEST_BASE_URL` 打通并通过断言/提取；
   `--write-mocks` 抓 137 行响应后由 mock server 原样回放（资产侧仍为 5 行 + 截断标记，凭证仍掩码）；
   `python -m apps.index_platform --out -` 可见 `mock_server`（`plane_runnable=false`）；模板版本 2.5.0
+
+## 2026-08-31 — packages.fake 公共造数包
+
+- **commit**: `22ca2c8`
+- **目的**: 提供可 seed 的假数据生成器（医疗 UDI/社信码自研 + Faker zh_CN 包装），CLI/`run`/`catalog` 与业务单值函数共用契约，供测试员手工造数与后续平台 Fake 页。
+- **路径**:
+  - `packages/fake/**`
+  - `packages/tests/test_fake_*.py`
+  - `packages/action_words/_internal/generators.py`（re-export）
+  - `pyproject.toml` / `uv.lock`（`faker`）
+  - `.cursor/rules/packages-fake.mdc`
+  - `.cursor/rules/bdd-asset-layering.mdc`
+  - `.cursor/skills/create-action-word/SKILL.md`
+  - `INDEX.md` / `AGENTS.md` / `docs/spec/action-words-syntax.md`
+- **不在同步范围**: jafron 业务 db_seed 换 import（后续合并后再改）
+- **验证**: `uv run --extra test pytest packages/tests/test_fake_medical.py packages/tests/test_fake_china.py packages/tests/test_fake_core.py packages/tests/test_fake_cli.py -q`；`python -m packages.fake list`
 
 ## 2026-08-24 — 本机多套环境一键切换（packages.config）
 

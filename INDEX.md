@@ -44,6 +44,7 @@
 | `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |
 | `packages/api_mock` | 用 api_objects + `data/mocks` 起可改返回值的 mock server（需 `mock` extra） | `packages/api_mock/README.md` |
 | `packages/excel` | xlsx/CSV 解析 | — |
+| `packages/fake` | 假数据（UDI/USCC/Faker zh_CN）；`run`/`catalog` CLI | `packages/fake/USAGE.md`，`.cursor/rules/packages-fake.mdc` |
 | `packages/action_words` | 业务动作层 | `docs/spec/action-words-syntax.md` |
 | `packages/api_objects` | 路由对齐 API 资产；`registry.iter_api_models()` 枚举全部 APIModel | `docs/spec/api-objects-syntax.md` |
 | `packages/page_objects` | UI 资产 | `docs/spec/page-objects-syntax.md` |

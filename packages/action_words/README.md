@@ -141,7 +141,7 @@ uv run python -m packages.action_words run <word_id> --example
 | 内容 | 位置 |
 | --- | --- |
 | 业务默认常量（主数据样例） | `_internal/params.py`（项目填充） |
-| 随机/派生值生成 | `_internal/generators.py` |
+| 随机/派生值生成 | `packages.fake`（`_internal/generators.py` 为兼容 re-export） |
 | 客户端 bigint id 生成 | `_internal/ids.py` |
 | 批量插入 SQL 帮助函数 | `_internal/db.py` |
 | APIModel 动态加载 / 登录换 token | `_internal/api.py` |
