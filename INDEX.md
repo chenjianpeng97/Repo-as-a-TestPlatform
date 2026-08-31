@@ -38,14 +38,15 @@
 
 | 包 | 用途 | 规范 |
 | --- | --- | --- |
-| `packages/config` | 命名环境解析与切换（`ENVIRONMENTS` + `.active_env` / `ARGON_ENV`）；API base URL | `python -m packages.config` |
+| `packages/config` | 命名环境解析与切换（`ENVIRONMENTS` + `.active_env` / `ARGON_ENV`）；API / UI base URL | `python -m packages.config` |
 | `packages/db` | 多数据源 DB 访问（MySQL / SQL Server / PostgreSQL） | `.cursor/rules/packages-db.mdc` |
 | `packages/logging` | 统一日志 | `.cursor/rules/packages-logging.mdc`，`packages/logging/README.md` |
 | `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |
+| `packages/page_test` | PageModel 运行框架（元素表 + 声明式 flow、多定位器备用、locator 体检、CLI 独立运行） | `packages/page_test/USAGE.md`，`.cursor/rules/packages-page-test.mdc` |
 | `packages/excel` | xlsx/CSV 解析 | — |
 | `packages/action_words` | 业务动作层 | `docs/spec/action-words-syntax.md` |
 | `packages/api_objects` | 路由对齐 API 资产 | `docs/spec/api-objects-syntax.md` |
-| `packages/page_objects` | UI 资产 | `docs/spec/page-objects-syntax.md` |
+| `packages/page_objects` | UI 资产（`PageModel` / `BasePage`，`python -m packages.page_test list` 可查） | `docs/spec/page-objects-syntax.md` |
 
 ### 2.1 已冻结的 API Objects（自动/半自动区）
 
@@ -55,9 +56,9 @@
 
 ### 2.2 已有的 Page Objects
 
-| 页面/组件 | 文件 | 备注 |
-| --- | --- | --- |
-| _(暂无)_ | | |
+| page_id | 文件 | 范式 | 备注 |
+| --- | --- | --- | --- |
+| _(暂无)_ | | | `python -m packages.page_test list` 列出实际发现的资产 |
 
 ## 3. 工具层（apps/）
 

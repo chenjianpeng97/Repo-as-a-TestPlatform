@@ -201,6 +201,24 @@ def get_test_base_url() -> str:
     return base_url.rstrip("/")
 
 
+def get_ui_base_url() -> str:
+    """Base URL for UI execution (host only).
+
+    PageModel assets store only ``url_path`` (no host); the host is injected at
+    runtime by ``packages.page_test.driver.PageDriver``. Falls back to the API
+    host when the SUT serves UI and API from the same origin.
+    """
+
+    base_url = (os.getenv("TEST_UI_BASE_URL") or "").strip()
+    if not base_url:
+        from config import env as env_config
+
+        base_url = str(getattr(env_config, "TEST_UI_BASE_URL", "") or "").strip()
+    if not base_url:
+        return get_test_base_url()
+    return base_url.rstrip("/")
+
+
 def _print_profile_summary(name: str, profile: Mapping[str, Any]) -> None:
     url = profile.get("TEST_BASE_URL") or ""
     databases = profile.get("DATABASES") if isinstance(profile.get("DATABASES"), dict) else {}

@@ -1,0 +1,92 @@
+---
+description: Require all UI locators to live in packages.page_test ElementSpec declarations with multiple fallback candidates; forbid raw page.locator/get_by_* outside page assets
+globs: packages/page_objects/**,tests/features/**,packages/action_words/**
+alwaysApply: false
+version: 1.0.0
+---
+
+# packages.page_test — mandatory UI locator surface
+
+页面资产由 `packages/page_test/` 驱动（完整规范见 `docs/spec/page-objects-syntax.md`，
+用法见 `packages/page_test/USAGE.md`）。**所有 UI 定位都必须经 `ElementSpec` 声明**。
+
+## API to use
+
+```python
+from packages.page_test import (
+    BasePage, ElementSpec, LocatorSpec, PageDriver, PageFlow, PageModel,
+    AssertVisible, Click, Fill, WaitForElement,
+)
+```
+
+- 声明式资产：模块级 `PageModel`，动作写在 `flows` 的 step 序列里。
+- 逃生舱：`BasePage` 子类，复杂交互写 Python 方法，元素经 `self.el(name)` 访问。
+- 执行：`PageDriver.launch()` 自起浏览器，或 `PageDriver.attach(page)` 复用外部 page。
+
+## Hard rules
+
+- **定位器只能出现在 `ElementSpec.locators` 里**。`tests/**`、`packages/action_words/**`
+  以及页面资产的动作方法体内出现 `page.locator(...)` / `get_by_*(...)` / xpath / css
+  字面量 → **禁止**。裸 Playwright API 只能经 `driver.raw_page`（命名刺眼，需在 review
+  中被看见并说明理由）。
+- **每个元素给足候选**：语义定位（`role` 配 `name` / `label`）+ `test_id`（如有）至少两个。
+  只写一个候选就上线等于放弃了 fallback 能力，首选一失效就直接红。
+- **纯文本定位不作首选**：`get_by_text` 在多语言下会全线崩溃；文本只作 role 的限定词。
+- **绝对 XPath 禁止**；相对 XPath 仅当 CSS 表达不出（`text()` / 轴向定位）时使用，且必须
+  `confidence="fragile"` + `note` 写清风险与替代建议。
+- **区分索引寻址与消歧**：`nth(i)` 是用位置代替业务标识（默认禁，豁免须在该页
+  `locator_policy={"allow_index": True}` 并写 `note`）；`.first` 是消除 strict mode
+  violation 的标准手段（允许）。
+- **禁止固定 sleep**：等待用 `WaitForElement` / `WaitForUrl` / `WaitForResponse`，
+  或类范式里的 `expect(...)` 轮询。
+- **无 host、无凭据**：`url_path` 与 `Goto(path=...)` 只写路径（host 由
+  `packages.config.get_ui_base_url()` 注入）；敏感值写 `{{password}}` 占位符，
+  运行时代入，**任何情况下不得把真实凭据写进资产**。
+- **id 约定**：`<app>.<page_slug>@v<major>`。破坏性变更才升 major。
+- 页面资产**不做**业务数据拉取、不发 API 请求、不写 SQL（那是 action words / api_objects
+  / packages.db 的职责）。
+- 改动页面资产需有证据：Playwright MCP snapshot、`run_summary`，或
+  `python -m packages.page_test doctor <page_id>` 报告。
+- 新增/修改资产后必须跑 `python -m packages.page_test validate`（不启浏览器）。
+
+## 自愈边界
+
+- **级别一（运行时降级）**与**级别二（doctor 审计）**是本仓能力。
+- **级别三（自动改写资产源码把命中候选提升为首选）不做** —— 工具悄悄改代码没人 review
+  会造成静默漂移。doctor 只给建议 patch，采纳由人或 AI 显式执行。
+
+## 用途边界
+
+本地 `PageDriver` 供页面资产自检 / health check / pytest 回归 / doctor 体检。
+BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（见
+`bdd-pipeline-gates.mdc` Gate 1），本地 `sync_playwright` 不得替代 MCP。
+
+## Examples
+
+**Bad（selector 泄漏到 step / 单候选 / 索引寻址）**
+
+```python
+@when("点击登录")
+def step_click_login(context):
+    context.page.locator("#login-btn").click()          # selector 在 step 里
+
+ElementSpec(name="row_delete", locators=(
+    LocatorSpec("css", ".ant-table-row:nth-child(2) .del"),   # 索引寻址 + 单候选
+))
+```
+
+**Good**
+
+```python
+@when("点击登录")
+def step_click_login(context):
+    context.pages.login.run("login", **context.vars)    # 资产自己管定位
+
+ElementSpec(
+    name="row_delete",
+    locators=(
+        LocatorSpec("test_id", "row-delete"),
+        LocatorSpec("role", "button", name="删除", scope="order_row"),
+    ),
+)
+```
