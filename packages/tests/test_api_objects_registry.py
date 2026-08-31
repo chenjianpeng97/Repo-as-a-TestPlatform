@@ -145,3 +145,33 @@ def test_find_api_model_matches_exact_method_and_path(tmp_path: Path) -> None:
 
     assert find_api_model("POST", "/svc/thing", root=tmp_path) is not None
     assert find_api_model("GET", "/svc/thing", root=tmp_path) is None
+
+
+def test_recording_package_is_not_scanned_as_assets(tmp_path: Path) -> None:
+    _asset(
+        tmp_path,
+        "svc/thing",
+        "GET.v1.py",
+        var="thing_get_v1",
+        ident="svc.GET./svc/thing@v1",
+        name="thing",
+        method="GET",
+        path="/svc/thing",
+    )
+    rec = tmp_path / "packages" / "api_objects" / "recording"
+    rec.mkdir(parents=True)
+    (rec / "ghost.py").write_text(
+        ASSET.format(
+            var="should_be_ignored",
+            ident="rec.GET./recording/ghost@v1",
+            name="ghost",
+            method="GET",
+            path="/recording/ghost",
+        ),
+        encoding="utf-8",
+    )
+
+    refs = iter_api_models(tmp_path)
+
+    assert [ref.route_key for ref in refs] == ["GET /svc/thing"]
+    assert all("recording" not in ref.file for ref in refs)

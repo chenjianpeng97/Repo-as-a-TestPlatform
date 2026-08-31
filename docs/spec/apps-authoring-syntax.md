@@ -1,7 +1,7 @@
 # apps 工具编写规范（apps-authoring-syntax）
 
 > `apps/` 存放**可独立运行**的测试工具。分两类：
-> **本地维护**（`dump_ddl`、`recorder`、`index_ai`、`init_repo`）——产物进 git，不上 Plane；
+> **本地维护**（`dump_ddl`、`recorder`、`api_recorder`、`page_recorder`、`index_ai`、`init_repo`）——产物进 git，不上 Plane；
 > **Plane Job**（`index_platform`）——`plane.py` + `@plane_app`。
 > 领域动作（造数 / API / UI）留在 `packages/`，用 `@plane_db_seed` 等 opt-in 上架，不经 apps 冒充。
 > 供 `apps-authoring.mdc`（创建期）与 `apps-handover.mdc`（完成期）引用。
@@ -14,7 +14,9 @@
 apps/
 ├── __init__.py                 # 常规包，保证 python -m apps.<name> 可导入
 ├── dump_ddl.py                 # 本地维护：python apps/dump_ddl.py <args>
-├── recorder/                   # 本地维护：python -m apps.recorder
+├── recorder/                   # 本地维护合录：python -m apps.recorder
+├── api_recorder/               # 本地维护代理：python -m apps.api_recorder
+├── page_recorder/              # 本地维护仅 UI：python -m apps.page_recorder
 ├── index_platform/             # Plane Sync 引导扫描（expose=False）
 ├── _shared/plane_app.py        # @plane_app 注册器（不是独立工具）
 ├── _shared/plane_asset.py      # 收集 @plane_* 包资产（不是独立工具）
@@ -44,8 +46,9 @@ apps/
 
 - **原始知识回填** → `assets/`（如 DDL 落 `assets/ddl/<datasource>/`）。
 - **可复用资源** → `packages/`（如抓包冻结为 `packages/api_objects/`）。
-- **自动区变更留痕**：凡是覆盖式生成 `assets/**` 或 `packages/api_objects/**` 的工具，
-  运行结束**必须**用 `apps._shared.changelog.append_entry(...)` 向对应区 `CHANGELOG.md`
+- **自动区变更留痕**：凡是覆盖式生成 `assets/**`、`packages/api_objects/**` 或
+  `packages/page_objects/**` 的工具，运行结束**必须**用
+  `apps._shared.changelog.append_entry(...)` 向对应区 `CHANGELOG.md`
   追加一行（tool / action / items / 关键字段），供 `maintain-index` 增量更新 `INDEX.md`。
 
 ## 4. 交接文档（完成期必产出）
@@ -71,5 +74,6 @@ apps/
 
 ## 6. 测试
 
-- 纯逻辑（归一化、解析、代码生成）应可离线单测，放 `apps/<name>/tests/`（参考 `apps/recorder/tests`）。
+- 纯逻辑（归一化、解析、代码生成）应可离线单测：可放 `packages/**/tests` 或 `apps/<name>/tests/`
+  （参考 `packages/tests/test_api_objects_recording_*.py`、`apps/api_recorder/tests`）。
 - 依赖真实环境的部分用参数/开关隔离，便于 CI 只跑离线单测。

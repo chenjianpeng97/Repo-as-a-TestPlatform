@@ -3,11 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from apps.recorder.addon import ApiObjectRecorderAddon
-from apps.recorder.capture import build_capture
-from apps.recorder.codegen import truncate_sample
-from apps.recorder.freeze import ApiObjectFreezer
-from apps.recorder.mocks import MockSampleWriter
+from packages.api_objects.recording.capture import build_capture
+from packages.api_objects.recording.codegen import truncate_sample
+from packages.api_objects.recording.mocks import MockSampleWriter
 
 
 def _capture(
@@ -250,79 +248,6 @@ def test_max_bytes_zero_disables_the_guard(tmp_path: Path) -> None:
     writer = MockSampleWriter(tmp_path, max_bytes=0)
 
     assert writer.write(_capture(response=_big_list_response(200))).action == "created"
-
-
-# --- addon wiring ----------------------------------------------------------
-
-
-class _FakeFlow:
-    def __init__(self, response_body: dict) -> None:
-        payload = json.dumps(response_body).encode("utf-8")
-        self.request = _FakeRequest()
-        self.response = _FakeResponse(payload)
-
-
-class _FakeRequest:
-    method = "POST"
-    pretty_url = "http://example.com/prod-api/items"
-    url = pretty_url
-    content = b'{"pageNum":1}'
-    headers = {"Content-Type": "application/json"}
-
-
-class _FakeResponse:
-    def __init__(self, content: bytes) -> None:
-        self.status_code = 200
-        self.content = content
-        self.headers = {"Content-Type": "application/json"}
-
-
-def test_addon_writes_both_asset_and_full_mock(tmp_path: Path) -> None:
-    assets = tmp_path / "api_objects"
-    mocks = tmp_path / "mocks"
-    addon = ApiObjectRecorderAddon(
-        outputs_dir=assets,
-        verbose=False,
-        mock_writer=MockSampleWriter(mocks),
-    )
-
-    addon.response(_FakeFlow(_big_list_response(30)))
-
-    asset_src = (assets / "prod-api" / "items" / "POST.v1.py").read_text(encoding="utf-8")
-    assert "...(+25 more)" in asset_src  # asset stays truncated
-
-    mock = json.loads((mocks / "prod-api" / "items" / "POST.v1.json").read_text(encoding="utf-8"))
-    assert len(mock["scenarios"]["success"]["body"]["data"]["list"]) == 30  # mock is complete
-    assert addon.stats["mocks_written"] == 1
-
-
-def test_addon_without_writer_is_unchanged(tmp_path: Path) -> None:
-    addon = ApiObjectRecorderAddon(outputs_dir=tmp_path, verbose=False)
-
-    addon.response(_FakeFlow({"code": 200, "data": []}))
-
-    assert addon.stats["frozen"] == 1
-    assert addon.stats["mocks_written"] == 0
-    assert list(tmp_path.rglob("*.json")) == []
-
-
-def test_mock_write_failure_does_not_break_freezing(tmp_path: Path) -> None:
-    class Exploding(MockSampleWriter):
-        def write(self, capture, *, version: int = 1, asset_id: str | None = None):
-            raise RuntimeError("disk on fire")
-
-    assets = tmp_path / "api_objects"
-    addon = ApiObjectRecorderAddon(
-        outputs_dir=assets,
-        verbose=False,
-        mock_writer=Exploding(tmp_path / "mocks"),
-    )
-
-    addon.response(_FakeFlow({"code": 200, "data": []}))
-
-    assert addon.stats["frozen"] == 1
-    assert addon.stats["mocks_skipped"] == 1
-    assert (assets / "prod-api" / "items" / "POST.v1.py").exists()
 
 
 def test_seeded_mocks_load_into_the_store(tmp_path: Path) -> None:

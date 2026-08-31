@@ -1,7 +1,7 @@
 """Append-only changelog for auto-generated asset areas.
 
-Tools that (re)generate assets — ``apps/dump_ddl`` (DDL), ``apps/recorder``
-(API objects), project-specific generators — append **one line per run** to the
+Tools that (re)generate assets — ``apps/dump_ddl`` (DDL), ``apps.recorder``
+(合录 page+api), ``apps.api_recorder`` (API objects via proxy), ``apps.page_recorder`` (page objects only), project-specific generators — append **one line per run** to the
 changelog of the area they write into. ``maintain-index`` then updates
 ``INDEX.md`` by reading only the **tail delta** of these changelogs, instead of
 re-reading full asset bodies (e.g. every ``assets/ddl/*.sql``). That keeps index

@@ -47,14 +47,14 @@
 | `packages/excel` | xlsx/CSV 解析 | — |
 | `packages/fake` | 假数据（UDI/USCC/Faker zh_CN）；`run`/`catalog` CLI | `packages/fake/USAGE.md`，`.cursor/rules/packages-fake.mdc` |
 | `packages/action_words` | 业务动作层 | `docs/spec/action-words-syntax.md` |
-| `packages/api_objects` | 路由对齐 API 资产；`registry.iter_api_models()` 枚举全部 APIModel | `docs/spec/api-objects-syntax.md` |
+| `packages/api_objects` | 路由对齐 API 资产；`registry.iter_api_models()` 枚举全部 APIModel；冻结内核 `recording/` | `docs/spec/api-objects-syntax.md` |
 | `packages/page_objects` | UI 资产（`PageModel` / `BasePage`，`python -m packages.page_test list` 可查） | `docs/spec/page-objects-syntax.md` |
 
 ### 2.1 已冻结的 API Objects（自动/半自动区）
 
 | method + path | 资产文件 | 来源 | 备注 |
 | --- | --- | --- | --- |
-| _(暂无)_ | | | `python -m apps.recorder` 或 freeze-api-objects 产出 |
+| _(暂无)_ | | | `python -m apps.recorder` / `python -m apps.api_recorder` 或 freeze-api-objects 产出 |
 
 ### 2.2 已有的 Page Objects
 
@@ -69,7 +69,9 @@
 | 工具 | 运行 | 用途 | 交接文档 |
 | --- | --- | --- | --- |
 | `dump_ddl` | `python apps/dump_ddl.py <table> --datasource <alias>` 或 `--all` | **本地**拉取表结构到 `assets/ddl/<alias>/`（不上 Plane） | `apps/README.md`；skill `/dump-ddl` |
-| `recorder` | `python -m apps.recorder` | **本地**代理抓包生成 `packages/api_objects`（不上 Plane） | `apps/recorder/README.md` |
+| `recorder` | `python -m apps.recorder --app <app>` | **本地** headed 合录：默认同时冻 PageObject 与 APIObject（`--page-only` / `--api-only`） | `apps/recorder/README.md` |
+| `api_recorder` | `python -m apps.api_recorder` | **本地** mitmproxy 代理抓包生成 `packages/api_objects`（非浏览器流量；不含 UI 元素表） | `apps/api_recorder/README.md` |
+| `page_recorder` | `python -m apps.page_recorder --app <app>` | **本地** headed 浏览器手点冻结 `packages/page_objects`（仅 UI） | `apps/page_recorder/README.md` |
 | `index_ai` | `python -m apps.index_ai` | **本地**扫描 `.cursor/**` 生成 `.cursor/REGISTRY.md`（不上 Plane） | `apps/index_ai/README.md` |
 | `init_repo` | `python -m apps.init_repo --help` | **本地**生成/更新项目仓骨架（不上 Plane） | `apps/init_repo/README.md` |
 | `index_platform` | `python -m apps.index_platform --out -` | **Plane Sync** 扫描 catalog JSON（不写 git） | `apps/index_platform/README.md` |

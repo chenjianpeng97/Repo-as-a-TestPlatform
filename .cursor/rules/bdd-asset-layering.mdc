@@ -40,7 +40,7 @@ Each layer owns one responsibility. Leakage across layers (e.g. selectors in ste
 ## Cross-cutting
 
 - **No secrets in repo**, ever: `Authorization`, `Cookie`, `Set-Cookie`, `*token*`, `*secret*`, `*password*`, `*session*`. Also applies to captures under `report/` / `testcase/`.
-- **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `apps.recorder` captures, or run_summary findings; avoid locator/path guesses.
+- **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `apps.recorder` / `apps.api_recorder` captures, or run_summary findings; avoid locator/path guesses.
 - **`tests/**` must not import `apps.*`**. Action words for BDD/pytest stay in
   `packages.action_words`. Opt into Plane with `@plane_db_seed` (etc.) from
   `packages.action_words.plane`; do not wrap them as `apps.*`.

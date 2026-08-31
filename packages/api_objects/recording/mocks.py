@@ -30,6 +30,7 @@ from packages.api_mock.spec import DEFAULT_SCENARIO, ResponseSpec, RouteMock, mo
 from packages.api_mock.errors import MockSpecError
 
 from .capture import Capture
+from .normalize import DEFAULT_TOOL
 
 __all__ = ["DEFAULT_MAX_BYTES", "MockSampleWriter", "MockWriteResult"]
 
@@ -52,10 +53,12 @@ class MockSampleWriter:
         *,
         scenario: str = DEFAULT_SCENARIO,
         max_bytes: int = DEFAULT_MAX_BYTES,
+        tool: str = DEFAULT_TOOL,
     ) -> None:
         self.mocks_dir = Path(mocks_dir).resolve()
         self.scenario = scenario or DEFAULT_SCENARIO
         self.max_bytes = int(max_bytes)
+        self.tool = (tool or DEFAULT_TOOL).strip() or DEFAULT_TOOL
         self.mocks_dir.mkdir(parents=True, exist_ok=True)
 
     def write(self, capture: Capture, *, version: int = 1, asset_id: str | None = None) -> MockWriteResult:
@@ -78,7 +81,7 @@ class MockSampleWriter:
             headers=self._response_headers(capture),
             body=body,
             description=(
-                "Full sample recorded by apps.recorder at "
+                f"Full sample recorded by apps.{self.tool} at "
                 f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}"
                 + ("" if capture.response_is_json else " (non-JSON response: body not captured)")
             ),
@@ -91,7 +94,7 @@ class MockSampleWriter:
                 path=capture.normalized_path,
                 id=asset_id,
                 version=max(1, version),
-                description=f"Recorded by apps.recorder from {capture.method} {capture.path}",
+                description=f"Recorded by apps.{self.tool} from {capture.method} {capture.path}",
                 active=self.scenario,
                 scenarios={self.scenario: response},
             )

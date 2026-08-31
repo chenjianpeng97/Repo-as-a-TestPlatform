@@ -262,3 +262,13 @@ def test_survives_primary_locator_rot(monkeypatch):
 本地 `PageDriver` 供页面资产自检 / health check / pytest 回归 / doctor 体检。
 BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（见
 `.cursor/rules/bdd-pipeline-gates.mdc` Gate 1），本地驱动不得替代。
+
+### 11) 手点录制（apps.page_recorder）
+
+```bash
+uv sync --extra bdd
+uv run python -m apps.page_recorder --app plane --flow login --url /sign-in --scan
+```
+
+人工点填时直播冻结 `PageModel`（多候选 + 当前 flow）。密码写成 `{{password}}`。
+交接见 `apps/page_recorder/README.md`。这不是 MCP capture 的替代品。

@@ -29,7 +29,7 @@ description: Creates or updates action words under packages/action_words/ follow
    `python apps/dump_ddl.py <table> --datasource <别名>`），列名固化为模块级
    `*_COLUMNS` 元组。
 5. API 类：只编排 `packages/api_objects/**` 冻结资产（`_internal/api.load_api`），
-   缺资产时先走 freeze-api-objects / apps.recorder 流程，**不得**手写 request 契约。
+   缺资产时先走 freeze-api-objects / `apps.recorder` 合录 / `apps.api_recorder` 代理，**不得**手写 request 契约。
 
 ## Hard template rules (enforced)
 

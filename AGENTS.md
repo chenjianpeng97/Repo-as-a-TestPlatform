@@ -12,7 +12,7 @@
 | --- | --- | --- | --- |
 | 知识层 | `assets/` | 给人和 LLM 阅读、生成测试代码的基础知识（ddl / sql / usecases / testreport / domain-notes）。见 `docs/spec/assets-knowledge-syntax.md`。 | 只读引用 |
 | 组件层 | `packages/` | 被引用、不独立运行的代码（db / logging / api_test / api_objects / page_objects / action_words / excel / config / fake）。 | 被 import；`packages.fake` 另提供 `python -m packages.fake` CLI |
-| 工具层 | `apps/` | 可独立运行的测试工具（`dump_ddl` / `recorder` / `index_ai` / `init_repo` / 项目特定造数）。见 `docs/spec/apps-authoring-syntax.md`。 | `python -m apps.<name>` |
+| 工具层 | `apps/` | 可独立运行的测试工具（`dump_ddl` / `recorder` 合录 / `api_recorder` 代理 / `page_recorder` / `index_ai` / `init_repo` / 项目特定造数）。见 `docs/spec/apps-authoring-syntax.md`。 | `python -m apps.<name>` |
 | 数据层 | `data/` | 供测试代码读取的结构化测试数据。 | 被读取 |
 | 测试层 | `tests/` | 自动化测试代码（behave `features/` + `pytest/`）。 | behave / pytest |
 | 文档层 | `docs/` | 仓库使用说明与规范（`docs/spec/**`）。 | 只读 |
@@ -50,7 +50,7 @@ flowchart TD
 - **业务 UI/API 流** → 参见 `.cursor/agents/bdd-asset-pipeline.md`（该编排内部含 BDD 三门禁，仅在此分支生效）。
 - **明确 pytest** → 直接写 pytest，复用 `packages/**`，不要为满足分层而硬造 Gherkin。
 - **造工具** → `create-app` skill；工具做好按 `apps-handover.mdc` 补交接文档。
-- **补知识** → 用 `apps/dump_ddl`、`apps/recorder` 等回填 `assets/` / `packages/api_objects`，再进入生成。
+- **补知识** → 用 `apps/dump_ddl`、`apps/recorder`（合录）、`apps/api_recorder`（代理）、`apps/page_recorder` 等回填 `assets/` / `packages/api_objects` / `packages/page_objects`，再进入生成。
 - **仓库初始化/发布** → `apps/init_repo`（携带 release manifest）+ `release-template` skill。
 - **读/索引知识** → 先查 `INDEX.md`；若存在 `INDEX.project.md` 则一并查。索引维护用 `maintain-index` skill。
 

@@ -2,7 +2,7 @@
 description: Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail; index is the discovery entry for humans and the LLM
 globs: assets/**,packages/api_objects/**,packages/page_objects/**,apps/**
 alwaysApply: false
-version: 1.1.0
+version: 1.1.1
 ---
 
 # index-hygiene — 索引与留痕纪律
@@ -11,8 +11,9 @@ version: 1.1.0
 
 ## 留痕（changelog trail）
 
-- **自动区**（工具产出：`assets/ddl/`、`packages/api_objects/` 等）：由**生成工具**在写文件时
-  追加 changelog（`assets/CHANGELOG.md` / `packages/api_objects/CHANGELOG.md`），格式见
+- **自动区**（工具产出：`assets/ddl/`、`packages/api_objects/`、`packages/page_objects/` 等）：由**生成工具**在写文件时
+  追加 changelog（`assets/CHANGELOG.md` / `packages/api_objects/CHANGELOG.md` /
+  `packages/page_objects/CHANGELOG.md`），格式见
   `docs/spec/apps-authoring-syntax.md`。人不手改自动区语义，要更新就重跑工具。
 - **人工/半自动区**（`assets/usecases`、`domain-notes`、`sql`、新 page/api object、新 app）：
   新增/变更后应在对应索引登记一行（或运行 `maintain-index` skill 增量补齐）：

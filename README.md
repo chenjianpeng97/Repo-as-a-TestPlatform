@@ -125,8 +125,8 @@ Behave --> Report["report"]
 
 ### 3) 资产沉淀类
 
-- **Page Object 维护**：从上下文提取定位候选，按优先级生成/更新 `packages/page_objects/`
-- **API Object 固化**：从 capture / `apps.recorder` 归一化/指纹匹配，生成/更新 `packages/api_objects/`（严格脱敏）
+- **Page Object 维护**：从上下文提取定位候选，或 `python -m apps.page_recorder` 手点冻结 `packages/page_objects/`
+- **API Object 固化**：从 capture / `apps.recorder` 合录 / `apps.api_recorder` 代理归一化/指纹匹配，生成/更新 `packages/api_objects/`（严格脱敏）
 - **Action Word 创建/维护**：按 `action-words-syntax.md` 新增或更新 `packages/action_words/**`
 - **复用分析**：对比现有 page/api objects / action words，判断“复用/新增/升级版本”
 
@@ -137,7 +137,7 @@ Behave --> Report["report"]
 ```text
 .
 ├── .cursor/skills/             # AI skills（含 create-action-word 等）
-├── apps/                       # 可独立运行的工具（dump_ddl、recorder）
+├── apps/                       # 可独立运行的工具（dump_ddl、recorder 合录、api_recorder 代理）
 ├── assets/                     # 原始用例资产、DDL 等（非 BDD 代码）
 │   └── ddl/                    # 表结构 SQL（工具产出）
 ├── tests/                      # 测试入口
@@ -169,7 +169,7 @@ Behave --> Report["report"]
 - **写/导入用例资产**：将 CSV/MD 等放入 `assets/`
 - **编写 feature**：在 `tests/features/` 新建 `.feature`（遵循 `behave-gerkin-syntax.md`）
 - **运行与沉淀**：
-  - SKILL 驱动执行场景（Playwright MCP）或 `python -m apps.recorder` 抓包
+  - SKILL 驱动执行场景（Playwright MCP）或 `python -m apps.recorder` 合录 / `python -m apps.api_recorder` 代理抓包
   - 生成/更新 `packages/page_objects/`、`packages/api_objects/`、`packages/action_words/`
   - 自动/半自动补齐 `tests/features/*_steps/`
 - **执行回归**：使用 behave 运行并产出 report（可用 html-pretty formatter）

@@ -1,7 +1,7 @@
 ---
 name: create-app
 description: Scaffolds a new standalone tool under apps/ that reuses packages (db/logging/config/api) and assets, following apps-authoring-syntax.md. Use when the engineer needs an on-demand test tool (data generator, checker, exporter, capture/enrichment) built from packages + assets.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Create App — 按需开发一个独立工具
@@ -15,8 +15,9 @@ version: 1.0.0
 
 ## Before creating（复用优先）
 
-1. 看 `apps/` 是否已有同类工具（`dump_ddl` 拉 DDL、`recorder` 抓包冻结 api_objects、
-   `index_ai` 生成注册表、`init_repo` 初始化）。能扩展就别新建。
+1. 看 `apps/` 是否已有同类工具（`dump_ddl` 拉 DDL、`recorder` 合录冻 page+api、
+   `api_recorder` 代理抓包、`page_recorder` 仅冻 page_objects、`index_ai` 生成注册表、
+   `init_repo` 初始化）。能扩展就别新建。
 2. 查根 `INDEX.md`：要用到的知识（DDL/SQL/用例）是否已在 `assets/`；缺则先回填。
 3. 明确工具的**输入/输出去向**：原始知识 → `assets/`；可复用资源 → `packages/`。
 4. 明确要复用哪些 packages：DB(`packages.db`)、日志(`packages.logging`)、
@@ -41,7 +42,7 @@ apps/<name>/
 - 支持 `python -m apps.<name>`；参数用 `argparse`。
 - DB 只走 `packages.db.DbClient`；日志只走 `packages.logging`；凭据只从 `config/env.py`
   + 环境变量取；**禁止** `print`、直连驱动、硬编码 DSN、SQL 拼接、自建日志文件。
-- 覆盖式生成 `assets/**` / `packages/api_objects/**` 的工具，运行结束必须
+- 覆盖式生成 `assets/**` / `packages/api_objects/**` / `packages/page_objects/**` 的工具，运行结束必须
   `apps._shared.changelog.append_entry(...)` 追加对应区 `CHANGELOG.md`。
 - 不得被 `tests/` import；不得写入 token/cookie/密码等敏感值；破坏性操作默认 dry-run/只读。
 

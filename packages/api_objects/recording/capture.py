@@ -10,7 +10,7 @@ from email.policy import HTTP
 from typing import Any, Mapping, Optional
 from urllib.parse import parse_qsl
 
-from .normalize import body_keys, fingerprint, normalize_path, schema_from_mapping, split_url
+from .normalize import DEFAULT_TOOL, body_keys, fingerprint, normalize_path, schema_from_mapping, split_url
 from .sanitize import detect_auth_strategy, sanitize_headers, sanitize_mapping
 
 _BOUNDARY_RE = re.compile(r"boundary=(?P<q>\"([^\"]+)\"|([^;\s]+))", re.I)
@@ -50,7 +50,9 @@ class Capture:
         )
 
 
-def _parse_multipart(raw: bytes, content_type: str) -> tuple[dict[str, Any], dict[str, Any], str]:
+def _parse_multipart(
+    raw: bytes, content_type: str, *, tool: str = DEFAULT_TOOL
+) -> tuple[dict[str, Any], dict[str, Any], str]:
     """Parse multipart/form-data; never keep file bytes — only field names.
 
     Returns ``(text_fields, files_schema, body_format)``.
@@ -91,9 +93,9 @@ def _parse_multipart(raw: bytes, content_type: str) -> tuple[dict[str, Any], dic
         filename_m = _FILENAME_RE.search(cd)
         if filename_m or part.get_filename():
             raw_name = (filename_m.group(1) if filename_m else part.get_filename()) or ""
-            note = "captured by apps.recorder (file field; content discarded)"
+            note = f"captured by apps.{tool} (file field; content discarded)"
             if raw_name:
-                note = f"captured by apps.recorder; sample filename={raw_name!s}"
+                note = f"captured by apps.{tool}; sample filename={raw_name!s}"
             files_schema[name] = {
                 "type": "file",
                 "required": False,
@@ -118,7 +120,7 @@ def _parse_multipart(raw: bytes, content_type: str) -> tuple[dict[str, Any], dic
 
 
 def _parse_body(
-    raw: bytes | str | None, content_type: str
+    raw: bytes | str | None, content_type: str, *, tool: str = DEFAULT_TOOL
 ) -> tuple[Any, str, dict[str, Any]]:
     """Return ``(body, body_format, files_schema)``.
 
@@ -135,7 +137,7 @@ def _parse_body(
     # Multipart first — may be binary-ish; do not utf-8-decode whole body.
     if "multipart/form-data" in ct_full.lower():
         raw_bytes = raw if isinstance(raw, bytes) else raw.encode("utf-8", errors="replace")
-        text_fields, files_schema, fmt = _parse_multipart(raw_bytes, ct_full)
+        text_fields, files_schema, fmt = _parse_multipart(raw_bytes, ct_full, tool=tool)
         if fmt == "multipart":
             return text_fields, "multipart", files_schema
         return None, "none", empty_files
@@ -209,6 +211,7 @@ def build_capture(
     response_status: int,
     response_headers: Mapping[str, Any],
     response_content: bytes | str | None,
+    tool: str = DEFAULT_TOOL,
 ) -> Capture:
     host, path, query = split_url(url)
     npath = normalize_path(path)
@@ -223,7 +226,8 @@ def build_capture(
             resp_ct = str(v)
             break
 
-    body, parsed_format, files_schema = _parse_body(request_content, req_ct)
+    stamp = (tool or DEFAULT_TOOL).strip() or DEFAULT_TOOL
+    body, parsed_format, files_schema = _parse_body(request_content, req_ct, tool=stamp)
     method_u = method.upper()
     if method_u == "GET":
         body = None
@@ -259,7 +263,9 @@ def build_capture(
         auth_required=auth_required,
         auth_strategy=auth_strategy,
         auth_source=auth_source,
-        query_schema=schema_from_mapping(safe_query, required=False),
-        body_schema=schema_from_mapping(body if isinstance(body, Mapping) else {}, required=False),
+        query_schema=schema_from_mapping(safe_query, required=False, tool=stamp),
+        body_schema=schema_from_mapping(
+            body if isinstance(body, Mapping) else {}, required=False, tool=stamp
+        ),
         files_schema=dict(files_schema or {}),
     )

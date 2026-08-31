@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from apps.recorder.normalize import (
+from packages.api_objects.recording.normalize import (
     fingerprint,
     is_static_request,
     normalize_path,
@@ -47,3 +47,44 @@ def test_fingerprint_includes_files_keys():
 
 def test_service_from_path():
     assert service_from_path("/argon/mainData/x") == "argon"
+
+
+def test_skip_api_flow_filters():
+    from packages.api_objects.recording.normalize import skip_api_flow
+
+    assert skip_api_flow(method="OPTIONS", url="http://example.com/api") == "method"
+    assert skip_api_flow(method="HEAD", url="http://example.com/api") == "method"
+    assert (
+        skip_api_flow(
+            method="GET",
+            url="http://cdn.example.com/app.js",
+        )
+        == "static"
+    )
+    assert (
+        skip_api_flow(
+            method="GET",
+            url="http://example.com/",
+            response_content_type="text/html; charset=utf-8",
+        )
+        == "static"
+    )
+    assert (
+        skip_api_flow(
+            method="POST",
+            url="http://other.example.com/api",
+            include_host="api.example.com",
+        )
+        == "host"
+    )
+    assert (
+        skip_api_flow(
+            method="POST",
+            url="http://api.example.com/items",
+            request_content_type="application/json",
+            response_content_type="application/json",
+            include_host="api.example.com",
+        )
+        is None
+    )
+

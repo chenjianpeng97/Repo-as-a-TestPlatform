@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from apps.recorder.capture import build_capture
-from apps.recorder.freeze import ApiObjectFreezer, parse_existing_asset
+from packages.api_objects.recording.capture import build_capture
+from packages.api_objects.recording.freeze import ApiObjectFreezer, parse_existing_asset
 
 
 def _cap(*, url: str, method: str = "GET", query_body: bytes = b"", resp: bytes = b'{"code":200,"data":[]}'):
@@ -71,3 +71,13 @@ def test_freeze_form_body_format(tmp_path: Path):
     text = r.path.read_text(encoding="utf-8")
     assert 'body_format="form"' in text
     assert "resp.content" in text
+
+
+def test_freeze_stamps_tool_and_recording_export_marker(tmp_path: Path):
+    freezer = ApiObjectFreezer(tmp_path, tool="api_recorder")
+    result = freezer.freeze(_cap(url="http://example.com/svc/ping"))
+    text = result.path.read_text(encoding="utf-8")
+    assert "Auto-maintained by apps.api_recorder" in text
+    init = result.path.parent.joinpath("__init__.py").read_text(encoding="utf-8")
+    assert "# --- recording export: GET.v1.py ---" in init
+    assert "apps.recorder export" not in init

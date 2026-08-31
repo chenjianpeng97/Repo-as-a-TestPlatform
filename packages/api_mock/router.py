@@ -1,7 +1,7 @@
 """Match an incoming request path against mock route patterns.
 
 Patterns use the same dynamic-segment vocabulary that
-``apps.recorder.normalize.normalize_path`` emits when it freezes assets
+``packages.api_objects.recording.normalize_path`` emits when it freezes assets
 (``{id}`` for integer segments, ``{uuid}`` for UUIDs). That function normalises
 a concrete path into a pattern; this module does the inverse — deciding whether
 a concrete path satisfies a pattern — so the two are complementary rather than

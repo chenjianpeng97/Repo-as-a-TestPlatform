@@ -16,6 +16,8 @@
   - `packages/excel/**`
   - `packages/fake/**`
   - `apps/recorder/**`
+  - `apps/api_recorder/**`
+  - `apps/page_recorder/**`
   - `apps/dump_ddl.py`
   - `apps/_shared/**`
   - `apps/index_platform/**`
@@ -41,6 +43,51 @@
 ```
 
 ---
+
+## 2026-08-31 — recorder 改名合录 + API 冻结内核下沉
+
+- **commit**: `TBD`
+- **目的**: 不兼容变更：`python -m apps.recorder` 从 mitmproxy 代理改为 headed 合录
+  （同一 Playwright 会话默认同时冻 PageObject 与 APIObject；`--page-only` /
+  `--api-only` 关一边）。旧代理迁到 `python -m apps.api_recorder`。收到 `--port` /
+  `--listen_host` **不**静默转发。冻结内核下沉到 `packages.api_objects.recording`
+  （离线可测；registry/catalog 跳过 `recording/`）。**不替代** BDD Gate 1 的 MCP 网络捕获。
+- **路径**:
+  - `packages/api_objects/recording/**`（capture / normalize / sanitize / codegen / freeze / mocks / pipeline）
+  - `apps/api_recorder/**`（mitmproxy CLI + `PlaywrightApiTap`）
+  - `apps/recorder/**`（合录门面：复用 `PageRecorderSession` + tap）
+  - `apps/page_recorder/session.py`（`on_page_ready` / `freeze_pages`）
+  - `packages/tests/test_api_objects_recording_*.py`、`apps/api_recorder/tests/**`、`apps/recorder/tests/**`
+  - `INDEX.md` §3、`AGENTS.md`、`apps/README.md`、`docs/spec/apps-authoring-syntax.md`
+  - `apps/init_repo/manifest.py`（`PLATFORM_PATHS` 追加 `apps/api_recorder`）
+  - `pyproject.toml`（version 3.0.0）
+- **不在同步范围**: 具体业务 `packages/api_objects/<路由>/`、`packages/page_objects/<app>/*.py` 正文
+- **验证**: `uv run --extra test pytest packages/tests/test_api_objects_recording_*.py packages/tests/test_api_objects_auth.py apps/api_recorder/tests apps/recorder/tests -q`；
+  `uv run python -m apps.recorder --help`；`uv run python -m apps.api_recorder --help`
+  （CI 不启 headed 浏览器、不启 mitmproxy）
+
+## 2026-08-31 — page_recorder：手点冻结 PageModel
+
+- **commit**: `TBD`
+- **目的**: 补齐 page_test 的录制接缝：headed Playwright 打开真实页面，人工点/填/浏览时
+  直播冻结声明式 `PageModel`（多候选 LocatorSpec + 当前 flow）到 `packages/page_objects/`，
+  对标 `apps.recorder` 的「抓一条冻一条」。不使用 `playwright codegen`（无 fallback、
+  无 `{{password}}`、不过 `locator_policy`）。绝对 XPath 在 harvest 阶段即丢弃。
+  本地 CLI，不加 `@plane_app`；**不替代** BDD Gate 1 的 MCP 网络捕获。
+- **路径**:
+  - `packages/page_test/harvest.py`（DOM 快照 → 排序后的 LocatorSpec；离线可测）
+  - `apps/page_recorder/**`（session / capture / freeze / codegen / cli）
+  - `packages/tests/test_page_test_harvest.py`、`apps/page_recorder/tests/**`
+  - `docs/spec/page-objects-syntax.md`（录制小节）
+  - `docs/spec/apps-authoring-syntax.md`（changelog 覆盖 `packages/page_objects/**`）
+  - `.cursor/rules/apps-authoring.mdc` / `index-hygiene.mdc`
+  - `.cursor/skills/create-app` / `maintain-index` / `maintain-page-objects`
+  - `INDEX.md` §3、`apps/README.md`、`packages/page_test/USAGE.md`
+  - `apps/init_repo/manifest.py`（`PLATFORM_PATHS` 追加 `apps/page_recorder`）
+  - `pyproject.toml`（version 2.6.0）
+- **不在同步范围**: 具体业务页面资产（`packages/page_objects/<app>/*.py` 正文）
+- **验证**: `uv run --extra test pytest packages/tests/test_page_test_harvest.py apps/page_recorder/tests -q`；
+  `uv run python -m apps.page_recorder --help`（CI 不启 headed 浏览器）
 
 ## 2026-08-31 — api_objects 可回放为 mock server（packages.api_mock / apps.mock_server）
 

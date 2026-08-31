@@ -2,7 +2,7 @@
 description: apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api); no reinventing wheels, no secrets, not imported by tests
 globs: apps/**
 alwaysApply: false
-version: 1.2.0
+version: 1.2.1
 ---
 
 # apps — 创建期约束
@@ -19,7 +19,8 @@ version: 1.2.0
   - 配置凭据 → `config/env.py`（`packages.config` 解析激活环境）+ 环境变量覆盖（不写死）。
   - HTTP/表格 → `packages.api_test` / `packages.api_objects` / `packages.excel`。
 - **产出去向**：原始知识回填 `assets/`；可复用资源落 `packages/`。
-- **自动区留痕**：覆盖式生成 `assets/**` 或 `packages/api_objects/**` 的工具，运行结束必须
+- **自动区留痕**：覆盖式生成 `assets/**`、`packages/api_objects/**` 或
+  `packages/page_objects/**` 的工具，运行结束必须
   调用 `apps._shared.changelog.append_entry(...)` 追加该区 `CHANGELOG.md`（供 `maintain-index`）。
 
 ## 禁止
@@ -27,8 +28,8 @@ version: 1.2.0
 - 不得被 `tests/` import（复用逻辑下沉到 `packages/`）。
 - 不得写入 token / cookie / 密码 / Authorization / session 等敏感值。
 - 破坏性操作无开关、默认非 dry-run/只读 → 禁止。
-- 不得为了「被 Plane 看见」而给本地维护工具加 `@plane_app`（dump_ddl / recorder /
-  init_repo / index_ai 保持本机 CLI，产物进 git）。
+-   不得为了「被 Plane 看见」而给本地维护工具加 `@plane_app`（dump_ddl / recorder /
+  api_recorder / page_recorder / init_repo / index_ai 保持本机 CLI，产物进 git）。
 
 ## Plane 可运行 vs 本地维护
 

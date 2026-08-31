@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from apps.recorder.capture import build_capture
-from apps.recorder.freeze import ApiObjectFreezer
+from packages.api_objects.recording.capture import build_capture
+from packages.api_objects.recording.freeze import ApiObjectFreezer
 
 
 def _multipart_body(*, boundary: str = "----BoundaryTest") -> bytes:

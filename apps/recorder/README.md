@@ -1,127 +1,84 @@
-# apps.recorder — API Object traffic recorder
+# apps.recorder — headed 合录（PageObject + APIObject）
 
-Terminal HTTP(S) proxy that captures browser/client traffic and **auto-maintains** route-aligned API Objects under `packages/api_objects/` (or a custom `--outputs_dir`), following `docs/spec/api-objects-syntax.md`.
+拉起 headed Playwright 浏览器，人工点击 / 填写 / 浏览时**默认同时冻结**：
 
-## Install
+- `PageModel` → `packages/page_objects/`（元素表多候选 + 当前操作流）
+- `APIModel` → `packages/api_objects/`（路由树；Playwright `page.on("response")`）
 
-```bash
-pip install -e ".[recorder]"
-# or
-pip install "mitmproxy>=10"
-```
+不走 `playwright codegen`，不合入 mitmproxy。非浏览器客户端请用
+`python -m apps.api_recorder`。
 
-## Run
+**不是** BDD Gate 1：MCP 网络证据规则不变。本地 Playwright 不能替代 MCP capture。
 
-From the repo root:
+## 需求背景
 
-```bash
-python -m apps.recorder
-# custom output root (still expects an api_objects-style tree underneath)
-python -m apps.recorder --outputs_dir D:\tmp\api_objects
-# only freeze a target host
-python -m apps.recorder --include_host example.com --port 8888
-# also save FULL response samples for apps.mock_server
-python -m apps.recorder --write-mocks
-```
+`apps.page_recorder` 只冻 UI，`apps.api_recorder` 只冻代理流量。人工对着真实页面点一遍时，
+XHR 与 DOM 本来就在同一会话里，合录避免开两个工具、两套会话。
 
-Defaults:
+## 试用场景
 
-| Flag | Default |
-|------|---------|
-| `--outputs_dir` | `<repo>/packages/api_objects` |
-| `--listen_host` | `127.0.0.1` |
-| `--port` | `8080` |
-| `--write-mocks` | off |
-| `--mocks-dir` | `<repo>/data/mocks` |
-| `--mock-scenario` | `success` |
-| `--mock-max-bytes` | `1048576` (1 MiB; `0` disables) |
+**适用**
 
-Configure the browser (or OS) HTTP/HTTPS proxy to `127.0.0.1:8080`. For HTTPS, install/trust the mitmproxy CA.
+- 给尚未有 Page / API Object 的流程快速冻出元素表 + 接口资产（登录、填表）。
+- 只要 UI：`--page-only`（等价于只跑 page_recorder 的冻结侧）。
+- 只要 API：`--api-only`（仍开 headed 浏览器，不写 PageModel）。
 
-## What gets frozen
+**不适用**
 
-- Non-static API requests (JSON / form-urlencoded / **multipart upload** / binary download routes)
-- Path normalized: numeric segments → `{id}`, UUIDs → `{uuid}`
-- Files written as route tree + `<METHOD>.v<MAJOR>.py`, e.g.  
-  `packages/api_objects/argon/mainData/getCategoryTree/GET.v1.py`
-- Compatible re-hits **merge** into existing v1 (additive schema / stable asserts)
-- Secrets never written (`Authorization` / `Cookie` / `*token*` / …)
-- Each asset ends with ``if __name__ == "__main__"``：回放录制时的 request，并对 recorded response 做稳定断言
-- **Multipart**：只冻结文本字段 + 文件**字段名**（`files_schema`）；**从不**写入文件字节。回放需设置 `TEST_UPLOAD_FILE` 或 `TEST_UPLOAD_FILE_<FIELD>` 指向本地样例文件，否则 `__main__` 会 SKIP
+- 不能替代 BDD 流水线的 **Playwright MCP Gate 1**。
+- 不抓非浏览器 HTTP 客户端（用 `apps.api_recorder`）。
+- 不把命中 locator 自动提升为首选；不自动把 XHR 写成 `WaitForResponse` step。
 
-## Replay a single asset（端到端样本回放）
+**前置条件**
 
-录制后直接运行资产文件即可复现当时那次请求：
+- `uv sync --extra bdd` 后 `uv run playwright install chromium`
+- UI 入口：`--url` 绝对地址，或 `TEST_UI_BASE_URL` / `TEST_BASE_URL`
+- 可选 `--storage-state`（凭据仍不进资产）
+
+## 运行方式
 
 ```bash
-# 鉴权（类似 Postman Environment）——统一维护在 packages/api_objects/auth.py
-set TEST_BASE_URL=https://your-env.example
-set TEST_BEARER_TOKEN=...          # 或 TEST_USERNAME + TEST_PASSWORD 自动登录
+uv sync --extra bdd
+uv run playwright install chromium
 
-uv run python packages/api_objects/prod-api/bsx/mainReport/auditDistributorList/GET.v1.py
+uv run python -m apps.recorder --app plane --flow login --url /sign-in --scan
+# 只要 UI / 只要 API
+uv run python -m apps.recorder --app plane --url /sign-in --page-only
+uv run python -m apps.recorder --app plane --url /sign-in --api-only
+# API 侧同时写完整 mock
+uv run python -m apps.recorder --app plane --url /sign-in --write-mocks
 ```
 
-- Request / Response 样本写在文件底部的 `_RECORDED_*` 常量中（随 recorder 更新）
-- Token / Cookie **不**写入资产；一律从 `packages.api_objects.auth` 注入
-- 断言策略：`http_status` + `$.code` + 顶层 key 形状；列表类字段（`rows`/`data`）不做全量相等（易变）
+旧命令 `python -m apps.recorder --port 8080` **不会**静默转去代理，会报错并提示改用
+`python -m apps.api_recorder`。
 
-## `--write-mocks`：另存**完整**响应样例
+| 参数 | 默认 | 说明 |
+| --- | --- | --- |
+| `--app` | （必填） | PageModel 目录 `packages/page_objects/<app>/` |
+| `--flow` | `recorded` | 写入的 page flow 名 |
+| `--url` | `get_ui_base_url()` | 起始地址 |
+| `--scan` | 关 | 进页扫描可见控件（仅冻 page 时生效） |
+| `--outputs_dir` | `packages/page_objects` | Page Objects 根目录 |
+| `--api-outputs-dir` | `packages/api_objects` | API Objects 根目录 |
+| `--page-only` / `--api-only` | 关（双冻） | 互斥；只关一边 |
+| `--write-mocks` | 关 | 仅 API 开启时把完整响应写入 `data/mocks` |
+| `--storage-state` | 空 | 已登录会话 JSON |
+| `--include_host` | 空 | 页面与 API 共用的 host 子串过滤 |
 
-资产里的 `_RECORDED_RESPONSE` 是**故意截断**的（`codegen.truncate_sample`：列表留 5 条 +
-`...(+N more)`、嵌套超 6 层塌成 `...`、字符串超 240 字符裁掉），因为 Python 源码要保持可读、可 diff。
-但这样的样例喂给 `apps.mock_server` 就只剩 5 行数据和一堆 `null` 空洞。
+终端 **Ctrl+C** 或关掉浏览器窗口结束。
 
-加上 `--write-mocks` 后，同一次抓包会**额外**把**完整**响应体写成 mock 定义，
-与资产同路由树、同 `v<N>` 后缀：
+- page 有改动 → `packages/page_objects/CHANGELOG.md`
+- api 有改动 → `packages/api_objects/CHANGELOG.md`
 
-```text
-packages/api_objects/prod-api/inout/report/his/queryInoutHis/POST.v1.py    # 截断，给人读
-data/mocks/          prod-api/inout/report/his/queryInoutHis/POST.v1.json  # 完整，给 mock server 跑
-```
+## 实现
+
+薄封装，不复制 harvest/freeze：
+
+- UI：`apps.page_recorder.PageRecorderSession`（`on_page_ready` 挂 tap）
+- API：`apps.api_recorder.PlaywrightApiTap` → `packages.api_objects.recording`
+- tap 回调内禁止 `page.evaluate`（避免与 `expose_binding` 死锁）；可读 `response.body()`
 
 ```bash
-python -m apps.recorder --write-mocks
-# 抓完直接起 mock server 回放真实数据
-python -m apps.mock_server serve --port 8931
-```
-
-行为要点：
-
-- **只刷新自己那个场景**（默认 `success`）。文件里手工加的 `empty` / `boom` 等场景、
-  以及用户切到哪个 `active`，重录都不会被覆盖。
-- 想保住手工调过的 `success`，就让 recorder 写别的名字：`--mock-scenario recorded`。
-- 响应头**只保留 `Content-Type`**。回放录制来的 `Content-Length` / `Transfer-Encoding`
-  会与实际响应体不符，反而把客户端搞坏。
-- 超过 `--mock-max-bytes` 的响应跳过并计入 `mocks_skipped`，避免把巨型响应写进仓库。
-- 脱敏与资产**同一套**（`sanitize.py` 在 `build_capture` 阶段就已掩码），不会因为存全量而泄漏凭证。
-  但它确实比资产多留**很多行真实业务数据**，请按对待抓包产物的标准对待 `data/mocks/`。
-- mock 写失败不会影响冻结资产（异常被吞掉并计数，代理继续跑）。
-
-没开这个开关时，recorder 的行为与以前完全一致。
-若已经录过但当时没开，可以用 `python -m apps.mock_server seed` 从截断样例补一份骨架（数据不全）。
-
-## What is skipped
-
-- **`.js` / `.css`** (and `.mjs` / `.cjs`) — hard requirement
-- Other static blobs (images, fonts, source maps, media)
-- `OPTIONS` / `HEAD` / `CONNECT`
-- HTML document GETs (SPA shells)
-
-## Layout
-
-```text
-apps/recorder/
-  cli.py          # argparse + mitmdump runner
-  addon.py        # mitmproxy response hook
-  capture.py      # sanitize + structure one exchange
-  normalize.py    # path / fingerprint / static filter
-  sanitize.py     # header/body secret scrubbing
-  codegen.py      # APIModel source render (truncates samples)
-  freeze.py       # create/update route-tree files
-  mocks.py        # --write-mocks: full samples -> data/mocks (apps.mock_server)
-  tests/          # app-local unit tests
-```
-
-```bash
-uv run --with pytest pytest apps/recorder/tests -q
+uv run --extra test pytest apps/recorder/tests -q
+uv run python -m apps.recorder --help
 ```
