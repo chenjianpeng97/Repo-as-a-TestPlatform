@@ -20,6 +20,8 @@ python -m apps.recorder
 python -m apps.recorder --outputs_dir D:\tmp\api_objects
 # only freeze a target host
 python -m apps.recorder --include_host example.com --port 8888
+# also save FULL response samples for apps.mock_server
+python -m apps.recorder --write-mocks
 ```
 
 Defaults:
@@ -29,6 +31,10 @@ Defaults:
 | `--outputs_dir` | `<repo>/packages/api_objects` |
 | `--listen_host` | `127.0.0.1` |
 | `--port` | `8080` |
+| `--write-mocks` | off |
+| `--mocks-dir` | `<repo>/data/mocks` |
+| `--mock-scenario` | `success` |
+| `--mock-max-bytes` | `1048576` (1 MiB; `0` disables) |
 
 Configure the browser (or OS) HTTP/HTTPS proxy to `127.0.0.1:8080`. For HTTPS, install/trust the mitmproxy CA.
 
@@ -59,6 +65,41 @@ uv run python packages/api_objects/prod-api/bsx/mainReport/auditDistributorList/
 - Token / Cookie **不**写入资产；一律从 `packages.api_objects.auth` 注入
 - 断言策略：`http_status` + `$.code` + 顶层 key 形状；列表类字段（`rows`/`data`）不做全量相等（易变）
 
+## `--write-mocks`：另存**完整**响应样例
+
+资产里的 `_RECORDED_RESPONSE` 是**故意截断**的（`codegen.truncate_sample`：列表留 5 条 +
+`...(+N more)`、嵌套超 6 层塌成 `...`、字符串超 240 字符裁掉），因为 Python 源码要保持可读、可 diff。
+但这样的样例喂给 `apps.mock_server` 就只剩 5 行数据和一堆 `null` 空洞。
+
+加上 `--write-mocks` 后，同一次抓包会**额外**把**完整**响应体写成 mock 定义，
+与资产同路由树、同 `v<N>` 后缀：
+
+```text
+packages/api_objects/prod-api/inout/report/his/queryInoutHis/POST.v1.py    # 截断，给人读
+data/mocks/          prod-api/inout/report/his/queryInoutHis/POST.v1.json  # 完整，给 mock server 跑
+```
+
+```bash
+python -m apps.recorder --write-mocks
+# 抓完直接起 mock server 回放真实数据
+python -m apps.mock_server serve --port 8931
+```
+
+行为要点：
+
+- **只刷新自己那个场景**（默认 `success`）。文件里手工加的 `empty` / `boom` 等场景、
+  以及用户切到哪个 `active`，重录都不会被覆盖。
+- 想保住手工调过的 `success`，就让 recorder 写别的名字：`--mock-scenario recorded`。
+- 响应头**只保留 `Content-Type`**。回放录制来的 `Content-Length` / `Transfer-Encoding`
+  会与实际响应体不符，反而把客户端搞坏。
+- 超过 `--mock-max-bytes` 的响应跳过并计入 `mocks_skipped`，避免把巨型响应写进仓库。
+- 脱敏与资产**同一套**（`sanitize.py` 在 `build_capture` 阶段就已掩码），不会因为存全量而泄漏凭证。
+  但它确实比资产多留**很多行真实业务数据**，请按对待抓包产物的标准对待 `data/mocks/`。
+- mock 写失败不会影响冻结资产（异常被吞掉并计数，代理继续跑）。
+
+没开这个开关时，recorder 的行为与以前完全一致。
+若已经录过但当时没开，可以用 `python -m apps.mock_server seed` 从截断样例补一份骨架（数据不全）。
+
 ## What is skipped
 
 - **`.js` / `.css`** (and `.mjs` / `.cjs`) — hard requirement
@@ -75,8 +116,9 @@ apps/recorder/
   capture.py      # sanitize + structure one exchange
   normalize.py    # path / fingerprint / static filter
   sanitize.py     # header/body secret scrubbing
-  codegen.py      # APIModel source render
+  codegen.py      # APIModel source render (truncates samples)
   freeze.py       # create/update route-tree files
+  mocks.py        # --write-mocks: full samples -> data/mocks (apps.mock_server)
   tests/          # app-local unit tests
 ```
 

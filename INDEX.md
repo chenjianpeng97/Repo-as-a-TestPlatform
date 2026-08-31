@@ -42,9 +42,10 @@
 | `packages/db` | 多数据源 DB 访问（MySQL / SQL Server / PostgreSQL） | `.cursor/rules/packages-db.mdc` |
 | `packages/logging` | 统一日志 | `.cursor/rules/packages-logging.mdc`，`packages/logging/README.md` |
 | `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |
+| `packages/api_mock` | 用 api_objects + `data/mocks` 起可改返回值的 mock server（需 `mock` extra） | `packages/api_mock/README.md` |
 | `packages/excel` | xlsx/CSV 解析 | — |
 | `packages/action_words` | 业务动作层 | `docs/spec/action-words-syntax.md` |
-| `packages/api_objects` | 路由对齐 API 资产 | `docs/spec/api-objects-syntax.md` |
+| `packages/api_objects` | 路由对齐 API 资产；`registry.iter_api_models()` 枚举全部 APIModel | `docs/spec/api-objects-syntax.md` |
 | `packages/page_objects` | UI 资产 | `docs/spec/page-objects-syntax.md` |
 
 ### 2.1 已冻结的 API Objects（自动/半自动区）
@@ -70,6 +71,7 @@
 | `index_ai` | `python -m apps.index_ai` | **本地**扫描 `.cursor/**` 生成 `.cursor/REGISTRY.md`（不上 Plane） | `apps/index_ai/README.md` |
 | `init_repo` | `python -m apps.init_repo --help` | **本地**生成/更新项目仓骨架（不上 Plane） | `apps/init_repo/README.md` |
 | `index_platform` | `python -m apps.index_platform --out -` | **Plane Sync** 扫描 catalog JSON（不写 git） | `apps/index_platform/README.md` |
+| `mock_server` | `python -m apps.mock_server serve` / `seed` / `routes` | **常驻服务**（Plane `long_lived`）：按 `data/mocks` 回放 api_objects 路由，控制面可运行时改返回值 | `apps/mock_server/README.md` |
 
 ## 4. 测试层（tests/）
 

@@ -39,6 +39,34 @@
 
 ---
 
+## 2026-08-31 — api_objects 可回放为 mock server（packages.api_mock / apps.mock_server）
+
+- **commit**: `TBD`
+- **目的**: 让冻结的 `APIModel` 资产能直接起一个可在运行时改返回值的 mock 服务，
+  供后端未就绪 / 造异常分支 / 测试平台按需定义响应时使用。
+  `APIModel` 只描述请求契约（`response_hints` 仅有顶层键名、状态码只藏在 asserts 里、
+  真实样例 `_RECORDED_RESPONSE` 在 `__main__` 块内 import 不到），
+  因此**响应契约外置**到 `data/mocks/**.json`，按路由树与资产一一对照，
+  `packages/api_test` 与 `apps/recorder` 均未改动。
+- **路径**:
+  - `packages/api_mock/**`（`spec` 定义 / `store` 磁盘+内存覆盖 / `router` 占位符匹配 / `app` FastAPI）
+  - `packages/api_objects/registry.py`（`iter_api_models()`：按文件位置加载，
+    修正了按点分模块名发现会跳过 `prod-api` 这类非标识符路由目录的问题）
+  - `apps/mock_server/**`（`serve` / `seed` / `routes`；`plane.py` 用 `runtime="long_lived"`
+    登记为常驻服务，是本仓第一个使用该 runtime 的 app）
+  - `apps/recorder/**`（新增 `--write-mocks`：抓包时把**完整**响应另存为 mock 定义。
+    资产里的 `_RECORDED_RESPONSE` 仍按 `truncate_sample` 截断以保证源码可读，
+    完整体走 `data/mocks/`，两者同路由树同 `v<N>`；`mocks.py` + `FreezeResult.major`）
+  - `apps/init_repo/manifest.py`（`PLATFORM_PATHS` 追加 `apps/mock_server`）
+  - `pyproject.toml`（新增 `mock` extra：fastapi / uvicorn / httpx）
+  - `packages/tests/test_api_mock_*.py`、`test_api_objects_registry.py`、`test_mock_server_seed.py`、
+    `apps/recorder/tests/test_mock_samples.py`
+- **不在同步范围**: `data/mocks/**`（项目业务资产，不随平台 DNA 分发）
+- **验证**: `uv run --extra test --extra mock pytest packages/tests apps -q`（+88 用例）；
+  真实起服后用未改动的 `APIModel` 经 `TEST_BASE_URL` 打通并通过断言/提取；
+  `--write-mocks` 抓 137 行响应后由 mock server 原样回放（资产侧仍为 5 行 + 截断标记，凭证仍掩码）；
+  `python -m apps.index_platform --out -` 可见 `mock_server`（`plane_runnable=false`）；模板版本 2.5.0
+
 ## 2026-08-24 — 本机多套环境一键切换（packages.config）
 
 - **commit**: `1acea69`
