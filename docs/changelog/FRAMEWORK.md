@@ -12,6 +12,7 @@
   - `packages/config.py`
   - `packages/logging/**`
   - `packages/excel/**`
+  - `packages/fake/**`
   - `apps/recorder/**`
   - `apps/dump_ddl.py`
   - `apps/_shared/**`
@@ -38,6 +39,22 @@
 ```
 
 ---
+
+## 2026-08-31 — packages.fake 公共造数包
+
+- **commit**: `TBD`
+- **目的**: 提供可 seed 的假数据生成器（医疗 UDI/社信码自研 + Faker zh_CN 包装），CLI/`run`/`catalog` 与业务单值函数共用契约，供测试员手工造数与后续平台 Fake 页。
+- **路径**:
+  - `packages/fake/**`
+  - `packages/tests/test_fake_*.py`
+  - `packages/action_words/_internal/generators.py`（re-export）
+  - `pyproject.toml` / `uv.lock`（`faker`）
+  - `.cursor/rules/packages-fake.mdc`
+  - `.cursor/rules/bdd-asset-layering.mdc`
+  - `.cursor/skills/create-action-word/SKILL.md`
+  - `INDEX.md` / `AGENTS.md` / `docs/spec/action-words-syntax.md`
+- **不在同步范围**: jafron 业务 db_seed 换 import（后续合并后再改）
+- **验证**: `uv run --extra test pytest packages/tests/test_fake_medical.py packages/tests/test_fake_china.py packages/tests/test_fake_core.py packages/tests/test_fake_cli.py -q`；`python -m packages.fake list`
 
 ## 2026-08-24 — 本机多套环境一键切换（packages.config）
 

@@ -43,6 +43,7 @@
 | `packages/logging` | 统一日志 | `.cursor/rules/packages-logging.mdc`，`packages/logging/README.md` |
 | `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |
 | `packages/excel` | xlsx/CSV 解析 | — |
+| `packages/fake` | 假数据（UDI/USCC/Faker zh_CN）；`run`/`catalog` CLI | `packages/fake/USAGE.md`，`.cursor/rules/packages-fake.mdc` |
 | `packages/action_words` | 业务动作层 | `docs/spec/action-words-syntax.md` |
 | `packages/api_objects` | 路由对齐 API 资产 | `docs/spec/api-objects-syntax.md` |
 | `packages/page_objects` | UI 资产 | `docs/spec/page-objects-syntax.md` |

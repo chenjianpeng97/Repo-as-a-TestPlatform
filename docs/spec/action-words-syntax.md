@@ -16,7 +16,7 @@ description: Action Words spec for unified test-asset management. Covers the bas
   - 造数产生的行**按表登记 cleanup**，测试夹具场景后精确删除。
 - **边界**：
   - action word 是**业务动作**，不是技术封装——`packages/db`、`packages/api_test`、
-    `packages/api_objects` 这类基础设施不属于 action word；
+    `packages/api_objects`、`packages.fake` 这类基础设施不属于 action word；
   - API 类 word **只编排冻结的 API Objects**（`packages/api_objects/**`），不得
     手写 request 契约（与 `api-objects-syntax` 的边界一致）；
   - behave 步骤层只做「DataTable / 别名 → word 入参」翻译，不写执行逻辑。
