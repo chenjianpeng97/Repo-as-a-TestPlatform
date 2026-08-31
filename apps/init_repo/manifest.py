@@ -33,6 +33,7 @@ PLATFORM_PATHS: tuple[str, ...] = (
     "apps/index_ai",
     "apps/index_platform",
     "apps/init_repo",
+    "apps/mock_server",
     "tools/git-hooks",
     "AGENTS.md",
     "INDEX.md",

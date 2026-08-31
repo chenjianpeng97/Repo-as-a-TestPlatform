@@ -8,11 +8,16 @@ from urllib.parse import urlsplit
 
 from .capture import build_capture
 from .freeze import ApiObjectFreezer, FreezeResult
+from .mocks import MockSampleWriter
 from .normalize import SKIP_METHODS, is_static_request
 
 
 class ApiObjectRecorderAddon:
-    """Capture eligible HTTP flows into route-aligned API Objects."""
+    """Capture eligible HTTP flows into route-aligned API Objects.
+
+    When ``mock_writer`` is set, the same capture is also saved untruncated as a
+    mock definition so ``apps.mock_server`` can replay the real payload.
+    """
 
     def __init__(
         self,
@@ -20,11 +25,21 @@ class ApiObjectRecorderAddon:
         outputs_dir: Path,
         include_host: Optional[str] = None,
         verbose: bool = True,
+        mock_writer: Optional[MockSampleWriter] = None,
     ) -> None:
         self.freezer = ApiObjectFreezer(outputs_dir)
         self.include_host = (include_host or "").strip().lower() or None
         self.verbose = verbose
-        self.stats = {"seen": 0, "skipped_static": 0, "skipped_host": 0, "skipped_method": 0, "frozen": 0}
+        self.mock_writer = mock_writer
+        self.stats = {
+            "seen": 0,
+            "skipped_static": 0,
+            "skipped_host": 0,
+            "skipped_method": 0,
+            "frozen": 0,
+            "mocks_written": 0,
+            "mocks_skipped": 0,
+        }
         self.results: list[FreezeResult] = []
 
     def _log(self, msg: str) -> None:
@@ -85,14 +100,37 @@ class ApiObjectRecorderAddon:
             self._log(
                 f"[recorder] {result.action} {result.method} {result.normalized_path} -> {result.path}"
             )
+            self._write_mock(capture, result)
         except Exception as exc:  # noqa: BLE001 — keep proxy alive on freeze errors
             self._log(f"[recorder] freeze error: {exc}")
 
+    def _write_mock(self, capture, result: FreezeResult) -> None:
+        """Side-car full-sample write. Never let it break the freeze path."""
+        if self.mock_writer is None or result.action == "skipped":
+            return
+        try:
+            written = self.mock_writer.write(capture, version=result.major)
+        except Exception as exc:  # noqa: BLE001 — a mock write must not kill the proxy
+            self.stats["mocks_skipped"] += 1
+            self._log(f"[recorder] mock write error: {exc}")
+            return
+        if written.action == "skipped":
+            self.stats["mocks_skipped"] += 1
+        else:
+            self.stats["mocks_written"] += 1
+        self._log(f"[recorder] mock {written.action} {written.path} ({written.detail})")
+
     def done(self) -> None:
-        self._log(
+        summary = (
             "[recorder] done "
             f"seen={self.stats['seen']} frozen={self.stats['frozen']} "
             f"skipped_static={self.stats['skipped_static']} "
             f"skipped_host={self.stats['skipped_host']} "
             f"skipped_method={self.stats['skipped_method']}"
         )
+        if self.mock_writer is not None:
+            summary += (
+                f" mocks_written={self.stats['mocks_written']} "
+                f"mocks_skipped={self.stats['mocks_skipped']}"
+            )
+        self._log(summary)

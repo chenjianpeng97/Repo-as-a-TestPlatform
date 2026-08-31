@@ -12,6 +12,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 DEFAULT_OUTPUTS = REPO_ROOT / "packages" / "api_objects"
+DEFAULT_MOCKS = REPO_ROOT / "data" / "mocks"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -55,6 +56,36 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Less console output",
     )
+    p.add_argument(
+        "--write-mocks",
+        action="store_true",
+        help=(
+            "Also save the FULL (untruncated) response sample as a mock definition "
+            "for apps.mock_server. The asset's _RECORDED_RESPONSE stays truncated "
+            "for readability; this side-car keeps every row."
+        ),
+    )
+    p.add_argument(
+        "--mocks-dir",
+        type=pathlib.Path,
+        default=DEFAULT_MOCKS,
+        help=f"Where --write-mocks saves definitions (default: {DEFAULT_MOCKS})",
+    )
+    p.add_argument(
+        "--mock-scenario",
+        default="success",
+        help=(
+            "Scenario name the recorder writes/refreshes (default: success). "
+            "Other scenarios in the file are preserved. Use a distinct name "
+            "(e.g. recorded) to keep a hand-tuned 'success' untouched."
+        ),
+    )
+    p.add_argument(
+        "--mock-max-bytes",
+        type=int,
+        default=1_048_576,
+        help="Skip mock writes whose JSON body exceeds this size (default: 1 MiB; 0 disables)",
+    )
     return p
 
 
@@ -78,10 +109,23 @@ async def _run_proxy(args: argparse.Namespace) -> None:
     outputs_dir = args.outputs_dir.expanduser().resolve()
     outputs_dir.mkdir(parents=True, exist_ok=True)
 
+    mock_writer = None
+    mocks_dir = None
+    if args.write_mocks:
+        from apps.recorder.mocks import MockSampleWriter
+
+        mocks_dir = args.mocks_dir.expanduser().resolve()
+        mock_writer = MockSampleWriter(
+            mocks_dir,
+            scenario=args.mock_scenario,
+            max_bytes=args.mock_max_bytes,
+        )
+
     addon = ApiObjectRecorderAddon(
         outputs_dir=outputs_dir,
         include_host=args.include_host or None,
         verbose=not args.quiet,
+        mock_writer=mock_writer,
     )
 
     opts = Options(
@@ -94,6 +138,8 @@ async def _run_proxy(args: argparse.Namespace) -> None:
 
     print(f"API Object recorder proxy listening on {args.listen_host}:{args.port}")
     print(f"Writing assets to: {outputs_dir}")
+    if mocks_dir is not None:
+        print(f"Writing full response samples to: {mocks_dir} (scenario '{args.mock_scenario}')")
     print("Point the browser / system HTTP(S) proxy here.")
     print("Static .js/.css (and similar assets) are ignored.")
     print("For HTTPS, trust the mitmproxy CA (mitmproxy docs: about:certificates / certutil).")

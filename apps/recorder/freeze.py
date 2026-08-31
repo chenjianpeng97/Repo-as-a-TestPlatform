@@ -29,6 +29,8 @@ class FreezeResult:
     method: str
     normalized_path: str
     detail: str = ""
+    major: int = 1
+    """Asset major version, so side-car writers can align their ``v<N>`` suffix."""
 
 
 def ensure_package_inits(root: Path, segments: list[str]) -> None:
@@ -218,6 +220,7 @@ class ApiObjectFreezer:
                 method=capture.method,
                 normalized_path=capture.normalized_path,
                 detail="empty path",
+                major=0,
             )
 
         ensure_package_inits(self.outputs_dir, segments)
@@ -236,6 +239,7 @@ class ApiObjectFreezer:
                 path=target,
                 method=capture.method,
                 normalized_path=capture.normalized_path,
+                major=major,
             )
 
         path, major = existing
@@ -299,4 +303,5 @@ class ApiObjectFreezer:
             method=capture.method,
             normalized_path=capture.normalized_path,
             detail=f"merged into v{major}",
+            major=major,
         )

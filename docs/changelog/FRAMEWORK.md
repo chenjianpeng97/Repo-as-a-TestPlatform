@@ -8,10 +8,13 @@
 
 - **何时写**：改动下列任一可回灌 / 已回灌路径时，同一提交必须追加条目：
   - `packages/api_test/**`
+  - `packages/page_test/**`
+  - `packages/page_objects/session.py`（凭据与回放接缝，非业务资产）
   - `packages/db/**`
   - `packages/config.py`
   - `packages/logging/**`
   - `packages/excel/**`
+  - `packages/fake/**`
   - `apps/recorder/**`
   - `apps/dump_ddl.py`
   - `apps/_shared/**`
@@ -38,6 +41,88 @@
 ```
 
 ---
+
+## 2026-08-31 — api_objects 可回放为 mock server（packages.api_mock / apps.mock_server）
+
+- **commit**: `ca0ebc6`
+- **目的**: 让冻结的 `APIModel` 资产能直接起一个可在运行时改返回值的 mock 服务，
+  供后端未就绪 / 造异常分支 / 测试平台按需定义响应时使用。
+  `APIModel` 只描述请求契约（`response_hints` 仅有顶层键名、状态码只藏在 asserts 里、
+  真实样例 `_RECORDED_RESPONSE` 在 `__main__` 块内 import 不到），
+  因此**响应契约外置**到 `data/mocks/**.json`，按路由树与资产一一对照，
+  `packages/api_test` 与 `apps/recorder` 均未改动。
+- **路径**:
+  - `packages/api_mock/**`（`spec` 定义 / `store` 磁盘+内存覆盖 / `router` 占位符匹配 / `app` FastAPI）
+  - `packages/api_objects/registry.py`（`iter_api_models()`：按文件位置加载，
+    修正了按点分模块名发现会跳过 `prod-api` 这类非标识符路由目录的问题）
+  - `apps/mock_server/**`（`serve` / `seed` / `routes`；`plane.py` 用 `runtime="long_lived"`
+    登记为常驻服务，是本仓第一个使用该 runtime 的 app）
+  - `apps/recorder/**`（新增 `--write-mocks`：抓包时把**完整**响应另存为 mock 定义。
+    资产里的 `_RECORDED_RESPONSE` 仍按 `truncate_sample` 截断以保证源码可读，
+    完整体走 `data/mocks/`，两者同路由树同 `v<N>`；`mocks.py` + `FreezeResult.major`）
+  - `apps/init_repo/manifest.py`（`PLATFORM_PATHS` 追加 `apps/mock_server`）
+  - `pyproject.toml`（新增 `mock` extra：fastapi / uvicorn / httpx）
+  - `packages/tests/test_api_mock_*.py`、`test_api_objects_registry.py`、`test_mock_server_seed.py`、
+    `apps/recorder/tests/test_mock_samples.py`
+- **不在同步范围**: `data/mocks/**`（项目业务资产，不随平台 DNA 分发）
+- **验证**: `uv run --extra test --extra mock pytest packages/tests apps -q`（+88 用例）；
+  真实起服后用未改动的 `APIModel` 经 `TEST_BASE_URL` 打通并通过断言/提取；
+  `--write-mocks` 抓 137 行响应后由 mock server 原样回放（资产侧仍为 5 行 + 截断标记，凭证仍掩码）；
+  `python -m apps.index_platform --out -` 可见 `mock_server`（`plane_runnable=false`）；模板版本 2.5.0
+
+## 2026-08-31 — packages.fake 公共造数包
+
+- **commit**: `22ca2c8`
+- **目的**: 提供可 seed 的假数据生成器（医疗 UDI/社信码自研 + Faker zh_CN 包装），CLI/`run`/`catalog` 与业务单值函数共用契约，供测试员手工造数与后续平台 Fake 页。
+- **路径**:
+  - `packages/fake/**`
+  - `packages/tests/test_fake_*.py`
+  - `packages/action_words/_internal/generators.py`（re-export）
+  - `pyproject.toml` / `uv.lock`（`faker`）
+  - `.cursor/rules/packages-fake.mdc`
+  - `.cursor/rules/bdd-asset-layering.mdc`
+  - `.cursor/skills/create-action-word/SKILL.md`
+  - `INDEX.md` / `AGENTS.md` / `docs/spec/action-words-syntax.md`
+- **不在同步范围**: jafron 业务 db_seed 换 import（后续合并后再改）
+- **验证**: `uv run --extra test pytest packages/tests/test_fake_medical.py packages/tests/test_fake_china.py packages/tests/test_fake_core.py packages/tests/test_fake_cli.py -q`；`python -m packages.fake list`
+
+## 2026-08-29 — page_test 运行库：PageModel 资产 + 多定位器备用 + doctor 体检
+
+- **commit**: `a0193d9`
+- **目的**: 把 Page Object 从「手写 class + `@property` locator」升级为与 `packages.api_test`
+  同构的运行库：`PageModel`（元素表 + 声明式 flow）对位 `APIModel`、`PageDriver` 对位
+  `ApiClient`。三个可落地的收益：
+  1. **稳定性**：每个元素挂一组按优先级排序的候选定位器，运行时顺序探测；首选失效时
+     自动降级（测试不红），并产出健康事件避免资产静默腐烂。`locator_policy` 把
+     `page-objects-syntax.md` 的 locator 约束变成运行时可执行的校验（对位
+     `headers_policy` 拦截敏感请求头）。
+  2. **独立运行**：`python -m packages.page_test run/list/describe/validate/catalog/doctor`，
+     以及资产文件 `__main__` 单文件回放（对位 api_objects 的 `auth.replay_execute`）。
+  3. **平台化 / recorder 接缝**：`describe()` 导出元素表 + 流程步骤表，step 与
+     `LocatorSpec` 双向 `to_dict()` / `from_dict()`，`fingerprint()` 供去重。
+  复杂交互走 `BasePage` 逃生舱：动作写 Python 方法，元素声明不变，因此照样享受
+  fallback、可视化与体检。自愈只做级别一（运行时降级）与级别二（doctor 审计），
+  **不做**级别三（自动改写资产源码）。
+- **路径**:
+  - `packages/page_test/**`（`locator` / `steps` / `model` / `driver` / `base` / `health`
+    / `registry` / `errors` / `testing` / `__main__` / `USAGE.md`）
+  - `packages/page_objects/session.py`（凭据与单文件回放接缝）、`packages/page_objects/__init__.py`
+  - `packages/config.py`（新增 `get_ui_base_url()`：`TEST_UI_BASE_URL` → `config.env` → 回落 API host）
+  - `packages/tests/test_page_test_{locator,steps,model,driver,health,base,registry}.py`、
+    `packages/tests/test_page_objects_session.py`
+  - `docs/spec/page-objects-syntax.md`（改写：元素声明表 / 多定位器 / 两种范式 / 独立运行；
+    并修订 locator 策略——绝对 XPath 保留硬禁、相对 XPath 放宽为降权候选、索引定位区分
+    「消歧」与「寻址」、纯文本定位降档、修正 test_id 优先级的措辞矛盾）
+  - `.cursor/rules/packages-page-test.mdc`（新增）
+  - `.cursor/skills/maintain-page-objects/SKILL.md`（2.0.0）
+  - `pyproject.toml`（version bump）、`INDEX.md` §2 / §2.2
+  - `docs/changelog/FRAMEWORK.md`（本条目）
+- **不在同步范围**: 具体业务页面资产（`packages/page_objects/<app>/...`）、`apps/page_recorder`
+  （后续独立任务，本期只留 codegen 接缝与命名约定）、`Pages` 容器与 `context.pages` 注册
+  （第二阶段，本期只提供 `PageDriver.attach(page)` 接缝）
+- **验证**: `uv run --extra test pytest packages/tests -q`（全程离线：`driver` 惰性 import
+  playwright，`packages.page_test.testing` 提供 FakePage 替身）；
+  `uv run python -m packages.page_test validate`
 
 ## 2026-08-24 — 本机多套环境一键切换（packages.config）
 

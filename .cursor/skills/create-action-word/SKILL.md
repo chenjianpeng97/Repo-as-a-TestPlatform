@@ -1,6 +1,6 @@
 ---
 name: create-action-word
-version: 1.1.0
+version: 1.1.1
 description: Creates or updates action words under packages/action_words/ following action-words-syntax.md. Use when adding DB seed/assert, API request/assert, or UI action/assert business actions, or when migrating ad-hoc test logic (SQL scripts, step bodies) into reusable action words.
 ---
 
@@ -53,7 +53,7 @@ description: Creates or updates action words under packages/action_words/ follow
 - 纯构建函数 `build_<x>_rows(params, ids) -> dict[table, rows]`（无 DB，便于离线单测）
   与 `run` 内 `bulk_insert` 落库分离；
 - 默认值与真实主数据样例同源（`_internal/params.py`）；随机值用
-  `_internal/generators`，id 用 `_internal/ids.default_id_generator`；
+  `packages.fake`（`_internal/generators` 只是 re-export），id 用 `_internal/ids.default_id_generator`；
 - 跨 word 复用的行结构放 `packages/action_words/models.py`；
 - 文件末尾**必须**提供 `if __name__ == "__main__"` 手工改参入口：显式构造
   `Params(...)`（关键业务字段逐个列出，带行内注释），`with ActionContext()`

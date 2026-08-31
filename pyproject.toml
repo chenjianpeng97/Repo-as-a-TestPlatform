@@ -1,6 +1,6 @@
 [project]
 name = "innovammed-test-project-example"
-version = "2.4.0"
+version = "2.5.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -12,6 +12,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "requests>=2.33.1",
     "pydantic>=2",
+    "faker>=37.0.0",
 ]
 
 [project.optional-dependencies]
@@ -29,6 +30,13 @@ bdd = [
 # 终端代理抓包 → 自动维护 packages/api_objects（apps.recorder）
 recorder = [
     "mitmproxy>=11.1.3",
+]
+# 用 api_objects + data/mocks 起 mock server（packages.api_mock / apps.mock_server）
+# httpx 供 fastapi.testclient 跑 packages/tests 里的 mock 单测
+mock = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "httpx>=0.28.0",
 ]
 # 本地全套：单测 + BDD/UI（等价于同时装 test 与 bdd）
 dev = [

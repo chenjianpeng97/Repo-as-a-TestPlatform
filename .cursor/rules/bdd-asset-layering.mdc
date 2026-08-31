@@ -2,7 +2,7 @@
 description: Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages; no selector or request leakage across layers
 globs: **/*.py
 alwaysApply: false
-version: 1.2.0
+version: 1.2.1
 ---
 
 # Asset Layering — boundary rules per layer
@@ -31,10 +31,11 @@ Each layer owns one responsibility. Leakage across layers (e.g. selectors in ste
   - One asset per `method + normalized_path` (versioned `V1/V2` only when incompatible). `path` contains **no host**.
   - Executes only via `APIModel.execute()` after `set_*` / `override_*`; no custom executor patterns.
   - Asserts are stable/observable (`http status`, `$.code`, key-exists). **Never** hardcode scenario-specific constants (e.g. expected `total=12`) inside APIModel asserts.
-- **`packages/**`** — framework base capabilities (DB, logging, config, generic http client).
-  - No UI actions, no feature-level business rules. See `packages-logging.mdc` and `packages-db.mdc` for the two mandatory component surfaces.
+- **`packages/**`** — framework base capabilities (DB, logging, config, generic http client, fake data).
+  - No UI actions, no feature-level business rules. See `packages-logging.mdc`, `packages-db.mdc`, and `packages-fake.mdc`.
   - **`packages/excel`**: read xlsx/CSV from bytes or path; returns stringified cells and `list[dict]` records. **No domain**; call sites map columns. **Dependency**: `openpyxl` (declared in `pyproject.toml`).
   - **`packages.api_test`**: `ApiResponse` always includes **`content: bytes`** (raw body) in addition to `json` / `text`. JSON APIs populate `json`; file-download routes often leave `json is None` — use **`execute()` 返回的 `resp.content`** 交给 `packages.excel` 或业务层解析。`APIModel.body_format` 支持 **`"json"`**（默认）与 **`"form"`**（`application/x-www-form-urlencoded`）；仍仅通过 `set_json(...).execute()` 传 body，禁止在 steps 里手写 `requests`。
+  - **`packages.fake`**: 业务随机值（UDI / USCC / 姓名 / 金额等）。生成器产单值；批量走 `run(fake_id, count=..., inputs=...)` 或 `python -m packages.fake run`。禁止在 steps/words 里手写 `random.choices` 或无校验社信码。
 
 ## Cross-cutting
 

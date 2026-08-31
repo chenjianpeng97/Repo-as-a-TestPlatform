@@ -11,7 +11,7 @@
 | 层 | 目录 | 职责 | 谁运行 |
 | --- | --- | --- | --- |
 | 知识层 | `assets/` | 给人和 LLM 阅读、生成测试代码的基础知识（ddl / sql / usecases / testreport / domain-notes）。见 `docs/spec/assets-knowledge-syntax.md`。 | 只读引用 |
-| 组件层 | `packages/` | 被引用、不独立运行的代码（db / logging / api_test / api_objects / page_objects / action_words / excel / config）。 | 被 import |
+| 组件层 | `packages/` | 被引用、不独立运行的代码（db / logging / api_test / api_objects / page_objects / action_words / excel / config / fake）。 | 被 import；`packages.fake` 另提供 `python -m packages.fake` CLI |
 | 工具层 | `apps/` | 可独立运行的测试工具（`dump_ddl` / `recorder` / `index_ai` / `init_repo` / 项目特定造数）。见 `docs/spec/apps-authoring-syntax.md`。 | `python -m apps.<name>` |
 | 数据层 | `data/` | 供测试代码读取的结构化测试数据。 | 被读取 |
 | 测试层 | `tests/` | 自动化测试代码（behave `features/` + `pytest/`）。 | behave / pytest |
