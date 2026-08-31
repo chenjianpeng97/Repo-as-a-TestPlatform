@@ -1,7 +1,7 @@
 ---
 name: python-playwright-page-objects
 user-invocable: false
-description: Python + Playwright 的 Page Object 规范（中文），用于被 behave steps 调用；强调 locator 策略、动作/断言分离、稳定性与 AI 可维护边界。
+description: Python + Playwright 的 Page Object 规范（中文）。以 packages.page_test 的 PageModel（元素表 + 声明式 flow）为主范式、BasePage 逃生舱为辅；强调多定位器备用、locator_policy 确定性拦截、动作/断言分离与 AI 可维护边界。
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
@@ -9,166 +9,254 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 
 ## 目标
 
-- **目标**：将 UI 定位与交互封装在 `packages/page_objects/`，让 steps 只表达业务意图，提升可维护性。
-- **关键边界**：steps 禁止直接写 selector；selector 只能出现在 page object 内部。
+- **目标**：把 UI 定位与交互封装在 `packages/page_objects/`，让 steps 只表达业务意图。
+- **关键边界**：steps 禁止直接写 selector；selector 只能出现在页面资产的**元素声明表**里。
+- **运行库**：所有页面资产由 `packages.page_test` 驱动（用法见 `packages/page_test/USAGE.md`），
+  与 `packages.api_test` 同构：资产是冻结的声明式 dataclass，执行引擎独占 IO 与日志。
 
-## 目录与模块组织（建议）
+## 两种范式（都由同一套元素声明支撑）
 
-- `packages/page_objects/`
-  - `pages/`：页面级对象（如 login、home）
-  - `components/`：可复用组件对象（如 table、modal、date_picker）
-  - `__init__.py`：可选，统一导出入口
+| 范式 | 什么时候用 | 动作怎么写 |
+| --- | --- | --- |
+| **声明式 `PageModel`**（主） | 线性流程：填表、点按、等待、断言 | `flows` 里的有序 step 序列（数据，可被 recorder 生成、被平台渲染成步骤表） |
+| **`BasePage` 子类**（逃生舱） | 循环 / 条件分支 / 跨页编排 | 普通 Python 方法，元素仍经 `self.el(name)` 访问 |
+
+**逃生舱逃掉的只有「动作序列的声明式表达」，元素层一点没逃**：定位器始终在
+`elements` 里，因此两种范式都享受多定位器 fallback、平台元素表可视化与 doctor 体检。
+
+## 目录与模块组织
+
+- `packages/page_objects/<app>/<page_slug>.py` —— 一个文件一个页面资产
+  - 声明式：模块级变量 `<page_slug>_page_v1 = PageModel(...)`
+  - 类范式：`class <PageSlug>Page(BasePage)`
+- `packages/page_objects/session.py` —— 凭据与单文件回放（对标 `api_objects/auth.py`），**不是**资产
+- 组件复用：把公共元素抽成模块级 `ElementSpec` 常量共享，或用 `scope` 收窄到容器内
 
 ## 设计原则（必须遵守）
 
-- **单一职责**：一个对象只描述一个页面或一个组件。
-- **封装**：对外只暴露“业务动作”和“业务断言”，隐藏 locator/等待细节。
-- **Plane**：要出现在 Formulation Page，用 `@plane_pageobject`（`packages.page_objects.plane`）标在类上。未装饰的模块不上架。本期只读展示。
-- **稳定性优先**：优先选择稳定 locator（见下文优先级）。
-- **可审计**：当 locator 不稳定时，必须在实现中体现“风险等级与替代建议”（可通过命名/结构体现，避免在 steps 泄露细节）。
+- **单一职责**：一个资产只描述一个页面。
+- **封装**：对外只暴露「业务动作」与「业务断言」，隐藏 locator 与等待细节。
+- **id 约定**：`<app>.<page_slug>@v<major>`（如 `plane.login@v1`）；破坏性变更才升版本。
+- **无 host**：`url_path` 与 `Goto(path=...)` 只写路径；host 由
+  `packages.config.get_ui_base_url()` 运行时注入。
+- **无凭据**：敏感值写 `{{password}}` 占位符，运行时从入参或环境变量代入，**永不落盘**。
+- **Plane**：要出现在 Formulation Page，用 `@plane_pageobject`（`packages.page_objects.plane`）。
+- **可审计**：脆弱 locator 必须声明 `confidence="fragile"` 并在 `note` 写清风险与替代建议。
 
-## Locator 策略（优先级与禁用项）
+## Locator 策略
+
+### 元素 = 一组按优先级排序的候选
+
+稳定性的核心不是「挑一个完美 locator」，而是**每个元素挂多个候选**：运行时按序探测，
+首个命中者胜出。首选失效时测试照常通过（自愈级别一），同时产出健康事件让降级可见
+（自愈级别二），避免资产静默腐烂。
+
+```python
+ElementSpec(
+    name="username_input",
+    description="登录用户名输入框",
+    role_hint="textbox",
+    locators=(
+        LocatorSpec("label", "用户名"),                 # 首选：语义定位
+        LocatorSpec("test_id", "login-username"),       # 备用：测试标识
+    ),
+)
+```
 
 ### 推荐优先级（从高到低）
 
-1. **语义定位**：`get_by_role` / `get_by_label` / `get_by_text`（可结合过滤）
-2. **测试标识**：`get_by_test_id`（若研发支持，最稳定）
-3. **结构化 CSS**：仅当语义定位不可用
-4. **XPath**：最后手段（第一期建议禁用，除非明确豁免）
+1. **角色/标签语义定位**：`get_by_role`（配 `name=`）、`get_by_label`
+   —— 同时验证了可访问性，这是它排在 test_id 之前的**唯一**理由。
+2. **测试标识**：`get_by_test_id` —— 对 DOM 与样式改动**韧性最强**；若研发愿意补
+   `data-testid`，它是最省心的选择，作为首选也完全可接受。
+3. **结构化 CSS**：语义与 test_id 都不可用时。
+4. **相对 XPath**：仅当 CSS 表达不出来（需要 `text()` 精确匹配或
+   `ancestor::` / `following-sibling::` 轴向定位，典型是 `<div>` 拼的伪表格）。
+   必须 `confidence="fragile"` + `note`。
 
-### 禁止（默认）
+**纯文本定位（`get_by_text`）不在第 1 档**：文案定位在多语言场景下会全线崩溃——切一次
+语言包所有定位器一起断。文本只应作为 role 的限定词（`get_by_role("button", name="登录")`
+安全；`get_by_text("登录")` 不安全）。
 
-- 绝对 XPath
-- 依赖 DOM 层级的超长 selector
-- `nth(0)` 这类基于索引的定位（除非列表无稳定标识且已豁免）
+### 禁止与豁免
 
-## 动作与断言分离
+`locator_policy` 把下列约束变成**运行时可执行的校验**（违规抛 `LocatorPolicyError`），
+而不是只写在文档里靠自觉：
 
-### 对外暴露的方法类型
+- **绝对 XPath**（`/html/body/div[3]`）—— 硬禁（`allow_absolute_xpath=False`）。
+- **依赖 DOM 层级的超长 CSS** —— 层级数超过 `max_css_depth`（默认 4）即拒。
+- **索引寻址**（`nth(3)`）—— 默认禁（`allow_index=False`）。用位置代替业务标识，
+  插一行数据就错位。确需豁免时在该页 `locator_policy={"allow_index": True}` 并在
+  候选的 `note` 写清为何没有稳定标识——豁免因此成为资产里一行**可审计的声明**。
+- **索引消歧**（`.first`）—— **允许**（`allow_disambiguation=True`）。页面有多个视觉
+  等价元素时取任一都对，这是消除 Playwright strict mode violation 的标准手段；
+  与「寻址」是两件事，不可一并禁掉。
+- **稳定性下限**：每个元素至少 `min_stable_candidates`（默认 1）个 stable 候选；
+  首选是 fragile 时必须有备用（`require_fallback_for_fragile`）。
+- **探测超时**：`probe_timeout_ms`（默认 1500）。这是多定位器机制的**性能护栏**——
+  Playwright 默认超时 30 秒，若首选已失效且候选很多，每次都等满超时会让单个元素
+  卡上百秒。候选探测超时必须短，且与「等待条件成立」的超时分离。
 
-- **动作（actions）**：`login()`、`open()`、`search()`、`submit()`…
-- **断言（assertions）**：`assert_visible()`、`assert_error_message()`…
+用 `python -m packages.page_test validate` 一次性校验全部资产。
 
-> 断言方法内部负责等待条件成立（避免 steps 写 sleep）。
+### 链式收窄（提升唯一性）
 
-## Python + Playwright Page Object 示例
-
-> 仅示例结构与风格；真实项目可按你们的 runner/context 封装调整。
-
-```python
-from playwright.sync_api import Page, expect
-
-
-class LoginPage:
-    def __init__(self, page: Page, base_url: str):
-        self.page = page
-        self.base_url = base_url
-
-    # Locators（只在 page object 内部出现）
-    @property
-    def username_input(self):
-        return self.page.get_by_label("用户名")
-
-    @property
-    def password_input(self):
-        return self.page.get_by_label("密码")
-
-    @property
-    def submit_button(self):
-        return self.page.get_by_role("button", name="登录")
-
-    @property
-    def error_alert(self):
-        return self.page.get_by_role("alert")
-
-    # Actions
-    def open(self):
-        self.page.goto(f"{self.base_url}/login")
-
-    def login(self, username: str, password: str):
-        self.username_input.fill(username)
-        self.password_input.fill(password)
-        self.submit_button.click()
-
-    # Assertions（内部等待，不让 steps sleep）
-    def assert_login_failed(self, message: str):
-        expect(self.error_alert).to_be_visible()
-        expect(self.error_alert).to_contain_text(message)
-```
-
-## 组件对象（Component Object）示例
-
-当页面包含可复用控件（表格/弹窗/分页），应抽成组件对象，页面对象组合调用。
+候选过于宽泛时，先缩小容器再定位子元素，用 `scope` 引用父元素：
 
 ```python
-from playwright.sync_api import Page, Locator, expect
-
-
-class Toast:
-    def __init__(self, page: Page):
-        self.page = page
-
-    @property
-    def root(self) -> Locator:
-        return self.page.get_by_role("status")
-
-    def assert_success(self, message: str):
-        expect(self.root).to_be_visible()
-        expect(self.root).to_contain_text(message)
+elements = {
+    "cart": ElementSpec(name="cart", locators=(LocatorSpec("test_id", "shopping-cart"),)),
+    "price_cell": ElementSpec(
+        name="price_cell",
+        locators=(LocatorSpec("role", "cell", name="价格", scope="cart"),),
+    ),
+}
 ```
+
+也可用 `has_text` 过滤：`LocatorSpec("role", "listitem", has_text="iPhone", first=True)`。
+
+## 动作与断言
+
+### 声明式 flow
+
+```python
+login_page_v1 = PageModel(
+    id="example.login@v1",
+    name="登录页",
+    description="账号密码登录；前置条件：无",
+    url_path="/login",
+    elements=ELEMENTS,
+    inputs_schema={
+        "username": {"type": "string", "required": True},
+        "password": {"type": "string", "required": True},
+    },
+    ready=(WaitForElement("username_input", state="visible"),),
+    flows={
+        "login": PageFlow(
+            name="login",
+            description="输入账号密码并提交",
+            steps=(
+                Fill("username_input", "{{username}}"),
+                Fill("password_input", "{{password}}"),
+                Click("submit_button"),
+                WaitForUrl("/dashboard"),
+                AssertVisible("welcome_banner"),
+            ),
+            example_params={"username": "demo", "password": "demo"},
+        ),
+    },
+)
+```
+
+- **动作 step**：`Fill` / `Click` / `Check` / `Select` / `Press` / `Hover` / `Upload`
+- **断言 step**：`AssertVisible` / `AssertHidden` / `AssertText` / `AssertUrl` / `AssertCount`
+- **提取 step**：`ExtractText` / `ExtractAttribute` / `ExtractCount`，提取的变量可被后续 step 用 `{{name}}` 引用
+- **`asserts` / `extracts`（页面级）**：描述**页面自身的稳定契约**，在 `open()` 时执行。
+  flow 级断言写在该 flow 的 steps 里——因为 UI flow 常常导航离开本页，不能像 API 那样
+  每次调用后都套同一组页面断言。
+
+### 类范式的动作与断言
+
+对外方法命名沿用同一套约定：动作 `login()` / `open()` / `search()`；断言 `assert_*()`。
+断言方法内部负责等待条件成立（不让 steps 写 sleep）。
+
+```python
+class OrderListPage(BasePage):
+    """订单列表页。前置条件：已登录且有列表查看权限。"""
+
+    page_id = "example.order_list@v1"
+    name = "订单列表页"
+    url_path = "/orders"
+    elements = {...}
+
+    def find_order_across_pages(self, order_no: str, *, max_pages: int = 10) -> bool:
+        """翻页查找订单号 —— 声明式 step 序列表达不了的循环。"""
+        for _ in range(max_pages):
+            if self.el("row").locator.filter(has_text=order_no).count():
+                return True
+            if not self.el("next_page").locator.is_enabled():
+                return False
+            self.el("next_page").locator.click()
+        return False
+
+    def assert_not_empty(self) -> None:
+        """业务断言：列表非空。"""
+        if not self.el("row").locator.count():
+            raise AssertionError("订单列表为空")
+```
+
+`BasePage` **不暴露** `self.page`。确需裸 Playwright API 时走 `self.driver.raw_page`——
+命名刺眼是故意的，出现它就意味着绕过了元素声明表，需要在 review 里被看见。
 
 ## 等待策略（必须）
 
-- 只允许等待“条件成立”，禁止固定 sleep。
-- 等待应封装在 page object 的 action/assert 内部。
+- 只允许等待「条件成立」，**禁止固定 sleep**：用 `WaitForElement` / `WaitForUrl` /
+  `WaitForResponse`，或类范式里的 `expect(...)` 轮询。
+- 优先等待 UI 条件：元素可见/隐藏、URL 变化、文本出现。
+- 需要等接口时用 `WaitForResponse(path_contains=..., status=200)`，只等与业务强相关的响应。
+- 幂等的定位/点击类 step 可加 `retry=RetryPolicy(attempts=2)`；提交类默认不重试。
 
-## 与 steps 的契约（必须）
+## 与 steps / pytest 的契约（必须）
 
-- steps 调用 page object 时，只能调用“动作/断言”方法。
-- steps 不允许访问 page object 的 locator 属性（避免泄露实现细节）。
+- steps 只能调用业务动作与断言，或 `model.run("<flow>")`；**禁止**访问元素声明与 locator。
+- steps 里**不得**出现 `page.locator(...)` / `get_by_*` / xpath / css 字面量。
+- 页面资产不做业务数据拉取，不发 API 请求，不写 SQL。
 
-## AI 生成/更新 page objects 的约束
+## 独立运行与体检
 
-- **允许修改范围**：`packages/page_objects/` 下的页面/组件实现。
-- **禁止**：在 steps 中新增 selector；禁止在 page object 中固化环境 host（只用 `base_url`/config）。
-- **当 locator 不稳定时**：优先建议研发补 `data-testid`；在未补齐前，选择语义定位 + 过滤策略，避免 XPath。
-
-## 最佳实践（补充原文中的关键知识点）
-
-### 1) Locator 链式与过滤（提升唯一性）
-> 当一个 locator 过于宽泛时，用“先缩小容器，再定位子元素”的方式提升稳定性。
-
-```python
-# 先定位到购物车容器，再定位价格单元格（示意）
-cart = page.get_by_test_id("shopping-cart")
-price_cell = cart.get_by_role("cell", name="价格")
+```bash
+python -m packages.page_test list                     # 已发现的资产
+python -m packages.page_test describe example.login@v1
+python -m packages.page_test validate                 # 静态校验，不启浏览器
+python -m packages.page_test run example.login@v1 --flow login --example --headed
+python -m packages.page_test doctor example.login@v1  # 定位器健康度 + 建议 patch
+python packages/page_objects/example/login.py         # 单文件回放（__main__ 块）
 ```
 
+**用途边界**：本地驱动供页面资产自检 / health check / pytest 回归 / doctor 体检。
+BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（见
+`.cursor/rules/bdd-pipeline-gates.mdc` Gate 1），本地驱动不得替代。
+
+### doctor 与「自愈」的边界
+
+- **级别一 · 运行时降级**：多定位器 fallback 本身，首选失效时测试不红。
+- **级别二 · 审计**：`doctor` 聚合健康事件，输出体检报告与**建议** patch。
+- **级别三 · 持久化自愈**（自动改写资产源码）：**本仓不做**。工具悄悄改代码没人 review，
+  等发现时已说不清页面到底改了什么。采纳建议由人或 AI 显式执行，doctor 报告即证据。
+
+## AI 生成/更新页面资产的约束
+
+- **允许修改范围**：`packages/page_objects/**`。
+- **禁止**：在 steps 中新增 selector；在资产中固化 host 或凭据；用绝对 XPath 或索引寻址。
+- **新增元素时给足候选**：语义定位 + `test_id`（如有）至少两个，让 fallback 有意义。
+- **locator 不稳定时**：优先建议研发补 `data-testid`；未补齐前用语义定位 + `scope` /
+  `has_text` 收窄，并把脆弱候选标 `fragile` + `note`。
+- **改动需有证据**：Playwright MCP snapshot、`run_summary`，或 `doctor` 报告。
+
+## 离线单测
+
+`packages.page_test.testing` 提供 `FakePage` / `make_driver` / `patch_playwright`，
+不装 playwright、不起浏览器也能测页面资产的 flow、插值、fallback 与断言：
+
 ```python
-# 通过 has_text 过滤（示意）
-item = page.get_by_role("listitem").filter(has_text="iPhone").first
+def test_login_flow(monkeypatch):
+    patch_playwright(monkeypatch)
+    page = FakePage()
+    page.register("label=用户名")
+    page.register("test_id=login-password")
+    page.register("role=button name=登录")
+
+    result = login_page_v1.set_inputs({"username": "demo", "password": "x"}).run(
+        "login", driver=make_driver(page)
+    )
+    assert result.ok
 ```
 
-### 2) 组件化与组合（Component Objects）
-- 页面对象负责“页面级流程”与“业务入口”
-- 组件对象负责“可复用控件”（表格、弹窗、Toast、分页、表单）
-- 页面对象可以组合多个组件对象，避免在每个页面重复写同一套控件逻辑
+## 反模式（Bad examples）
 
-### 3) 高层动作聚合（App Actions / Flow 层，按需）
-当一个业务流程跨多个页面（例如“登录→选品→下单→支付”），建议在 `packages/page_objects/flows/`（或类似目录）提供高层动作：
-- steps 调用 flow
-- flow 内部组合多个 page object / component object
-
-**约束**：flow 只做编排，不写 selector（selector 仍在 page/component objects 内）。
-
-### 4) 等待策略（更具体的约束）
-- 优先等待 UI 条件：元素可见/不可见、URL 变化、文本出现
-- 需要等待接口时，优先等待“与业务强相关的响应”（例如 path 包含某段且 status=200）
-- 禁止 `sleep` 与不带条件的长超时等待
-
-### 5) 反模式（Bad examples）
-- **Bad：在 steps 里拿 locator 点击**（泄露实现细节、导致维护地狱）
-- **Bad：page object 暴露 locator 给 steps 使用**（同上）
-- **Bad：把断言写在 steps 里到处复制**（应该下沉到 `assert_*`）
-- **Bad：用 `nth()`/index 定位核心元素**（除非明确豁免且有审计）
-
+- **在 steps 里拿 locator 点击** —— 泄露实现细节，维护地狱。
+- **页面资产把元素声明暴露给 steps** —— 同上。
+- **把断言复制到 steps 里到处散落** —— 应下沉到断言 step 或 `assert_*` 方法。
+- **用 `nth()` 寻址核心元素** —— 数据一变就错位（`.first` 消歧是另一回事，允许）。
+- **只给一个 locator 就上线** —— 首选一失效就直接红，等于放弃了 fallback 能力。
+- **给 fragile 候选不写 `note`** —— 后来者无法判断该不该换、换成什么。
