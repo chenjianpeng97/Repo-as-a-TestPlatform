@@ -42,7 +42,7 @@
 
 ## 2026-08-31 — packages.fake 公共造数包
 
-- **commit**: `TBD`
+- **commit**: `22ca2c8`
 - **目的**: 提供可 seed 的假数据生成器（医疗 UDI/社信码自研 + Faker zh_CN 包装），CLI/`run`/`catalog` 与业务单值函数共用契约，供测试员手工造数与后续平台 Fake 页。
 - **路径**:
   - `packages/fake/**`
