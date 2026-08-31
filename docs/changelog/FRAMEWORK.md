@@ -41,7 +41,7 @@
 
 ## 2026-08-31 — api_objects 可回放为 mock server（packages.api_mock / apps.mock_server）
 
-- **commit**: `TBD`
+- **commit**: `ca0ebc6`
 - **目的**: 让冻结的 `APIModel` 资产能直接起一个可在运行时改返回值的 mock 服务，
   供后端未就绪 / 造异常分支 / 测试平台按需定义响应时使用。
   `APIModel` 只描述请求契约（`response_hints` 仅有顶层键名、状态码只藏在 asserts 里、
