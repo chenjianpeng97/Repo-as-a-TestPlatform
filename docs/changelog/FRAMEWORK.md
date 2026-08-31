@@ -43,7 +43,7 @@
 
 ## 2026-08-29 — page_test 运行库：PageModel 资产 + 多定位器备用 + doctor 体检
 
-- **commit**: `TBD`
+- **commit**: `a0193d9`
 - **目的**: 把 Page Object 从「手写 class + `@property` locator」升级为与 `packages.api_test`
   同构的运行库：`PageModel`（元素表 + 声明式 flow）对位 `APIModel`、`PageDriver` 对位
   `ApiClient`。三个可落地的收益：
