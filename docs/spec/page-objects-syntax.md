@@ -224,6 +224,26 @@ BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（
 - **级别三 · 持久化自愈**（自动改写资产源码）：**本仓不做**。工具悄悄改代码没人 review，
   等发现时已说不清页面到底改了什么。采纳建议由人或 AI 显式执行，doctor 报告即证据。
 
+## 录制（apps.page_recorder）
+
+本地维护 CLI：headed Playwright 打开真实页面，人工点/填/浏览时直播冻结 `PageModel`
+到 `packages/page_objects/<app>/<page_slug>.py`。交接文档见 `apps/page_recorder/README.md`。
+同一 headed 会话还要冻 API Object 用 `python -m apps.recorder`（见 `apps/recorder/README.md`）。
+
+```bash
+uv sync --extra bdd
+uv run python -m apps.page_recorder --app plane --flow login --url /sign-in --scan
+```
+
+- 页面脚本把 `click` / `change` / `submit` 经 `expose_binding` 送回 Python；
+  `packages.page_test.harvest` 按 locator 优先级生成多候选，过 `validate_locator`
+  丢掉绝对 XPath / 超长 CSS / 无 name 的裸 role。
+- 密码与敏感键当场写成 `{{password}}`，真值不落盘。
+- 按归一化后的 `url_path` 切资产；已有 `PageModel` **元素候选并集、flow steps 追加**
+  （连续相同 Click 压成一次）。不覆盖手写 `BasePage` 文件。
+- **不是** BDD Gate 1 的替代：网络证据仍走 Playwright MCP。不生成 `If`/`Loop`。
+- 会话结束向 `packages/page_objects/CHANGELOG.md` 追加一行。
+
 ## AI 生成/更新页面资产的约束
 
 - **允许修改范围**：`packages/page_objects/**`。
@@ -231,7 +251,7 @@ BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（
 - **新增元素时给足候选**：语义定位 + `test_id`（如有）至少两个，让 fallback 有意义。
 - **locator 不稳定时**：优先建议研发补 `data-testid`；未补齐前用语义定位 + `scope` /
   `has_text` 收窄，并把脆弱候选标 `fragile` + `note`。
-- **改动需有证据**：Playwright MCP snapshot、`run_summary`，或 `doctor` 报告。
+- **改动需有证据**：Playwright MCP snapshot、`run_summary`、`doctor` 报告，或 `apps.page_recorder` 会话产出。
 
 ## 离线单测
 

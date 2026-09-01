@@ -25,11 +25,11 @@ from packages.logging import log_warn
 
 __all__ = ["ApiModelRef", "find_api_model", "iter_api_models"]
 
-_SKIP_DIR_PARTS = {"__pycache__", ".pytest_cache", ".mypy_cache"}
+_SKIP_DIR_PARTS = {"__pycache__", ".pytest_cache", ".mypy_cache", "recording"}
 # Leaf ``__init__.py`` files only re-export the sibling ``<METHOD>.v<N>.py``
 # asset (see docs/spec/api-objects-syntax.md), so scanning them would load the
 # same model twice under a second path.
-_SKIP_FILE_NAMES = {"__init__.py", "conftest.py"}
+_SKIP_FILE_NAMES = {"__init__.py", "conftest.py", "auth.py", "plane.py", "registry.py"}
 
 
 @dataclass(frozen=True)

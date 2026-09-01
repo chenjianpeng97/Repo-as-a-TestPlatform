@@ -42,7 +42,7 @@ _UUID_SEG_RE = re.compile(
 def normalize_url_path(path: str) -> str:
     """把 ``/projects/42/issues/<uuid>`` 归一为 ``/projects/{id}/issues/{uuid}``。
 
-    与 ``apps.recorder`` 对 API path 的归一同构，供 fingerprint 去重使用。
+    与 ``packages.api_objects.recording.normalize_path`` 对 API path 的归一同构，供 fingerprint 去重使用。
     """
     segments = []
     for segment in (path or "/").split("/"):

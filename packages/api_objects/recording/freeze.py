@@ -10,16 +10,21 @@ from typing import Any, Optional
 
 from .capture import Capture
 from .codegen import build_assert_ops, build_extract_ops, merge_capture_into_schemas, render_api_model_source
-from .normalize import route_dir_segments
+from .normalize import DEFAULT_TOOL, route_dir_segments
 
 try:
-    from packages.api_objects.auth import ensure_auth_file
+    from ..auth import ensure_auth_file
 except Exception:  # noqa: BLE001 — freeze must work even if package auth import fails
     def ensure_auth_file(outputs_dir: Path) -> Path:  # type: ignore[misc]
         return outputs_dir / "auth.py"
 
 _ASSET_FILE_RE = re.compile(r"^(?P<method>[A-Z]+)\.v(?P<major>\d+)\.py$")
 _ASSET_FILE_ALT_RE = re.compile(r"^(?P<method>[A-Z]+)_v(?P<major>\d+)\.py$")
+_EXPORT_KINDS = (
+    "recording export",
+    "apps.recorder export",
+    "apps.api_recorder export",
+)
 
 
 @dataclass(frozen=True)
@@ -178,7 +183,7 @@ def write_init_exports(route_dir: Path, filename: str, var_name: str) -> None:
     """Keep directory ``__init__.py`` re-exporting the asset via importlib."""
     init_path = route_dir / "__init__.py"
     loader_block = f'''
-# --- apps.recorder export: {filename} ---
+# --- recording export: {filename} ---
 from importlib.machinery import SourceFileLoader
 from pathlib import Path as _Path
 
@@ -190,11 +195,9 @@ _{var_name}_mod = SourceFileLoader(
 # --- end export: {filename} ---
 '''
     existing = init_path.read_text(encoding="utf-8") if init_path.exists() else ""
-    marker = f"# --- apps.recorder export: {filename} ---"
-    if marker in existing:
-        # Replace previous block for this file.
+    for kind in _EXPORT_KINDS:
         pattern = re.compile(
-            rf"# --- apps\.recorder export: {re.escape(filename)} ---.*?# --- end export: {re.escape(filename)} ---\n?",
+            rf"# --- {re.escape(kind)}: {re.escape(filename)} ---.*?# --- end export: {re.escape(filename)} ---\n?",
             re.S,
         )
         existing = pattern.sub("", existing)
@@ -204,8 +207,9 @@ _{var_name}_mod = SourceFileLoader(
 class ApiObjectFreezer:
     """Create/update route-aligned API Objects under ``outputs_dir``."""
 
-    def __init__(self, outputs_dir: Path) -> None:
+    def __init__(self, outputs_dir: Path, *, tool: str = DEFAULT_TOOL) -> None:
         self.outputs_dir = outputs_dir.resolve()
+        self.tool = (tool or DEFAULT_TOOL).strip() or DEFAULT_TOOL
         self.outputs_dir.mkdir(parents=True, exist_ok=True)
         ensure_package_inits(self.outputs_dir, [])
         # Shared auth module (Postman-style); never overwrite a customized file.
@@ -231,7 +235,7 @@ class ApiObjectFreezer:
             major = 1
             filename = asset_filename(capture.method, major)
             target = route_dir / filename
-            var, source = render_api_model_source(capture=capture, major=major)
+            var, source = render_api_model_source(capture=capture, major=major, tool=self.tool)
             target.write_text(source, encoding="utf-8")
             write_init_exports(route_dir, filename, var)
             return FreezeResult(
@@ -290,6 +294,7 @@ class ApiObjectFreezer:
             asserts=asserts,
             extracts=extracts,
             name=parsed.get("name"),
+            tool=self.tool,
         )
         # Always write canonical METHOD.vN.py (migrate from METHOD_vN.py if needed).
         canonical = route_dir / asset_filename(capture.method, major)

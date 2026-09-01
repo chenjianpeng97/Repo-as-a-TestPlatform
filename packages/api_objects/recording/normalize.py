@@ -40,6 +40,42 @@ STATIC_EXTENSIONS = frozenset(
 )
 
 SKIP_METHODS = frozenset({"OPTIONS", "HEAD", "CONNECT"})
+DEFAULT_TOOL = "recorder"
+
+DEFAULT_TOOL = "recorder"
+
+
+def skip_api_flow(
+    *,
+    method: str,
+    url: str,
+    request_content_type: str = "",
+    response_content_type: str = "",
+    include_host: str | None = None,
+) -> str | None:
+    """Return why this flow should not be frozen, or ``None`` to freeze it.
+
+    Reasons: ``method`` / ``host`` / ``static``. ``static`` also covers HTML
+    document GETs (SPA shells).
+    """
+    method_u = (method or "").upper()
+    if method_u in SKIP_METHODS:
+        return "method"
+    parts = urlsplit(url or "")
+    host = (parts.netloc or "").lower()
+    path = parts.path or "/"
+    needle = (include_host or "").strip().lower()
+    if needle and needle not in host:
+        return "host"
+    if is_static_request(
+        path=path,
+        content_type=request_content_type,
+        response_content_type=response_content_type,
+    ):
+        return "static"
+    if "text/html" in (response_content_type or "").lower() and method_u == "GET":
+        return "static"
+    return None
 
 
 def split_url(url: str) -> tuple[str, str, dict[str, str]]:
@@ -105,6 +141,38 @@ def is_static_request(
     return False
 
 
+def skip_api_flow(
+    *,
+    method: str,
+    url: str,
+    request_content_type: str = "",
+    response_content_type: str = "",
+    include_host: str | None = None,
+) -> str | None:
+    """Return why this flow should not be frozen, or ``None`` to freeze it.
+
+    Reasons: ``method`` / ``host`` / ``static`` (static also covers HTML document GETs).
+    """
+    method_u = (method or "").upper()
+    if method_u in SKIP_METHODS:
+        return "method"
+    parts = urlsplit(url)
+    host = (parts.netloc or "").lower()
+    path = parts.path or "/"
+    needle = (include_host or "").strip().lower() or None
+    if needle and needle not in host:
+        return "host"
+    if is_static_request(
+        path=path,
+        content_type=request_content_type,
+        response_content_type=response_content_type,
+    ):
+        return "static"
+    if "text/html" in (response_content_type or "").lower() and method_u == "GET":
+        return "static"
+    return None
+
+
 def body_keys(body: Any) -> list[str]:
     if isinstance(body, Mapping):
         return sorted(str(k) for k in body.keys())
@@ -155,13 +223,19 @@ def infer_type(value: Any) -> str:
     return "any"
 
 
-def schema_from_mapping(values: Optional[Mapping[str, Any]], *, required: bool = False) -> dict[str, Any]:
+def schema_from_mapping(
+    values: Optional[Mapping[str, Any]],
+    *,
+    required: bool = False,
+    tool: str = DEFAULT_TOOL,
+) -> dict[str, Any]:
+    stamp = (tool or DEFAULT_TOOL).strip() or DEFAULT_TOOL
     out: dict[str, Any] = {}
     for k, v in (values or {}).items():
         out[str(k)] = {
             "type": infer_type(v),
             "required": required,
-            "note": "captured by apps.recorder",
+            "note": f"captured by apps.{stamp}",
         }
     return out
 

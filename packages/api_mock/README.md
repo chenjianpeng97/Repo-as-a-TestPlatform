@@ -8,7 +8,7 @@ mock HTTP 服务。工具入口与完整使用说明见 [`apps/mock_server/READM
 
 `APIModel` 描述的是**请求契约 + 稳定断言**：
 
-- `response_hints` 由 `apps.recorder.codegen.build_response_hints` 生成，只有
+- `response_hints` 由 `packages.api_objects.recording.codegen.build_response_hints` 生成，只有
   `{"top_level_keys": [...]}`，没有值、类型、状态码、响应头。
 - 状态码只能从 `asserts` 里的 `$.http_status` 反解，但那是**断言**不是响应契约，
   反向依赖会让「改 mock」变成「改断言」。

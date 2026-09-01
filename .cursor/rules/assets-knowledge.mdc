@@ -16,7 +16,7 @@ version: 1.0.0
   检索相关 domain 的知识（真实 DDL 列名、`assets/sql` 真实业务 SQL、`usecases` /
   `domain-notes`），以此为依据，**不要凭空臆造**列名、接口字段、业务规则。
 - 缺知识时先回填：`/dump-ddl` 或 `python apps/dump_ddl.py --all --datasource <alias>`（DDL）、
-  `python -m apps.recorder`（接口），再进入生成。
+  `python -m apps.recorder`（合录）或 `python -m apps.api_recorder`（代理抓包），再进入生成。
 
 ## 目录与元数据
 

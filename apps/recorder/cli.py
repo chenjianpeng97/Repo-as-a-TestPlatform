@@ -1,166 +1,227 @@
-"""CLI for the API Object traffic recorder."""
+"""CLI for headed 合录 (PageObject + APIObject in one Playwright session)."""
 
 from __future__ import annotations
 
 import argparse
-import asyncio
 import pathlib
 import sys
+
+from packages.logging import log_info, log_warn
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-DEFAULT_OUTPUTS = REPO_ROOT / "packages" / "api_objects"
+DEFAULT_PAGE_OUTPUTS = REPO_ROOT / "packages" / "page_objects"
+DEFAULT_API_OUTPUTS = REPO_ROOT / "packages" / "api_objects"
 DEFAULT_MOCKS = REPO_ROOT / "data" / "mocks"
+
+_LEGACY_PROXY_FLAGS = frozenset({"--port", "--listen_host", "--listen-host"})
+
+
+def reject_legacy_proxy_argv(argv: list[str] | None) -> None:
+    """``python -m apps.recorder`` used to be the mitmproxy proxy. Do not silently forward."""
+    tokens = list(argv) if argv is not None else sys.argv[1:]
+    for token in tokens:
+        name = token.split("=", 1)[0]
+        if name in _LEGACY_PROXY_FLAGS:
+            raise SystemExit(
+                "python -m apps.recorder 已改为 headed 合录（PageObject + APIObject），"
+                "不再启动 mitmproxy 代理。\n"
+                "请改用: python -m apps.api_recorder"
+            )
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         prog="python -m apps.recorder",
         description=(
-            "Start an HTTP(S) proxy that captures non-static API traffic and "
-            "auto-maintains route-aligned API Objects under packages/api_objects "
-            "(see docs/spec/api-objects-syntax.md)."
+            "Launch a headed Playwright browser and freeze PageModel + APIModel "
+            "as you click, fill, and browse. Use --page-only / --api-only to freeze "
+            "one side. For HTTP(S) proxy capture of non-browser clients, use "
+            "python -m apps.api_recorder."
         ),
     )
-    p.add_argument(
+    parser.add_argument(
+        "--app",
+        required=True,
+        help="应用名，写入 id '<app>.<page_slug>@v1' 与目录 packages/page_objects/<app>/",
+    )
+    parser.add_argument(
+        "--flow",
+        default="recorded",
+        help="写入的 flow 名（默认 recorded）",
+    )
+    parser.add_argument(
+        "--url",
+        default="",
+        help="起始 URL；相对路径拼到 TEST_UI_BASE_URL / TEST_BASE_URL",
+    )
+    parser.add_argument(
+        "--scan",
+        action="store_true",
+        help="进入每个新 URL 后扫描可见的 button/link/textbox 等，只扩元素表（仅冻 page 时生效）",
+    )
+    parser.add_argument(
         "--outputs_dir",
         type=pathlib.Path,
-        default=DEFAULT_OUTPUTS,
-        help=f"API Objects root directory (default: {DEFAULT_OUTPUTS})",
+        default=DEFAULT_PAGE_OUTPUTS,
+        help=f"Page Objects 根目录（默认: {DEFAULT_PAGE_OUTPUTS}）",
     )
-    p.add_argument(
-        "--listen_host",
-        default="127.0.0.1",
-        help="Proxy bind address (default: 127.0.0.1)",
+    parser.add_argument(
+        "--storage-state",
+        default="",
+        help="可选 Playwright storage_state JSON（已登录会话；凭据不进资产）",
     )
-    p.add_argument(
-        "--port",
-        type=int,
-        default=8080,
-        help="Proxy listen port (default: 8080)",
-    )
-    p.add_argument(
+    parser.add_argument(
         "--include_host",
         default="",
-        help="Only freeze flows whose host contains this substring (optional)",
+        help="只冻结 host 包含该子串的页面与 API（可选）",
     )
-    p.add_argument(
-        "--ssl-insecure",
+    exclusive = parser.add_mutually_exclusive_group()
+    exclusive.add_argument(
+        "--page-only",
         action="store_true",
-        help="Do not verify upstream TLS certificates (useful for lab envs)",
+        help="只冻 PageModel，不挂 API tap",
     )
-    p.add_argument(
-        "--quiet",
+    exclusive.add_argument(
+        "--api-only",
         action="store_true",
-        help="Less console output",
+        help="仍开 headed 浏览器，只冻 APIModel，不写 PageModel",
     )
-    p.add_argument(
+    parser.add_argument(
+        "--api-outputs-dir",
+        type=pathlib.Path,
+        default=DEFAULT_API_OUTPUTS,
+        help=f"API Objects 根目录（默认: {DEFAULT_API_OUTPUTS}）",
+    )
+    parser.add_argument(
         "--write-mocks",
         action="store_true",
-        help=(
-            "Also save the FULL (untruncated) response sample as a mock definition "
-            "for apps.mock_server. The asset's _RECORDED_RESPONSE stays truncated "
-            "for readability; this side-car keeps every row."
-        ),
+        help="冻 API 时同时把完整响应写入 data/mocks（仅 API 开启时生效）",
     )
-    p.add_argument(
+    parser.add_argument(
         "--mocks-dir",
         type=pathlib.Path,
         default=DEFAULT_MOCKS,
         help=f"Where --write-mocks saves definitions (default: {DEFAULT_MOCKS})",
     )
-    p.add_argument(
+    parser.add_argument(
         "--mock-scenario",
         default="success",
-        help=(
-            "Scenario name the recorder writes/refreshes (default: success). "
-            "Other scenarios in the file are preserved. Use a distinct name "
-            "(e.g. recorded) to keep a hand-tuned 'success' untouched."
-        ),
+        help="Scenario name --write-mocks writes/refreshes (default: success)",
     )
-    p.add_argument(
+    parser.add_argument(
         "--mock-max-bytes",
         type=int,
         default=1_048_576,
         help="Skip mock writes whose JSON body exceeds this size (default: 1 MiB; 0 disables)",
     )
-    return p
-
-
-def _require_mitmproxy() -> None:
-    try:
-        import mitmproxy  # noqa: F401
-    except ImportError as exc:
-        raise SystemExit(
-            "mitmproxy is required for apps.recorder.\n"
-            "Install with:  pip install 'mitmproxy>=10'\n"
-            "Or:            pip install -e '.[recorder]'"
-        ) from exc
-
-
-async def _run_proxy(args: argparse.Namespace) -> None:
-    from mitmproxy.options import Options
-    from mitmproxy.tools.dump import DumpMaster
-
-    from apps.recorder.addon import ApiObjectRecorderAddon
-
-    outputs_dir = args.outputs_dir.expanduser().resolve()
-    outputs_dir.mkdir(parents=True, exist_ok=True)
-
-    mock_writer = None
-    mocks_dir = None
-    if args.write_mocks:
-        from apps.recorder.mocks import MockSampleWriter
-
-        mocks_dir = args.mocks_dir.expanduser().resolve()
-        mock_writer = MockSampleWriter(
-            mocks_dir,
-            scenario=args.mock_scenario,
-            max_bytes=args.mock_max_bytes,
-        )
-
-    addon = ApiObjectRecorderAddon(
-        outputs_dir=outputs_dir,
-        include_host=args.include_host or None,
-        verbose=not args.quiet,
-        mock_writer=mock_writer,
-    )
-
-    opts = Options(
-        listen_host=args.listen_host,
-        listen_port=args.port,
-        ssl_insecure=bool(args.ssl_insecure),
-    )
-    master = DumpMaster(opts, with_termlog=not args.quiet, with_dumper=False)
-    master.addons.add(addon)
-
-    print(f"API Object recorder proxy listening on {args.listen_host}:{args.port}")
-    print(f"Writing assets to: {outputs_dir}")
-    if mocks_dir is not None:
-        print(f"Writing full response samples to: {mocks_dir} (scenario '{args.mock_scenario}')")
-    print("Point the browser / system HTTP(S) proxy here.")
-    print("Static .js/.css (and similar assets) are ignored.")
-    print("For HTTPS, trust the mitmproxy CA (mitmproxy docs: about:certificates / certutil).")
-    print("Ctrl+C to stop.\n")
-
-    try:
-        await master.run()
-    finally:
-        addon.done()
+    return parser
 
 
 def main(argv: list[str] | None = None) -> int:
+    reject_legacy_proxy_argv(argv)
     parser = build_parser()
     args = parser.parse_args(argv)
-    _require_mitmproxy()
+
+    from apps.page_recorder.cli import _validate_app
+    from apps.page_recorder.session import PageRecorderSession, resolve_start_url
+
+    app = _validate_app(args.app)
+    flow = (args.flow or "recorded").strip() or "recorded"
+    freeze_pages = not bool(args.api_only)
+    freeze_apis = not bool(args.page_only)
+    page_outputs = args.outputs_dir.expanduser().resolve()
+    api_outputs = args.api_outputs_dir.expanduser().resolve()
+    if freeze_pages:
+        page_outputs.mkdir(parents=True, exist_ok=True)
+    if freeze_apis:
+        api_outputs.mkdir(parents=True, exist_ok=True)
+
     try:
-        asyncio.run(_run_proxy(args))
+        start_url = resolve_start_url(args.url or None)
+    except SystemExit:
+        raise
+
+    tap = None
+    if freeze_apis:
+        from packages.api_objects.recording import MockSampleWriter
+
+        from apps.api_recorder.playwright_tap import PlaywrightApiTap
+
+        mock_writer = None
+        if args.write_mocks:
+            mock_writer = MockSampleWriter(
+                args.mocks_dir.expanduser().resolve(),
+                scenario=args.mock_scenario,
+                max_bytes=args.mock_max_bytes,
+                tool="recorder",
+            )
+        tap = PlaywrightApiTap(
+            outputs_dir=api_outputs,
+            include_host=args.include_host or None,
+            mock_writer=mock_writer,
+            tool="recorder",
+        )
+
+    def on_page_ready(page) -> None:
+        if tap is not None:
+            tap.attach(page)
+
+    storage_state = (args.storage_state or "").strip() or None
+    session = PageRecorderSession(
+        app=app,
+        flow=flow,
+        outputs_dir=page_outputs,
+        start_url=start_url,
+        scan=bool(args.scan) and freeze_pages,
+        include_host=args.include_host or None,
+        storage_state=storage_state,
+        freeze_pages=freeze_pages,
+        on_page_ready=on_page_ready if freeze_apis else None,
+    )
+    try:
+        session.run()
     except KeyboardInterrupt:
-        print("\nRecorder stopped.")
-        return 0
+        log_info("recorder stopped (Ctrl+C)")
+    except Exception as exc:  # noqa: BLE001
+        log_warn("recorder aborted", error=str(exc))
+        from packages.page_test.errors import DriverError
+
+        if isinstance(exc, DriverError):
+            raise SystemExit(str(exc)) from exc
+        raise SystemExit(f"recorder failed: {exc}") from exc
+    finally:
+        if tap is not None:
+            tap.done()
+        if freeze_pages:
+            _write_page_changelog(page_outputs, app=app, items=session.freezer.touched_ids)
+        if freeze_apis and tap is not None:
+            from apps.api_recorder.cli import write_api_changelog
+
+            write_api_changelog(api_outputs, tap.touched_items(), tool="recorder")
+
     return 0
+
+
+def _write_page_changelog(outputs_dir: pathlib.Path, *, app: str, items: list[str]) -> None:
+    if not items:
+        return
+    try:
+        from apps._shared.changelog import append_entry
+    except Exception as exc:  # noqa: BLE001
+        log_warn("recorder page changelog skipped", error=str(exc))
+        return
+    append_entry(
+        outputs_dir / "CHANGELOG.md",
+        tool="recorder",
+        action="record-pages",
+        items=items,
+        app=app,
+        count=len(items),
+    )
+    log_info("recorder page changelog appended", count=len(items), app=app)
 
 
 if __name__ == "__main__":

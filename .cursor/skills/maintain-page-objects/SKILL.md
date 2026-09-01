@@ -1,6 +1,6 @@
 ---
 name: maintain-page-objects
-version: 2.0.0
+version: 2.0.1
 description: Creates or updates page assets under packages/page_objects/ on the packages.page_test runtime (PageModel element table + declarative flows, or BasePage escape hatch) following page-objects-syntax.md. Use when UI steps fail due to locators, new UI flows are needed, selector leakage must be removed from steps, or doctor reports locator rot.
 ---
 
@@ -80,10 +80,12 @@ python -m packages.page_test doctor <page_id>
 
 ## Pipeline expectation (required)
 
-- 页面资产改动必须有证据：Playwright MCP snapshot、`run_summary`，或 doctor 报告。
+- 页面资产改动必须有证据：Playwright MCP snapshot、`run_summary`、`doctor` 报告，
+  或 `apps.page_recorder` 会话产出。
 - 缺证据时明确声明不确定性，不要凭猜测拟合 selector。
 - 本地 `PageDriver` 用于自检 / health check / pytest 回归；BDD 流程的**网络证据捕获
-  仍必须走 Playwright MCP**（`bdd-pipeline-gates.mdc` Gate 1），不得用本地驱动替代。
+  仍必须走 Playwright MCP**（`bdd-pipeline-gates.mdc` Gate 1），不得用本地驱动或
+  `apps.page_recorder` 替代。
 
 ## 离线单测
 

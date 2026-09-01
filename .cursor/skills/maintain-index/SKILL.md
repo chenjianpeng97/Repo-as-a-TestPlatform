@@ -1,7 +1,7 @@
 ---
 name: maintain-index
 description: Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bodies. Use after new assets/tools/objects are added, or when INDEX.md drifts from reality.
-version: 1.1.0
+version: 1.1.1
 ---
 
 # Maintain INDEX.md（增量、省 token）
@@ -15,8 +15,9 @@ version: 1.1.0
 
 ## 核心原则：读 delta，不全量读
 
-- **自动区**（`assets/ddl/`、`packages/api_objects/` 等）：**只读各区 `CHANGELOG` 的尾部增量**
-  （`assets/CHANGELOG.md`、`packages/api_objects/CHANGELOG.md`），据此补/改 `INDEX.md` 条目。
+- **自动区**（`assets/ddl/`、`packages/api_objects/`、`packages/page_objects/` 等）：**只读各区 `CHANGELOG` 的尾部增量**
+  （`assets/CHANGELOG.md`、`packages/api_objects/CHANGELOG.md`、
+  `packages/page_objects/CHANGELOG.md`），据此补/改 `INDEX.md` 条目。
   **禁止**为维护索引而逐个打开 `assets/ddl/*.sql` 正文——那是 token 浪费。
 - **人工/半自动区**（`usecases` / `domain-notes` / `sql`）：读新增文件的 **front-matter 元数据头**
   （domain/source/date/version/confidence）即可登记，不必读全文。

@@ -42,6 +42,14 @@ from .health import (
     build_report,
     load_events,
 )
+from .harvest import (
+    HarvestedElement,
+    as_valid_element,
+    harvest_element,
+    harvest_locators,
+    suggest_name,
+    suggest_placeholder,
+)
 from .locator import (
     DEFAULT_POLICY,
     ElementSpec,
@@ -101,6 +109,13 @@ __all__ = [
     "resolve_element",
     "validate_element",
     "validate_elements",
+    # harvest（page recorder 离线核心）
+    "HarvestedElement",
+    "as_valid_element",
+    "harvest_element",
+    "harvest_locators",
+    "suggest_name",
+    "suggest_placeholder",
     # model
     "PageFlow",
     "PageInvocation",

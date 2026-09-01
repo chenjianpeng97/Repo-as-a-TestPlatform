@@ -6,7 +6,7 @@
 ## 需求背景
 
 `APIModel` 只描述**请求契约**（method / path / query / body / auth）与稳定断言；
-它的 `response_hints` 由 `apps.recorder` 生成，只有顶层键名，**没有响应体、状态码、响应头**，
+它的 `response_hints` 由 `packages.api_objects.recording` 生成，只有顶层键名，**没有响应体、状态码、响应头**，
 所以无法直接拿资产当 mock 用。另一方面，被测后端不可用（环境挂了、接口还没开发完、
 要造 500 / 超时 / 空列表等异常分支）时，UI 与 API 用例就跑不动。
 
@@ -48,7 +48,8 @@ uv sync --extra mock
 
 # 1) 拿到 mock 定义，二选一：
 #    a. 边抓包边存【完整】响应（推荐，数据最全）
-python -m apps.recorder --write-mocks
+python -m apps.api_recorder --write-mocks
+#    或合录：python -m apps.recorder --app <app> --write-mocks
 #    b. 从已冻结资产的【截断】样例补骨架
 python -m apps.mock_server seed --dry-run     # 先看会写什么
 python -m apps.mock_server seed
@@ -159,7 +160,7 @@ curl -X POST http://127.0.0.1:8931/__mock__/persist -H "Content-Type: applicatio
 ```
 
 - `body` 为 dict / list → JSON 响应；为字符串 → 原样文本；为 `null` → 空响应体。
-- `path` 支持 `{id}` / `{uuid}` 动态段，语义与 `apps.recorder.normalize.normalize_path` 一致。
+- `path` 支持 `{id}` / `{uuid}` 动态段，语义与 `packages.api_objects.recording.normalize_path` 一致。
   字面路由优先于占位路由，`/users/me` 不会被 `/users/{id}` 抢走。
 - 未定义的路由返回 **501** 并说明如何定义，不会静默返回 200。
 
@@ -167,7 +168,7 @@ curl -X POST http://127.0.0.1:8931/__mock__/persist -H "Content-Type: applicatio
 
 | 来源 | 命令 | 数据完整度 |
 | --- | --- | --- |
-| **recorder 直存**（推荐） | `python -m apps.recorder --write-mocks` | **完整**：全部行、全部层级、长字符串不裁 |
+| **recorder 直存**（推荐） | `python -m apps.api_recorder --write-mocks` 或合录 `--write-mocks` | **完整**：全部行、全部层级、长字符串不裁 |
 | **从资产 seed**（兜底） | `python -m apps.mock_server seed` | 截断：5 行 / 6 层 / 240 字符 |
 
 `seed` 用 `ast` 读资产 `__main__` 块里的 `_RECORDED_RESPONSE`（函数局部变量，import 拿不到），

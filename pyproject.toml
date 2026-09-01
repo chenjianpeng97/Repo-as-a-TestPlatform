@@ -1,6 +1,6 @@
 [project]
 name = "innovammed-test-project-example"
-version = "2.5.0"
+version = "3.0.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -27,7 +27,7 @@ bdd = [
     "playwright>=1.54.0",
     "behave-html-pretty-formatter>=1.16.1",
 ]
-# 终端代理抓包 → 自动维护 packages/api_objects（apps.recorder）
+# 终端代理抓包 → 自动维护 packages/api_objects（apps.api_recorder；extra 名保留 recorder）
 recorder = [
     "mitmproxy>=11.1.3",
 ]

@@ -1,6 +1,6 @@
 """Turn frozen api_objects into starter mock definitions.
 
-``apps.recorder`` stores the real captured response as ``_RECORDED_RESPONSE``
+``apps.recorder`` / ``apps.api_recorder`` store the real captured response as ``_RECORDED_RESPONSE``
 inside each asset's ``if __name__ == "__main__":`` block. That is a function-local
 value, so importing the module cannot reach it — we read it statically with
 ``ast`` instead, which also avoids executing the replay block.
@@ -122,7 +122,7 @@ def build_route_mock(ref: ApiModelRef, recorded: dict[str, Any] | None) -> tuple
         body = strip_truncation_markers(recorded.get("json")) if is_json else None
         headers = {"Content-Type": "application/json"} if is_json else {}
         used_recording = True
-        description = "Seeded from the apps.recorder sample (truncated by the recorder)."
+        description = "Seeded from the recorded sample (truncated by the recorder)."
     else:
         status = _status_from_asserts(ref)
         body = _body_from_hints(ref)

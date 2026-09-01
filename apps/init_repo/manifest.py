@@ -30,6 +30,8 @@ PLATFORM_PATHS: tuple[str, ...] = (
     "apps/__init__.py",
     "apps/dump_ddl.py",
     "apps/recorder",
+    "apps/api_recorder",
+    "apps/page_recorder",
     "apps/index_ai",
     "apps/index_platform",
     "apps/init_repo",

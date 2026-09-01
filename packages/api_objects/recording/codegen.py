@@ -6,7 +6,7 @@ import json
 from typing import Any, Mapping, Sequence
 
 from .capture import Capture
-from .normalize import asset_var_name, service_from_path
+from .normalize import DEFAULT_TOOL, asset_var_name, service_from_path
 
 _MAX_LIST_ITEMS = 5
 _MAX_STR_LEN = 240
@@ -152,7 +152,7 @@ def use_auth_for_replay(capture: Capture) -> bool:
     return True
 
 
-def render_main_block(*, var: str, capture: Capture) -> str:
+def render_main_block(*, var: str, capture: Capture, tool: str = DEFAULT_TOOL) -> str:
     """``if __name__ == '__main__'`` replay of the recorded E2E sample."""
     query = dict(capture.query or {})
     body = capture.request_body if capture.method != "GET" else None
@@ -163,10 +163,11 @@ def render_main_block(*, var: str, capture: Capture) -> str:
     file_fields = sorted(str(k) for k in (capture.files_schema or {}).keys())
     is_multipart = capture.body_format == "multipart"
 
+    stamp = (tool or DEFAULT_TOOL).strip() or DEFAULT_TOOL
     if is_multipart:
         return f'''
 if __name__ == "__main__":
-    # Replay the last recorded E2E sample (maintained by apps.recorder).
+    # Replay the last recorded E2E sample (maintained by apps.{stamp}).
     # Auth: packages.api_objects.auth (Postman/Apifox-style shared credentials).
     # Multipart: file bytes are never frozen. Set TEST_UPLOAD_FILE (or
     # TEST_UPLOAD_FILE_<FIELD>) to a local path to actually upload.
@@ -219,7 +220,7 @@ if __name__ == "__main__":
 
     return f'''
 if __name__ == "__main__":
-    # Replay the last recorded E2E sample (maintained by apps.recorder).
+    # Replay the last recorded E2E sample (maintained by apps.{stamp}).
     # Auth: packages.api_objects.auth (Postman/Apifox-style shared credentials).
     import sys
     from pathlib import Path
@@ -263,8 +264,10 @@ def render_api_model_source(
     asserts: Sequence[Mapping[str, Any]] | None = None,
     extracts: Sequence[Mapping[str, Any]] | None = None,
     name: str | None = None,
+    tool: str = DEFAULT_TOOL,
 ) -> tuple[str, str]:
     """Return ``(variable_name, python_source)``."""
+    stamp = (tool or DEFAULT_TOOL).strip() or DEFAULT_TOOL
     service = service_from_path(capture.normalized_path)
     var = asset_var_name(capture.method, capture.normalized_path, major)
     asset_id = f"{service}.{capture.method}.{capture.normalized_path}@v{major}"
@@ -279,7 +282,7 @@ def render_api_model_source(
 
     desc_lines = [
         "inputs:",
-        "  - query/body keys captured by apps.recorder (optional unless marked required)",
+        f"  - query/body keys captured by apps.{stamp} (optional unless marked required)",
         "outputs:",
         "  - see response_hints / extracts",
         "notes:",
@@ -326,10 +329,10 @@ def render_api_model_source(
     if f_schema or capture.body_format == "multipart":
         files_schema_line = f"    files_schema={_py_repr(f_schema, indent=4)},\n"
 
-    main_block = render_main_block(var=var, capture=capture)
+    main_block = render_main_block(var=var, capture=capture, tool=stamp)
 
     source = f'''\
-"""Auto-maintained by apps.recorder — do not commit secrets."""
+"""Auto-maintained by apps.{stamp} — do not commit secrets."""
 
 from packages.api_test.model import APIModel, AssertOperation, ExtractVariableOperation
 

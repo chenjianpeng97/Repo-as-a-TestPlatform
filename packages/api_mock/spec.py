@@ -2,7 +2,7 @@
 
 The response contract lives **outside** ``APIModel`` on purpose. ``APIModel``
 describes the request contract plus stable asserts; its ``response_hints`` only
-carries top-level key names (see ``apps.recorder.codegen.build_response_hints``)
+carries top-level key names (see ``packages.api_objects.recording.codegen.build_response_hints``)
 and its asserts are assertions, not a response definition. Keeping mock bodies
 in ``data/mocks/`` therefore leaves ``packages.api_test`` untouched and keeps
 scenario data out of the route assets.

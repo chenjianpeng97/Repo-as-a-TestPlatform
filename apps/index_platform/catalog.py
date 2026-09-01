@@ -10,6 +10,8 @@ METHOD_RE = re.compile(r"""^\s*method\s*=\s*['\"]([A-Za-z]+)['\"]""", re.M)
 PATH_RE = re.compile(r"""^\s*path\s*=\s*['\"]([^'\"]+)['\"]""", re.M)
 MAX_SCAN_FILES = 4000
 MAX_PARSE_BYTES = 256_000
+_SKIP_API_OBJECT_FILES = {"__init__.py", "conftest.py", "auth.py", "plane.py", "registry.py"}
+_SKIP_API_OBJECT_DIRS = {"recording"}
 
 
 def scan_ddl(root: Path) -> list[dict[str, Any]]:
@@ -69,7 +71,10 @@ def scan_api_objects(root: Path) -> list[dict[str, Any]]:
     for path in _iter_files(base):
         if path.suffix not in {".py", ".yml", ".yaml", ".json"} or path.name.startswith("test_"):
             continue
-        if path.name in {"__init__.py", "conftest.py"}:
+        if path.name in _SKIP_API_OBJECT_FILES:
+            continue
+        rel_parts = path.relative_to(base).parts
+        if any(part in _SKIP_API_OBJECT_DIRS for part in rel_parts):
             continue
         rel = _rel(root, path)
         text = _read_text(path)
