@@ -1,6 +1,6 @@
 ---
 name: create-action-word
-version: 1.1.1
+version: 1.1.2
 description: Creates or updates action words under packages/action_words/ following action-words-syntax.md. Use when adding DB seed/assert, API request/assert, or UI action/assert business actions, or when migrating ad-hoc test logic (SQL scripts, step bodies) into reusable action words.
 ---
 
@@ -29,7 +29,8 @@ description: Creates or updates action words under packages/action_words/ follow
    `python -m tuner_testkit.apps.dump_ddl <table> --datasource <别名>`），列名固化为模块级
    `*_COLUMNS` 元组。
 5. API 类：只编排 `packages/api_objects/**` 冻结资产（`_internal/api.load_api`），
-   缺资产时先走 freeze-api-objects / `apps.recorder` 合录 / `apps.api_recorder` 代理，**不得**手写 request 契约。
+   缺资产时先走 freeze-api-objects / `tuner-recorder` 合录 / `tuner-api-recorder` 代理
+   （`python -m tuner_testkit.apps.recorder` / `api_recorder`），**不得**手写 request 契约。
 
 ## Hard template rules (enforced)
 

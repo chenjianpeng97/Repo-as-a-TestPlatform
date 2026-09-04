@@ -10,7 +10,7 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 ## 适用范围
 
 - 本规范约束 **behave** 的 step definitions（`tests/features/{ui,api}_steps/`）。
-- 当用户**明确要求用 pytest** 实现时，**不要**强制编写 behave steps；用 pytest 测试直接调用 `packages/**`（及既有 page/api objects，如适用）。
+- 当用户**明确要求用 pytest** 实现时，**不要**强制编写 behave steps；用 pytest 测试直接调用 `tuner_testkit`（及既有 page/api objects / action words，如适用）。
 
 ## 目标
 
@@ -18,7 +18,8 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 - **硬原则**：steps 只编排业务动作与断言，具体实现必须委托给：
   - `packages/page_objects/`（UI 行为与定位）
   - `packages/api_objects/`（接口资产与执行）
-  - `packages/`（通用能力：配置、报告、上下文、断言工具）
+  - `packages/action_words/`（业务动作）
+  - `tuner_testkit`（运行库：配置、日志、db、excel 等）
 
 ## 分层目录（建议）
 

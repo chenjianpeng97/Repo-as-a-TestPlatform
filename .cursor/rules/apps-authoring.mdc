@@ -1,19 +1,21 @@
 ---
-description: apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api); no reinventing wheels, no secrets, not imported by tests
+description: SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's packages business assets; no reinventing wheels, no secrets, not imported by tests
 globs: apps/**,tuner_testkit/apps/**
 alwaysApply: false
-version: 1.3.0
+version: 1.4.0
 ---
 
 # apps — 创建期约束
 
-`apps/` 存放可独立运行的测试工具。完整规范见 `docs/spec/apps-authoring-syntax.md`。
+`apps/` 只放 **SUT 私有**工具。平台 CLI 在 `tuner_testkit.apps`（`tuner-*`）。完整规范见 `docs/spec/apps-authoring-syntax.md`。
 
 ## 必须
 
-- **可独立运行**：包形式提供 `__main__.py`，支持 `python -m tuner_testkit.apps.<name>`；仓库根保留
-  `apps/__init__.py`；参数用 `argparse`。
-- **复用 packages，不重造轮子**：
+- **可独立运行**（两套入口，不要混）：
+  - SUT 私有：`apps/<name>/`，`python -m apps.<name>`；仓库根保留 `apps/__init__.py`。
+  - 平台工具：只改 `tuner_testkit/apps/`，`tuner-*` 或 `python -m tuner_testkit.apps.<name>`。`create-app` 不要往 kit 里脚手架。
+  - 参数用 `argparse`。
+- **复用 kit 运行库 + 本仓业务资产，不重造轮子**：
   - DB → `tuner_testkit.db.DbClient`（禁止直连驱动 / 硬编码 DSN / SQL 拼接）。
   - 日志 → `tuner_testkit.logging`（禁止 `print` / stdlib logging / 自建日志文件）。
   - 配置凭据 → `config/env.py`（`tuner_testkit.config` 解析激活环境）+ 环境变量覆盖（不写死）。
@@ -21,22 +23,22 @@ version: 1.3.0
 - **产出去向**：原始知识回填 `assets/`；可复用资源落 `packages/`。
 - **自动区留痕**：覆盖式生成 `assets/**`、`packages/api_objects/**` 或
   `packages/page_objects/**` 的工具，运行结束必须
-  调用 `apps._shared.changelog.append_entry(...)` 追加该区 `CHANGELOG.md`（供 `maintain-index`）。
+  调用 `tuner_testkit.apps._shared.changelog.append_entry(...)` 追加该区 `CHANGELOG.md`（供 `maintain-index`）。scaffold 不会带 `apps/_shared`。
 
 ## 禁止
 
-- 不得被 `tests/` import（复用逻辑下沉到 `packages/`）。
+- 不得被 `tests/` import（复用逻辑下沉到 `packages/` 业务资产或 `tuner_testkit`）。
 - 不得写入 token / cookie / 密码 / Authorization / session 等敏感值。
 - 破坏性操作无开关、默认非 dry-run/只读 → 禁止。
--   不得为了「被 Plane 看见」而给本地维护工具加 `@plane_app`（dump_ddl / recorder /
+- 不得为了「被 Plane 看见」而给本地维护工具加 `@plane_app`（dump_ddl / recorder /
   api_recorder / page_recorder / init_repo / index_ai 保持本机 CLI，产物进 git）。
 
 ## Plane 可运行 vs 本地维护
 
 - **本地维护**（工程师跑完再 commit）：不必 `plane.py`，Plane Runner 不会执行。
 - **Plane Job**：必须提供 import-safe 的 `apps/<name>/plane.py`，用
-  `apps._shared.plane_app.@plane_app` / `register_plane_app` 登记；CLI 形态为
-  `python -m tuner_testkit.apps.<name>`。领域逻辑在 `packages/`，apps 只做协议适配。
+  `tuner_testkit.apps._shared.plane_app.@plane_app` / `register_plane_app` 登记；SUT CLI 为
+  `python -m apps.<name>`。领域逻辑在 `packages/`，apps 只做协议适配。
   造数 / API / UI 动作不要再做成伪 app；给 word 加 `@plane_db_seed` 等即可。
 - 发现器只 import 存在 `plane.py` 的包；`cli.py` 可以较重，但 `plane.py` 禁止
   顶层 import DB / mitmproxy。

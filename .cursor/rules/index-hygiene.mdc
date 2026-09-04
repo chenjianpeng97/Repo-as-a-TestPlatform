@@ -1,8 +1,8 @@
 ---
 description: Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail; index is the discovery entry for humans and the LLM
-globs: assets/**,packages/api_objects/**,packages/page_objects/**,apps/**
+globs: assets/**,packages/api_objects/**,packages/page_objects/**,apps/**,tuner_testkit/apps/**
 alwaysApply: false
-version: 1.1.1
+version: 1.1.2
 ---
 
 # index-hygiene — 索引与留痕纪律
@@ -28,6 +28,6 @@ version: 1.1.1
 
 ## 一致性
 
-- 新增/删除工具（`apps/`）→ 更新 `INDEX.md` 第 3 节 + 该工具交接文档。
+- 新增/删除工具（`apps/` 或 `tuner_testkit/apps/`）→ 更新 `INDEX.md` 第 3 节 + 该工具交接文档。
 - 冻结新的 api_object / page_object → 更新业务索引第 2.1 / 2.2 节（有 `INDEX.project.md` 写那里，否则 `INDEX.md`）。
 - 回填新的 DDL/用例/业务 SQL → 更新业务索引第 1 节（有 `INDEX.project.md` 写那里，否则 `INDEX.md`；或跑 `maintain-index`）。

@@ -36,7 +36,7 @@
 
 ## 2. 运行库（`tuner_testkit/`，PyPI：`tuner-testkit`）与本仓资产（`packages/`）
 
-发行名 `tuner-testkit`，导入名 `tuner_testkit`。下游用 extras 按需安装；本仓 editable 开发用 `uv sync --extra dev`。
+发行名 `tuner-testkit`，导入名 `tuner_testkit`。下游用 extras 按需安装；本仓 editable 开发用 `uv sync --extra dev`。安装 → `tuner-init scaffold` → 写业务 → `uv add` + `tuner-dna sync` 的标准作业流程见根 [`README.md`](README.md)（即 PyPI 项目说明）。
 
 | extra | 模块 | 用途 |
 | --- | --- | --- |

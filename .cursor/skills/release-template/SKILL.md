@@ -1,7 +1,7 @@
 ---
 name: release-template
-version: 1.0.0
-description: Versions the template's shared platform assets. Use when common packages/** or .cursor/** changed and the init_repo release manifest is stale (drift), to decide a semantic version bump, refresh the manifest, and write release notes.
+version: 1.0.1
+description: Versions the template's shared platform assets. Use when tuner_testkit/** or .cursor/** changed and the init_repo release manifest is stale (drift), to decide a semantic version bump, refresh the manifest, and write release notes.
 ---
 
 # Release Template — 版本化平台公共资产

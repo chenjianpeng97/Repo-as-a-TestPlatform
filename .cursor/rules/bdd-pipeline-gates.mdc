@@ -2,7 +2,7 @@
 description: Three non-negotiable gates for the BDD asset pipeline (Playwright MCP capture, API-object freeze, stage regression); scoped to BDD assets, skipped when user explicitly requests pytest
 globs: tests/features/**,packages/api_objects/**,packages/page_objects/**
 alwaysApply: false
-version: 2.0.0
+version: 2.0.1
 ---
 
 # BDD Pipeline — three non-negotiable gates
@@ -19,7 +19,7 @@ version: 2.0.0
 - **Default** for UI/API business-flow automation assets is the behave BDD pipeline below.
 - **Exception — user-explicit pytest**: If the user **explicitly** asks to implement with **pytest** (including performance, DB/data checks, or other non-BDD suites), implement with **pytest**. Do **not** force `.feature` / behave steps / `behave --stage` / this pipeline’s three gates.
 - When in doubt and the user did **not** name a framework, prefer behave for scenario-style UI/API flows; prefer asking once only if the task is clearly performance/DB-centric and framework is unspecified.
-- Pytest tests should still reuse `packages/**` (db, api_objects, logging, etc.) where useful; they are not required to go through Gherkin.
+- Pytest tests should still reuse `tuner_testkit` (db, logging, api_test, excel, fake) and this repo's `packages/**` business assets (api_objects, action words, etc.) where useful; they are not required to go through Gherkin.
 
 This repo’s BDD path follows `.cursor/agents/bdd-asset-pipeline.md`:
 **Feature → Playwright MCP Run/Capture → Reuse analysis → Freeze API Objects → Update Page Objects → Implement Steps → `behave --stage` regression**.

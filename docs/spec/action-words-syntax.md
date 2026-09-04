@@ -23,16 +23,15 @@ description: Action Words spec for unified test-asset management. Covers the bas
 
 ## 目录结构
 
+框架（基类 / registry / CLI）在 **`tuner_testkit.action_words`**。SUT 仓的 `packages/action_words/` 只做 re-export 并放本仓 word：
+
 ```
+tuner_testkit/action_words/   # kit：base / context / registry / plane / CLI
 packages/action_words/
-├── __init__.py          # 导出 ActionWord / ActionResult / register 等
-├── __main__.py          # CLI：list / describe / run / catalog
-├── base.py              # ActionCategory / TableRows / ActionResult / ActionWord
-├── context.py           # ActionContext：DB 连接 + API token 惰性初始化
-├── registry.py          # @register / discover / get / list_all / export_catalog
-├── plane.py             # @plane_db_seed 等 opt-in（Plane Formulation / Job）
+├── __init__.py          # re-export ActionWord / ActionResult / register 等
+├── __main__.py          # 转到 tuner_testkit.action_words CLI
 ├── models.py            # 跨 word 共享的业务模型（如 ProductLine）
-├── _internal/           # 内部工具（ids/generators/params/db/api/wait），不对外
+├── _internal/           # 本仓 overlays（如 params.py）；kit 另有 ids/db/api/wait
 ├── db_seed/             # 每个造数 word 一个模块
 ├── db_assert/
 ├── api_request/
@@ -41,6 +40,7 @@ packages/action_words/
 └── ui_assert/           # 预留
 ```
 
+- **不要**在 SUT 仓复制 `base.py` / `registry.py` / 框架 CLI。
 - **一个模块一组强相关 word**：默认一个模块一个 word；同一聚合的多个 word
   （如 `create_invoice_relation` 与 `link_invoice_to_uninvoiced`）可同模块。
 - 新增类别子包后无需注册：`registry.discover()` 会自动扫描

@@ -44,6 +44,23 @@
 
 ---
 
+## 2026-09-04 — DNA 描述对齐 tuner-testkit 分层
+
+- **commit**: `TBD`
+- **目的**: rules/skills/agents/specs 不再把运行库写成仓内 `packages/`，不再把平台 CLI
+  写成 `apps.recorder`；SUT `python -m apps.<name>` 与 kit `tuner-*` 入口分开；
+  changelog/Plane 共享走 `tuner_testkit.apps._shared`。
+- **路径**:
+  - `.cursor/rules/bdd-asset-layering.mdc`、`apps-authoring.mdc`、`apps-handover.mdc`、
+    `bdd-pipeline-gates.mdc`、`index-hygiene.mdc`
+  - `.cursor/skills/create-app/SKILL.md`、`create-action-word`、`maintain-page-objects`、
+    `release-template`
+  - `.cursor/agents/bdd-asset-pipeline.md`、`AGENTS.md`
+  - `docs/spec/apps-authoring-syntax.md`、`page-objects-syntax.md`、`action-words-syntax.md`、
+    `behave-step-definitions.md`、`assets-knowledge-syntax.md`
+- **不在同步范围**: 业务 `packages/api_objects` / `page_objects`；旧运行库树清理另开任务
+- **验证**: `python -m tuner_testkit.apps.index_ai`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-09-04 — tuner-testkit 4.0.0（PyPI extras + DNA sync）
 
 - **commit**: `TBD`

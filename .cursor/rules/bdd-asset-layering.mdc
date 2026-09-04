@@ -1,15 +1,15 @@
 ---
-description: Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages; no selector or request leakage across layers
+description: Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime; no selector or request leakage across layers
 globs: **/*.py
 alwaysApply: false
-version: 1.2.1
+version: 1.3.0
 ---
 
 # Asset Layering — boundary rules per layer
 
 Each layer owns one responsibility. Leakage across layers (e.g. selectors in steps, handcrafted requests in page objects) is forbidden. See per-layer skills in `.cursor/skills/` for the operational details; this rule is the hard-boundary check.
 
-**Framework note**: These layer contracts primarily govern **behave/BDD** assets (`.feature` + `*_steps` + action words + page/api objects). When the user **explicitly** asks for **pytest**, implement pytest tests that call `packages/**` (and action words / page/api objects if useful); do not invent Gherkin/steps solely to satisfy layering.
+**Framework note**: These layer contracts primarily govern **behave/BDD** assets (`.feature` + `*_steps` + action words + page/api objects). When the user **explicitly** asks for **pytest**, implement pytest tests that call `tuner_testkit` (db / logging / api_test / excel / fake) plus this repo's `packages/**` business assets (action words / page/api objects) if useful; do not invent Gherkin/steps solely to satisfy layering.
 
 ## Layer contract (hard rules)
 
@@ -31,16 +31,17 @@ Each layer owns one responsibility. Leakage across layers (e.g. selectors in ste
   - One asset per `method + normalized_path` (versioned `V1/V2` only when incompatible). `path` contains **no host**.
   - Executes only via `APIModel.execute()` after `set_*` / `override_*`; no custom executor patterns.
   - Asserts are stable/observable (`http status`, `$.code`, key-exists). **Never** hardcode scenario-specific constants (e.g. expected `total=12`) inside APIModel asserts.
-- **`packages/**`** — framework base capabilities (DB, logging, config, generic http client, fake data).
-  - No UI actions, no feature-level business rules. See `packages-logging.mdc`, `packages-db.mdc`, and `packages-fake.mdc`.
-  - **`tuner_testkit/excel`**: read xlsx/CSV from bytes or path; returns stringified cells and `list[dict]` records. **No domain**; call sites map columns. **Dependency**: `openpyxl` (declared in `pyproject.toml`).
+- **`packages/**`** — this repo's **business** assets only (`action_words` / `page_objects` / `api_objects` and thin re-exports). Not the kit runtime.
+  - No UI actions or feature-level rules outside the asset types above.
+- **`tuner_testkit/**`** — shared runtime (DB, logging, config, HTTP client, fake data, recorders). See `packages-logging.mdc`, `packages-db.mdc`, and `packages-fake.mdc`.
+  - **`tuner_testkit.excel`**: read xlsx/CSV from bytes or path; returns stringified cells and `list[dict]` records. **No domain**; call sites map columns. **Dependency**: `openpyxl` (declared in `pyproject.toml`).
   - **`tuner_testkit.api_test`**: `ApiResponse` always includes **`content: bytes`** (raw body) in addition to `json` / `text`. JSON APIs populate `json`; file-download routes often leave `json is None` — use **`execute()` 返回的 `resp.content`** 交给 `tuner_testkit.excel` 或业务层解析。`APIModel.body_format` 支持 **`"json"`**（默认）与 **`"form"`**（`application/x-www-form-urlencoded`）；仍仅通过 `set_json(...).execute()` 传 body，禁止在 steps 里手写 `requests`。
   - **`tuner_testkit.fake`**: 业务随机值（UDI / USCC / 姓名 / 金额等）。生成器产单值；批量走 `run(fake_id, count=..., inputs=...)` 或 `python -m tuner_testkit.fake run`。禁止在 steps/words 里手写 `random.choices` 或无校验社信码。
 
 ## Cross-cutting
 
 - **No secrets in repo**, ever: `Authorization`, `Cookie`, `Set-Cookie`, `*token*`, `*secret*`, `*password*`, `*session*`. Also applies to captures under `report/` / `testcase/`.
-- **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `apps.recorder` / `apps.api_recorder` captures, or run_summary findings; avoid locator/path guesses.
+- **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `tuner-recorder` / `tuner-api-recorder` captures (`python -m tuner_testkit.apps.recorder` / `api_recorder`), or run_summary findings; avoid locator/path guesses.
 - **`tests/**` must not import `apps.*`**. Action words for BDD/pytest stay in
   `tuner_testkit.action_words`. Opt into Plane with `@plane_db_seed` (etc.) from
   `tuner_testkit.action_words.plane`; do not wrap them as `apps.*`.

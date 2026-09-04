@@ -1,4 +1,4 @@
-<!-- version: 1.2.0 -->
+<!-- version: 1.2.1 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -41,15 +41,15 @@
 flowchart TD
   Start[任务到达] --> Q{任务类型?}
   Q -->|"业务 UI/API 流自动化"| BDD["BDD 资产流水线\n.cursor/agents/bdd-asset-pipeline.md"]
-  Q -->|"明确要求 pytest / 性能 / DB 核对"| Pytest["pytest 路径\n复用 packages/**，不产出 .feature"]
+  Q -->|"明确要求 pytest / 性能 / DB 核对"| Pytest["pytest 路径\n复用 tuner_testkit + packages，不产出 .feature"]
   Q -->|"需要一个新的独立工具"| App["create-app skill\napps-authoring / apps-handover 规则"]
   Q -->|"缺少知识(ddl/api/用例)"| Know["先跑 kit CLI 回填 assets\n再走生成"]
-  Q -->|"新建/更新项目仓"| Init["init_repo / release-template"]
+  Q -->|"新建/更新项目仓"| Init["tuner-init / tuner-dna / release-template"]
   Q -->|"读/策展/索引知识"| Idx["查 INDEX.md + maintain-index skill"]
 ```
 
 - **业务 UI/API 流** → 参见 `.cursor/agents/bdd-asset-pipeline.md`（该编排内部含 BDD 三门禁，仅在此分支生效）。
-- **明确 pytest** → 直接写 pytest，复用 `packages/**`，不要为满足分层而硬造 Gherkin。
+- **明确 pytest** → 直接写 pytest，复用 `tuner_testkit` 与本仓 `packages/**` 业务资产，不要为满足分层而硬造 Gherkin。
 - **造工具** → `create-app` skill；工具做好按 `apps-handover.mdc` 补交接文档。
 - **补知识** → 用 `tuner-dump-ddl`、`tuner-recorder`（合录）、`tuner-api-recorder`、`tuner-page-recorder` 等回填 `assets/` / `packages/api_objects` / `packages/page_objects`，再进入生成。
 - **仓库初始化/发布** → `tuner-init scaffold`（骨架 + 依赖 `tuner-testkit` + 一次 `tuner-dna sync`）+ `release-template` skill。下游升 kit：`uv add tuner-testkit==x.y.z` 然后 `tuner-dna sync`，再提交。
@@ -64,7 +64,7 @@ flowchart TD
 
 ## 6. 本仓分支约定（平台 + Plane dogfood）
 
-本公开仓同时维护平台 DNA 与一个 **Plane dogfood** 试用场，**不是**把多个被测系统合进 `main`。其它 SUT 在各自项目仓演进，用 `init_repo` 从 `main` 取 DNA。
+本公开仓同时维护平台 DNA 与一个 **Plane dogfood** 试用场，**不是**把多个被测系统合进 `main`。其它 SUT 在各自项目仓演进，用 `tuner-init scaffold` / `tuner-dna sync` 从平台取 DNA。
 
 Dogfood：用开源项目管理软件 [Plane](https://github.com/makeplane/plane) 做本测试仓的可视化，同时用本仓回归 Plane 自身。
 

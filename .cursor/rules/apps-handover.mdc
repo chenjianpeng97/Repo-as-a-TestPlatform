@@ -1,8 +1,8 @@
 ---
-description: When an apps/ tool is created or changed, it must ship a handover doc (requirement background, trial scenarios, run method, run example) and be registered in INDEX.md
-globs: apps/**
+description: When an apps/ or tuner_testkit.apps tool is created or changed, it must ship a handover doc (requirement background, trial scenarios, run method, run example) and be registered in INDEX.md
+globs: apps/**,tuner_testkit/apps/**
 alwaysApply: false
-version: 1.0.0
+version: 1.1.0
 ---
 
 # apps — 完成期交接纪律
@@ -12,7 +12,7 @@ version: 1.0.0
 
 ## 交接文档必须包含
 
-写在 `apps/<name>/README.md`（单文件工具写进 `apps/README.md` 的条目）：
+写在 `apps/<name>/README.md` 或 `tuner_testkit/apps/<name>/README.md`（单文件工具写进对应目录的 README 条目）：
 
 - **需求背景**：当时为解决什么问题而造。
 - **试用场景**：适用/不适用场景与前置条件（数据源、是否需登录、依赖 extra 等）。

@@ -8,7 +8,7 @@
 
 ```text
 assets/
-├── ddl/<datasource>/<table>.sql   # 工具产出(自动区): 表结构，apps/dump_ddl 生成
+├── ddl/<datasource>/<table>.sql   # 工具产出(自动区): 表结构，tuner-dump-ddl / tuner_testkit.apps.dump_ddl 生成
 ├── sql/<name>.sql                 # 人类可读的业务 SQL 副本(packages-db.mdc 约定镜像)
 ├── usecases/<domain>/<name>.md    # 禅道/XMind 导出、整理后的用例
 ├── domain-notes/<domain>/<name>.md# 业务讲解、字段含义、权限规则等高置信度经验

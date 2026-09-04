@@ -1,6 +1,6 @@
 ---
 name: bdd-asset-pipeline
-version: 1.0.0
+version: 1.0.1
 description: Orchestrates the Feature → MCP Run/Capture → Reuse Analysis → Freeze API Objects → Maintain Page Objects → Maintain Steps → behave regression loop for this repo. Use only for behave/BDD automation assets. Do NOT use when the user explicitly requests pytest (e.g. performance or DB-centric tests).
 ---
 
@@ -15,7 +15,7 @@ Feature → (Playwright MCP) Run/Capture → Reuse vs Create decision → Freeze
 ## Applicability
 
 - **Use this agent** when the task is generating or maintaining `.feature` / behave steps / BDD UI·API assets.
-- **Do not use this agent** when the user **explicitly** asks for **pytest** (performance, DB/data checks, or other non-Gherkin suites). In that case implement pytest tests directly (still prefer `packages/**` helpers); do not force the Feature→MCP→behave loop.
+- **Do not use this agent** when the user **explicitly** asks for **pytest** (performance, DB/data checks, or other non-Gherkin suites). In that case implement pytest tests directly (still prefer `tuner_testkit` plus this repo's `packages/**` business assets); do not force the Feature→MCP→behave loop.
 
 ## Non-negotiable workflow contract (hard gates)
 

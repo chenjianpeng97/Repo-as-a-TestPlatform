@@ -28,7 +28,7 @@ apps/                            # 仅 SUT 私有工具
   `apps/__init__.py`。平台 CLI 走 `python -m tuner_testkit.apps.<name>` / `tuner-*`。
 - 需要在仓库根外可运行时，用 `tuner_testkit.project.project_root()`（禁止 kit `__file__` 当 SUT 根）。
 
-## 2. 必须复用 packages（不得重造轮子）
+## 2. 必须复用 kit 运行库（不得重造轮子）
 
 - **DB** → `tuner_testkit.db.DbClient`（多数据源，`config/env.py` 的别名）。禁止 `pymysql` /
   `pymssql` / `psycopg.connect`、硬编码 DSN、SQL 字符串拼接。见 `.cursor/rules/packages-db.mdc`。
@@ -44,7 +44,7 @@ apps/                            # 仅 SUT 私有工具
 - **可复用资源** → `packages/`（如抓包冻结为 `packages/api_objects/`）。
 - **自动区变更留痕**：凡是覆盖式生成 `assets/**`、`packages/api_objects/**` 或
   `packages/page_objects/**` 的工具，运行结束**必须**用
-  `apps._shared.changelog.append_entry(...)` 向对应区 `CHANGELOG.md`
+  `tuner_testkit.apps._shared.changelog.append_entry(...)` 向对应区 `CHANGELOG.md`
   追加一行（tool / action / items / 关键字段），供 `maintain-index` 增量更新 `INDEX.md`。
 
 ## 4. 交接文档（完成期必产出）
@@ -66,7 +66,7 @@ apps/                            # 仅 SUT 私有工具
 - **Plane vs 本地**：只有要在 Plane 跑的 **CLI 工具** 才加 `plane.py` + `@plane_app`。
   回填 git 的工具（DDL/api_objects/REGISTRY/脚手架）不要注册。领域动作留在
   `packages/`，用 `@plane_db_seed` 等标记上架；发现器只加载 `apps/*/plane.py`
-  作为 `tools[]`。
+  作为 `tools[]`。Plane 装饰器从 `tuner_testkit.apps._shared.plane_app` 导入。
 
 ## 6. 测试
 

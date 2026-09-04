@@ -1,7 +1,7 @@
 ---
 name: python-playwright-page-objects
 user-invocable: false
-description: Python + Playwright 的 Page Object 规范（中文）。以 packages.page_test 的 PageModel（元素表 + 声明式 flow）为主范式、BasePage 逃生舱为辅；强调多定位器备用、locator_policy 确定性拦截、动作/断言分离与 AI 可维护边界。
+description: Python + Playwright 的 Page Object 规范（中文）。以 tuner_testkit.page_test 的 PageModel（元素表 + 声明式 flow）为主范式、BasePage 逃生舱为辅；强调多定位器备用、locator_policy 确定性拦截、动作/断言分离与 AI 可维护边界。
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
@@ -224,7 +224,7 @@ BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（
 - **级别三 · 持久化自愈**（自动改写资产源码）：**本仓不做**。工具悄悄改代码没人 review，
   等发现时已说不清页面到底改了什么。采纳建议由人或 AI 显式执行，doctor 报告即证据。
 
-## 录制（apps.page_recorder）
+## 录制（tuner-page-recorder）
 
 本地维护 CLI：headed Playwright 打开真实页面，人工点/填/浏览时直播冻结 `PageModel`
 到 `packages/page_objects/<app>/<page_slug>.py`。交接文档见 `tuner_testkit/apps/page_recorder/README.md`。
@@ -251,7 +251,7 @@ uv run python -m tuner_testkit.apps.page_recorder --app plane --flow login --url
 - **新增元素时给足候选**：语义定位 + `test_id`（如有）至少两个，让 fallback 有意义。
 - **locator 不稳定时**：优先建议研发补 `data-testid`；未补齐前用语义定位 + `scope` /
   `has_text` 收窄，并把脆弱候选标 `fragile` + `note`。
-- **改动需有证据**：Playwright MCP snapshot、`run_summary`、`doctor` 报告，或 `apps.page_recorder` 会话产出。
+- **改动需有证据**：Playwright MCP snapshot、`run_summary`、`doctor` 报告，或 `tuner-page-recorder` 会话产出。
 
 ## 离线单测
 

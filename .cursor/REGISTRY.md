@@ -12,14 +12,14 @@
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
-| `apps-authoring` | glob | apps/**,tuner_testkit/apps/** | 1.3.0 | apps/ tools must be standalone-runnable and reuse packages (db/logging/config/api) | `.cursor/rules/apps-authoring.mdc` |
-| `apps-handover` | glob | apps/** | 1.0.0 | When an apps/ tool is created or changed, it must ship a handover doc (requirement background, trial scenarios, run met… | `.cursor/rules/apps-handover.mdc` |
+| `apps-authoring` | glob | apps/**,tuner_testkit/apps/** | 1.4.0 | SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's package… | `.cursor/rules/apps-authoring.mdc` |
+| `apps-handover` | glob | apps/**,tuner_testkit/apps/** | 1.1.0 | When an apps/ or tuner_testkit.apps tool is created or changed, it must ship a handover doc (requirement background, tr… | `.cursor/rules/apps-handover.mdc` |
 | `assets-knowledge` | glob | assets/** | 1.0.0 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
-| `bdd-asset-layering` | glob | **/*.py | 1.2.1 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects/packages | `.cursor/rules/bdd-asset-layering.mdc` |
-| `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/** | 2.0.0 | Three non-negotiable gates for the BDD asset pipeline (Playwright MCP capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
+| `bdd-asset-layering` | glob | **/*.py | 1.3.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime | `.cursor/rules/bdd-asset-layering.mdc` |
+| `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/** | 2.0.1 | Three non-negotiable gates for the BDD asset pipeline (Playwright MCP capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
 | `commit-convention` | always | all files | 1.0.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
-| `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/** | 1.1.1 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
+| `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/**,tuner_testkit/apps/** | 1.1.2 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
 | `packages-db` | glob | **/*.py | 1.3.1 | Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL c… | `.cursor/rules/packages-db.mdc` |
 | `packages-fake` | glob | **/*.py | 1.0.0 | Require business random/fake values to go through tuner_testkit.fake | `.cursor/rules/packages-fake.mdc` |
 | `packages-logging` | glob | **/*.py | 1.0.0 | Require all run-time logging to go through tuner_testkit.logging | `.cursor/rules/packages-logging.mdc` |
@@ -29,16 +29,16 @@
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
-| `create-action-word` | on-demand | - | 1.1.1 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
-| `create-app` | on-demand | - | 1.0.1 | Scaffolds a new standalone tool under apps/ that reuses packages (db/logging/config/api) and assets, following apps-aut… | `.cursor/skills/create-app/SKILL.md` |
+| `create-action-word` | on-demand | - | 1.1.2 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
+| `create-app` | on-demand | - | 1.1.0 | Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business as… | `.cursor/skills/create-app/SKILL.md` |
 | `dump-ddl` | on-demand | - | 1.2.0 | Dumps live table DDL into assets/ddl/<datasource>/ via tuner_testkit/apps/dump_ddl.py, then updates the knowledge index… | `.cursor/skills/dump-ddl/SKILL.md` |
 | `feature-authoring` | on-demand | - | 1.0.0 | Creates or rewrites behave Gherkin .feature files following behave-gerkin-syntax.md | `.cursor/skills/feature-authoring/SKILL.md` |
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.0.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.1.1 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
-| `maintain-page-objects` | on-demand | - | 2.0.1 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
-| `release-template` | on-demand | - | 1.0.0 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
+| `maintain-page-objects` | on-demand | - | 2.0.2 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
+| `release-template` | on-demand | - | 1.0.1 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
 | `reuse-analysis` | on-demand | - | 1.0.0 | Analyzes whether to reuse/add/update Feature steps, Page Objects, and API Objects by searching for existing assets, mat… | `.cursor/skills/reuse-analysis/SKILL.md` |
 | `run-feature-playwright-mcp` | on-demand | - | 1.0.0 | Runs behave Gherkin scenarios via Playwright MCP with Run→Capture→Freeze workflow and strict sanitization | `.cursor/skills/run-feature-playwright-mcp/SKILL.md` |
 
@@ -46,7 +46,7 @@
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
-| `bdd-asset-pipeline` | orchestration | - | 1.0.0 | Orchestrates the Feature → MCP Run/Capture → Reuse Analysis → Freeze API Objects → Maintain Page Objects → Maintain Ste… | `.cursor/agents/bdd-asset-pipeline.md` |
+| `bdd-asset-pipeline` | orchestration | - | 1.0.1 | Orchestrates the Feature → MCP Run/Capture → Reuse Analysis → Freeze API Objects → Maintain Page Objects → Maintain Ste… | `.cursor/agents/bdd-asset-pipeline.md` |
 
 ## Hooks（事件驱动脚本）
 
