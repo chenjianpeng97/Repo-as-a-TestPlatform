@@ -61,24 +61,6 @@ class TestResolveActiveName:
         )
         assert name == "uat"
 
-    def test_tuner_env_wins_over_legacy_argon(self):
-        name = resolve_active_name(
-            available=("dev", "uat"),
-            module_default="dev",
-            environ={"TUNER_ENV": "dev", "ARGON_ENV": "uat"},
-            active_file_text="uat",
-        )
-        assert name == "dev"
-
-    def test_legacy_argon_env_still_accepted(self):
-        name = resolve_active_name(
-            available=("dev", "uat"),
-            module_default="dev",
-            environ={"ARGON_ENV": "uat"},
-            active_file_text="dev",
-        )
-        assert name == "uat"
-
     def test_active_file_wins_over_module_default(self):
         name = resolve_active_name(
             available=("dev", "uat"),
@@ -115,12 +97,12 @@ class TestResolveActiveName:
                 active_file_text=None,
             )
 
-    def test_unknown_argon_env_raises(self):
+    def test_unknown_tuner_env_raises(self):
         with pytest.raises(EnvProfileError, match="未知环境"):
             resolve_active_name(
                 available=("dev", "uat"),
                 module_default="dev",
-                environ={"ARGON_ENV": "prd"},
+                environ={"TUNER_ENV": "prd"},
                 active_file_text=None,
             )
 
@@ -199,7 +181,6 @@ class TestCli:
     @pytest.fixture(autouse=True)
     def _clear_env_vars(self, monkeypatch):
         monkeypatch.delenv("TUNER_ENV", raising=False)
-        monkeypatch.delenv("ARGON_ENV", raising=False)
 
     def test_show_lists_and_marks_active(self, monkeypatch, capsys):
         source = _catalog(dev=_DEV, uat=_UAT)

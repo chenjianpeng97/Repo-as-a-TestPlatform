@@ -6,10 +6,10 @@
 #   2. config/env_overlay.py（可选，项目/试验田提交：额外别名与类型，仍无密钥）
 #   3. config/env_local.py（gitignore，本机真实 host/密码/账号）
 #      - 若定义了非空 ENVIRONMENTS：由 tuner_testkit.config 按激活名只套用那一套
-#        （TUNER_ENV > ARGON_ENV > config/.active_env > ACTIVE_ENV > 唯一 key）
+#        （TUNER_ENV > config/.active_env > ACTIVE_ENV > 唯一 key）
 #      - 否则按扁平 DATABASES / TEST_* 合并（旧写法）
 #   4. 环境变量 TUNER_DB_<ALIAS>_HOST/PORT/USER/PASSWORD/NAME
-#      （ARGON_DB_* 与旧的 TUNER_DB_HOST / ARGON_DB_HOST 继续覆盖默认别名 "main"）
+#      （未带别名的 TUNER_DB_HOST 等继续覆盖默认别名 "main"）
 #      TEST_BASE_URL / TEST_USERNAME / TEST_PASSWORD 同样优先于本模块。
 #
 # 切换激活环境：python -m tuner_testkit.config use <name>（写入 gitignore 的 .active_env）。

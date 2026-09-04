@@ -8,9 +8,9 @@ for additional stores); the concrete engine type lives only in that config.
 Credentials resolution precedence (first wins):
     1. Explicit ``ConnectionSettings`` instance passed by the caller
     2. Per-alias environment variables ``TUNER_DB_<ALIAS>_HOST`` / ``_PORT`` /
-       ``_USER`` / ``_PASSWORD`` / ``_NAME`` (legacy ``ARGON_DB_*`` still accepted)
-    3. Legacy unprefixed variables (``TUNER_DB_HOST`` / ``ARGON_DB_HOST`` / ...)
-       — apply to the default ``"main"`` alias only
+       ``_USER`` / ``_PASSWORD`` / ``_NAME``
+    3. Unprefixed variables (``TUNER_DB_HOST`` / ...) — apply to the default
+       ``"main"`` alias only
     4. ``config.env.DATABASES[alias]`` in the SUT project
 """
 from __future__ import annotations
@@ -73,25 +73,17 @@ def get_settings(alias: str = DEFAULT_ALIAS) -> ConnectionSettings:
         )
     base = dict(databases[alias])
     prefix = f"TUNER_DB_{alias.upper()}_"
-    legacy_prefix = f"ARGON_DB_{alias.upper()}_"
-    legacy = alias == DEFAULT_ALIAS
-    extra_host = ("TUNER_DB_HOST", "ARGON_DB_HOST") if legacy else ()
-    extra_port = ("TUNER_DB_PORT", "ARGON_DB_PORT") if legacy else ()
-    extra_user = ("TUNER_DB_USER", "ARGON_DB_USER") if legacy else ()
-    extra_password = ("TUNER_DB_PASSWORD", "ARGON_DB_PASSWORD") if legacy else ()
-    extra_name = ("TUNER_DB_NAME", "ARGON_DB_NAME") if legacy else ()
-    host = _env_or(str(base["host"]), prefix + "HOST", legacy_prefix + "HOST", *extra_host)
-    port_str = _env_or(str(base["port"]), prefix + "PORT", legacy_prefix + "PORT", *extra_port)
-    user = _env_or(str(base["user"]), prefix + "USER", legacy_prefix + "USER", *extra_user)
-    password = _env_or(
-        str(base["password"]),
-        prefix + "PASSWORD",
-        legacy_prefix + "PASSWORD",
-        *extra_password,
-    )
-    database = _env_or(
-        str(base["database"]), prefix + "NAME", legacy_prefix + "NAME", *extra_name
-    )
+    unprefixed = alias == DEFAULT_ALIAS
+    extra_host = ("TUNER_DB_HOST",) if unprefixed else ()
+    extra_port = ("TUNER_DB_PORT",) if unprefixed else ()
+    extra_user = ("TUNER_DB_USER",) if unprefixed else ()
+    extra_password = ("TUNER_DB_PASSWORD",) if unprefixed else ()
+    extra_name = ("TUNER_DB_NAME",) if unprefixed else ()
+    host = _env_or(str(base["host"]), prefix + "HOST", *extra_host)
+    port_str = _env_or(str(base["port"]), prefix + "PORT", *extra_port)
+    user = _env_or(str(base["user"]), prefix + "USER", *extra_user)
+    password = _env_or(str(base["password"]), prefix + "PASSWORD", *extra_password)
+    database = _env_or(str(base["database"]), prefix + "NAME", *extra_name)
     return ConnectionSettings(
         host=host,
         port=int(port_str),

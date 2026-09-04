@@ -40,7 +40,7 @@
 
 | extra | 模块 | 用途 |
 | --- | --- | --- |
-| （默认） | `tuner_testkit.config` / `logging` | 命名环境解析（`TUNER_ENV` > 旧名 `ARGON_ENV` > `.active_env`）；统一日志 |
+| （默认） | `tuner_testkit.config` / `logging` | 命名环境解析（`TUNER_ENV` > `.active_env`）；统一日志 |
 | `[db]` | `tuner_testkit.db` | 多数据源 DB |
 | `[api]` | `tuner_testkit.api_test` | APIModel 运行框架 |
 | `[web-ui]` | `tuner_testkit.page_test` | Web UI（Playwright）；Python 模块名仍为 `page_test` |

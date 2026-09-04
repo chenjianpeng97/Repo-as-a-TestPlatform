@@ -20,7 +20,7 @@
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
 | `commit-convention` | always | all files | 1.0.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
 | `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/** | 1.1.1 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
-| `packages-db` | glob | **/*.py | 1.3.0 | Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL c… | `.cursor/rules/packages-db.mdc` |
+| `packages-db` | glob | **/*.py | 1.3.1 | Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL c… | `.cursor/rules/packages-db.mdc` |
 | `packages-fake` | glob | **/*.py | 1.0.0 | Require business random/fake values to go through tuner_testkit.fake | `.cursor/rules/packages-fake.mdc` |
 | `packages-logging` | glob | **/*.py | 1.0.0 | Require all run-time logging to go through tuner_testkit.logging | `.cursor/rules/packages-logging.mdc` |
 | `packages-page-test` | glob | packages/page_objects/**,tests/features/**,packages/action_words/** | 1.0.0 | Require all UI locators to live in tuner_testkit.page_test ElementSpec declarations with multiple fallback candidates | `.cursor/rules/packages-page-test.mdc` |

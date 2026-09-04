@@ -21,7 +21,7 @@ description: Dumps live table DDL into assets/ddl/<datasource>/ via tuner_testki
 
 1. 读 `config/env.py` + 若存在的 `config/env_overlay.py`，确认 `DATABASES` 别名与
    `type`（`mysql` / `sqlserver` / `postgres`）。**不要把 `env_local.py` 的密码回显到对话。**
-2. 本机真实连接只存在于 `config/env_local.py` 或 `TUNER_DB_<ALIAS>_*`（旧名 `ARGON_DB_*`）。文件不存在则
+2. 本机真实连接只存在于 `config/env_local.py` 或 `TUNER_DB_<ALIAS>_*`。文件不存在则
    先让用户从 `config/env_local.py.example` 复制并填值，**不要替用户把密钥提交进 git**。
    多套环境时先 `python -m tuner_testkit.config show` 确认激活名（`tuner_testkit.config` 解析
    `ENVIRONMENTS`）；需要换套则 `python -m tuner_testkit.config use <name>`。

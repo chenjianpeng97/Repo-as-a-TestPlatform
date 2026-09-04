@@ -108,12 +108,12 @@ def step_assert_home(context):
 
 ```python
 from behave import when, then
-from packages.api_objects.argon.mainData.getCategoryTree.GET_v1 import get_category_tree_v1
+from packages.api_objects.example.users.list.GET_v1 import list_users_v1
 
-@when('我查询可授权产品，分类名为 "{category_name}"')
-def step_call_get_category_tree(context, category_name):
+@when('我查询用户列表，分类名为 "{category_name}"')
+def step_call_list_users(context, category_name):
     resp = (
-        get_category_tree_v1
+        list_users_v1
         .set_query({"categoryName": category_name})
         .execute(auth={"bearer_token": context.vars["token"]})
     )

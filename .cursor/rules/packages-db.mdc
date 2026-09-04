@@ -2,7 +2,7 @@
 description: Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL coexist); forbid direct pymssql/pymysql/psycopg, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
 globs: **/*.py
 alwaysApply: false
-version: 1.3.0
+version: 1.3.1
 ---
 
 # tuner_testkit.db — mandatory multi-datasource surface
@@ -60,10 +60,10 @@ class SeedOnSqlServer(ActionWord):
 ## Hard rules
 
 - Credentials come from `config.env.DATABASES` + env overrides
-  (`TUNER_DB_<ALIAS>_HOST` / `PORT` / `USER` / `PASSWORD` / `NAME`; legacy
-  `ARGON_DB_*` and unprefixed `TUNER_DB_HOST` / `ARGON_DB_HOST` still override the default `main` alias). Named
+  (`TUNER_DB_<ALIAS>_HOST` / `PORT` / `USER` / `PASSWORD` / `NAME`; unprefixed
+  `TUNER_DB_HOST` still overrides the default `main` alias). Named
   prd/uat/dev profiles in gitignored `env_local.ENVIRONMENTS` are resolved by
-  `tuner_testkit.config` (`TUNER_ENV` > `ARGON_ENV` > `config/.active_env` > `ACTIVE_ENV`) before
+  `tuner_testkit.config` (`TUNER_ENV` > `config/.active_env` > `ACTIVE_ENV`) before
   those field-level overrides. Hardcoding any credential in code → **forbidden**.
 - Both drivers use pyformat, so SQL must be parameterised with `%s`
   placeholders (or named `%(key)s`) on **every** datasource. Building SQL with

@@ -35,7 +35,7 @@ apps/                            # 仅 SUT 私有工具
 - **日志** → `tuner_testkit.logging`（`log_info/log_warn/log_error/log_data_setup/...`）。禁止 `print`、
   stdlib `logging`、自建日志文件。见 `.cursor/rules/packages-logging.mdc`。
 - **配置/凭据** → `config/env.py`（`tuner_testkit.config` 解析 `env_local` 命名环境；
-  再叠加 `TUNER_DB_*` / `TEST_*` 环境变量；旧名 `ARGON_DB_*` 仍可用），不在代码里写死。
+  再叠加 `TUNER_DB_*` / `TEST_*` 环境变量），不在代码里写死。
 - **HTTP/API** → 复用 `tuner_testkit.api_test` / `packages.api_objects`；表格解析用 `tuner_testkit.excel`。
 
 ## 3. 产出去向

@@ -8,7 +8,7 @@
 1. **依赖**：`pyproject.toml` 增加 `tuner-testkit[db,api]==4.0.0`（Web UI 再加 `web-ui`；合录再加 `recorder`）。不要再拷 `db` / `page_test` / 公共 recorder 源码。
 2. **导入**：`from packages.db import …` → `from tuner_testkit.db import …`（`page_test` / `api_test` / `logging` / `fake` / `excel` / `config` 同理）。业务资产仍在本仓 `packages/page_objects` 等。
 3. **CLI**：`python -m apps.recorder` → `tuner-recorder` 或 `python -m tuner_testkit.apps.recorder`。
-4. **环境变量**：`TUNER_ENV` / `TUNER_DB_<ALIAS>_*`（旧 `ARGON_*` 仍可读）。项目根可用 `TUNER_ROOT`。
+4. **环境变量**：`TUNER_ENV` / `TUNER_DB_<ALIAS>_*`。项目根可用 `TUNER_ROOT`。
 5. **DNA**：`uv add tuner-testkit==4.0.0` 之后必须 `tuner-dna sync`，把 `.cursor/`、`docs/spec/`、`tools/git-hooks/` 更新进 git。Cursor 不会读 site-packages 里的 rule/skill。
 6. **新建仓**：`tuner-init scaffold <dir>` 只铺骨架 + 依赖 + 一次 dna sync。
 

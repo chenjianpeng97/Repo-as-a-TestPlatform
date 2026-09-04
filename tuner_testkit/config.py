@@ -3,7 +3,7 @@
 Named environments live in gitignored ``config/env_local.py`` as ``ENVIRONMENTS``.
 The active name is resolved (first hit wins) from:
 
-1. ``TUNER_ENV`` (process / CI; legacy ``ARGON_ENV`` still accepted)
+1. ``TUNER_ENV`` (process / CI, does not change the repo pointer)
 2. ``config/.active_env`` (repo-global pointer; gitignore)
 3. ``env_local.ACTIVE_ENV`` (default before the first ``use``)
 4. the sole key, if ``ENVIRONMENTS`` has exactly one entry
@@ -23,7 +23,6 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 TUNER_ENV_VAR = "TUNER_ENV"
-ARGON_ENV_VAR = "ARGON_ENV"  # legacy alias of TUNER_ENV
 _PROD_LIKE = frozenset({"prd", "prod", "production"})
 _UNSET: Any = object()
 
@@ -102,7 +101,6 @@ def resolve_active_name(
 
     candidates = (
         _take(env_map.get(TUNER_ENV_VAR) if hasattr(env_map, "get") else None),
-        _take(env_map.get(ARGON_ENV_VAR) if hasattr(env_map, "get") else None),
         _take(active_file_text),
         _take(module_default),
     )

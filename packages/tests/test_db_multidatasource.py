@@ -44,7 +44,7 @@ _FAKE_DATABASES = {
 def fake_databases(monkeypatch):
     monkeypatch.setattr(env_config, "DATABASES", _FAKE_DATABASES)
     for var in list(__import__("os").environ):
-        if var.startswith("ARGON_DB") or var.startswith("TUNER_DB"):
+        if var.startswith("TUNER_DB"):
             monkeypatch.delenv(var, raising=False)
     return _FAKE_DATABASES
 
@@ -139,24 +139,9 @@ class TestGetSettings:
         # 其他别名不受影响
         assert get_settings("main").host == "my.example.com"
 
-    def test_legacy_argon_alias_env_still_accepted(self, fake_databases, monkeypatch):
-        monkeypatch.setenv("ARGON_DB_SQLSERVER_HOST", "legacy-alias.example.com")
-        s = get_settings("sqlserver")
-        assert s.host == "legacy-alias.example.com"
-
-    def test_tuner_alias_wins_over_legacy_argon(self, fake_databases, monkeypatch):
-        monkeypatch.setenv("ARGON_DB_SQLSERVER_HOST", "legacy-alias.example.com")
-        monkeypatch.setenv("TUNER_DB_SQLSERVER_HOST", "tuner-alias.example.com")
-        assert get_settings("sqlserver").host == "tuner-alias.example.com"
-
     def test_legacy_env_overrides_default_alias_only(self, fake_databases, monkeypatch):
         monkeypatch.setenv("TUNER_DB_HOST", "legacy.example.com")
         assert get_settings("main").host == "legacy.example.com"
-        assert get_settings("sqlserver").host == "ss.example.com"
-
-    def test_legacy_argon_unprefixed_still_accepted(self, fake_databases, monkeypatch):
-        monkeypatch.setenv("ARGON_DB_HOST", "argon-legacy.example.com")
-        assert get_settings("main").host == "argon-legacy.example.com"
         assert get_settings("sqlserver").host == "ss.example.com"
 
     def test_per_alias_env_wins_over_legacy(self, fake_databases, monkeypatch):
