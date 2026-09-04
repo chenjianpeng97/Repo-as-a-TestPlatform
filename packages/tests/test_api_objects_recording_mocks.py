@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from packages.api_objects.recording.capture import build_capture
-from packages.api_objects.recording.codegen import truncate_sample
-from packages.api_objects.recording.mocks import MockSampleWriter
+from tuner_testkit.api_objects.recording.capture import build_capture
+from tuner_testkit.api_objects.recording.codegen import truncate_sample
+from tuner_testkit.api_objects.recording.mocks import MockSampleWriter
 
 
 def _capture(
@@ -251,7 +251,7 @@ def test_max_bytes_zero_disables_the_guard(tmp_path: Path) -> None:
 
 
 def test_seeded_mocks_load_into_the_store(tmp_path: Path) -> None:
-    from packages.api_mock.store import MockStore
+    from tuner_testkit.api_mock.store import MockStore
 
     writer = MockSampleWriter(tmp_path)
     writer.write(_capture(url="http://example.com/a/b", response=_big_list_response(12)))

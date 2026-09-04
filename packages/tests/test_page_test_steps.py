@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import pytest
 
-from packages.page_test.errors import ElementSpecError, StepExecutionError
-from packages.page_test.steps import (
+from tuner_testkit.page_test.errors import ElementSpecError, StepExecutionError
+from tuner_testkit.page_test.steps import (
     STEP_TYPES,
     AssertCount,
     AssertText,

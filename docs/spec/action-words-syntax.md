@@ -15,8 +15,8 @@ description: Action Words spec for unified test-asset management. Covers the bas
     Formulation 做可视化表单与一键执行；
   - 造数产生的行**按表登记 cleanup**，测试夹具场景后精确删除。
 - **边界**：
-  - action word 是**业务动作**，不是技术封装——`packages/db`、`packages/api_test`、
-    `packages/api_objects`、`packages.fake` 这类基础设施不属于 action word；
+  - action word 是**业务动作**，不是技术封装——`tuner_testkit/db`、`tuner_testkit/api_test`、
+    `packages/api_objects`、`tuner_testkit.fake` 这类基础设施不属于 action word；
   - API 类 word **只编排冻结的 API Objects**（`packages/api_objects/**`），不得
     手写 request 契约（与 `api-objects-syntax` 的边界一致）；
   - behave 步骤层只做「DataTable / 别名 → word 入参」翻译，不写执行逻辑。
@@ -121,10 +121,10 @@ class CreateInOut(ActionWord):
 ## CLI（独立执行）
 
 ```
-uv run python -m packages.action_words list                 # 目录（word_id/name/category）
-uv run python -m packages.action_words describe <word_id>   # 元数据 + 入参 schema + 样例
-uv run python -m packages.action_words run <word_id> [--params '<json>' | --params-file f.json | --example]
-uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON（平台消费）
+uv run python -m tuner_testkit.action_words list                 # 目录（word_id/name/category）
+uv run python -m tuner_testkit.action_words describe <word_id>   # 元数据 + 入参 schema + 样例
+uv run python -m tuner_testkit.action_words run <word_id> [--params '<json>' | --params-file f.json | --example]
+uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录 JSON（平台消费）
 ```
 
 - `run` 输出 `Result` 的 JSON（含 cleanup 登记），退出码 0/1 对应成功/失败；
@@ -146,8 +146,8 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
 - 仅 `@register` 的 word 供 BDD / 本机 CLI；**不上 Plane**。
 - 要上 Formulation / Job：再加 `@plane_db_seed` / `@plane_db_assert` /
   `@plane_api_request` / `@plane_api_assert` / `@plane_ui_action` /
-  `@plane_ui_assert`（`from packages.action_words.plane import ...`，内部仍调用 `@register`）。
-- 运行：`python -m packages.action_words run <word_id>`。Plane 不暴露 CLI 的
+  `@plane_ui_assert`（`from tuner_testkit.action_words.plane import ...`，内部仍调用 `@register`）。
+- 运行：`python -m tuner_testkit.action_words run <word_id>`。Plane 不暴露 CLI 的
   `--username` / `--password` / `--params-file`；Job 只有 `word_id`、`--params` JSON、`--example`。
 - 词条 `params_schema` 仍给 Formulation 业务表单；Job 校验用 `job_params_schema`。
 
@@ -160,13 +160,13 @@ uv run python -m packages.action_words catalog [-o out.json] # 全量目录 JSON
 ## 新增 word 检查清单
 
 1. 选类别与 `word_id`（`<category>.<snake_name>`），先跑
-   `python -m packages.action_words list` 确认无重复/无既有可复用 word；
+   `python -m tuner_testkit.action_words list` 确认无重复/无既有可复用 word；
 2. **确定目标数据源**：业务数据长期存在哪个库就声明哪个别名
    （`datasource = "main"` / `"sqlserver"` / ...，见 `config/env.py` DATABASES）；
 3. 造数类先写纯构建函数 + 列名元组（列名以 `assets/ddl/<别名>/*.sql` 为准，注意
    generated column 不能出现在插入列表）；
 4. 按模板写 Params / Result / run / example_params，`@register` 注册；
 5. `uv run pytest packages/tests/test_action_word_template.py` 通过；
-6. `python -m packages.action_words run <word_id> --example` 冒烟（需要环境时）；
+6. `python -m tuner_testkit.action_words run <word_id> --example` 冒烟（需要环境时）；
 7. 若供 behave 使用，在步骤层接线并跑 `behave --stage api --dry-run`。
 8. 若要出现在 TestCopilot Formulation：再加对应 `@plane_*` 装饰器。

@@ -1,7 +1,7 @@
 """harvest：DOM 快照 → 多候选 LocatorSpec（不启浏览器）。"""
 from __future__ import annotations
 
-from packages.page_test.harvest import (
+from tuner_testkit.page_test.harvest import (
     as_valid_element,
     harvest_element,
     harvest_locators,
@@ -9,7 +9,7 @@ from packages.page_test.harvest import (
     suggest_name,
     suggest_placeholder,
 )
-from packages.page_test.locator import DEFAULT_POLICY, ElementSpec, LocatorPolicy, LocatorSpec
+from tuner_testkit.page_test.locator import DEFAULT_POLICY, ElementSpec, LocatorPolicy, LocatorSpec
 
 
 def test_role_and_label_rank_before_test_id():

@@ -11,8 +11,8 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 
 - **目标**：把 UI 定位与交互封装在 `packages/page_objects/`，让 steps 只表达业务意图。
 - **关键边界**：steps 禁止直接写 selector；selector 只能出现在页面资产的**元素声明表**里。
-- **运行库**：所有页面资产由 `packages.page_test` 驱动（用法见 `packages/page_test/USAGE.md`），
-  与 `packages.api_test` 同构：资产是冻结的声明式 dataclass，执行引擎独占 IO 与日志。
+- **运行库**：所有页面资产由 `tuner_testkit.page_test` 驱动（用法见 `tuner_testkit/page_test/USAGE.md`），
+  与 `tuner_testkit.api_test` 同构：资产是冻结的声明式 dataclass，执行引擎独占 IO 与日志。
 
 ## 两种范式（都由同一套元素声明支撑）
 
@@ -38,7 +38,7 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 - **封装**：对外只暴露「业务动作」与「业务断言」，隐藏 locator 与等待细节。
 - **id 约定**：`<app>.<page_slug>@v<major>`（如 `plane.login@v1`）；破坏性变更才升版本。
 - **无 host**：`url_path` 与 `Goto(path=...)` 只写路径；host 由
-  `packages.config.get_ui_base_url()` 运行时注入。
+  `tuner_testkit.config.get_ui_base_url()` 运行时注入。
 - **无凭据**：敏感值写 `{{password}}` 占位符，运行时从入参或环境变量代入，**永不落盘**。
 - **Plane**：要出现在 Formulation Page，用 `@plane_pageobject`（`packages.page_objects.plane`）。
 - **可审计**：脆弱 locator 必须声明 `confidence="fragile"` 并在 `note` 写清风险与替代建议。
@@ -97,7 +97,7 @@ ElementSpec(
   Playwright 默认超时 30 秒，若首选已失效且候选很多，每次都等满超时会让单个元素
   卡上百秒。候选探测超时必须短，且与「等待条件成立」的超时分离。
 
-用 `python -m packages.page_test validate` 一次性校验全部资产。
+用 `python -m tuner_testkit.page_test validate` 一次性校验全部资产。
 
 ### 链式收窄（提升唯一性）
 
@@ -205,11 +205,11 @@ class OrderListPage(BasePage):
 ## 独立运行与体检
 
 ```bash
-python -m packages.page_test list                     # 已发现的资产
-python -m packages.page_test describe example.login@v1
-python -m packages.page_test validate                 # 静态校验，不启浏览器
-python -m packages.page_test run example.login@v1 --flow login --example --headed
-python -m packages.page_test doctor example.login@v1  # 定位器健康度 + 建议 patch
+python -m tuner_testkit.page_test list                     # 已发现的资产
+python -m tuner_testkit.page_test describe example.login@v1
+python -m tuner_testkit.page_test validate                 # 静态校验，不启浏览器
+python -m tuner_testkit.page_test run example.login@v1 --flow login --example --headed
+python -m tuner_testkit.page_test doctor example.login@v1  # 定位器健康度 + 建议 patch
 python packages/page_objects/example/login.py         # 单文件回放（__main__ 块）
 ```
 
@@ -227,16 +227,16 @@ BDD 资产生成流程中的**网络证据捕获仍必须走 Playwright MCP**（
 ## 录制（apps.page_recorder）
 
 本地维护 CLI：headed Playwright 打开真实页面，人工点/填/浏览时直播冻结 `PageModel`
-到 `packages/page_objects/<app>/<page_slug>.py`。交接文档见 `apps/page_recorder/README.md`。
-同一 headed 会话还要冻 API Object 用 `python -m apps.recorder`（见 `apps/recorder/README.md`）。
+到 `packages/page_objects/<app>/<page_slug>.py`。交接文档见 `tuner_testkit/apps/page_recorder/README.md`。
+同一 headed 会话还要冻 API Object 用 `python -m tuner_testkit.apps.recorder`（见 `tuner_testkit/apps/recorder/README.md`）。
 
 ```bash
 uv sync --extra bdd
-uv run python -m apps.page_recorder --app plane --flow login --url /sign-in --scan
+uv run python -m tuner_testkit.apps.page_recorder --app plane --flow login --url /sign-in --scan
 ```
 
 - 页面脚本把 `click` / `change` / `submit` 经 `expose_binding` 送回 Python；
-  `packages.page_test.harvest` 按 locator 优先级生成多候选，过 `validate_locator`
+  `tuner_testkit.page_test.harvest` 按 locator 优先级生成多候选，过 `validate_locator`
   丢掉绝对 XPath / 超长 CSS / 无 name 的裸 role。
 - 密码与敏感键当场写成 `{{password}}`，真值不落盘。
 - 按归一化后的 `url_path` 切资产；已有 `PageModel` **元素候选并集、flow steps 追加**
@@ -255,7 +255,7 @@ uv run python -m apps.page_recorder --app plane --flow login --url /sign-in --sc
 
 ## 离线单测
 
-`packages.page_test.testing` 提供 `FakePage` / `make_driver` / `patch_playwright`，
+`tuner_testkit.page_test.testing` 提供 `FakePage` / `make_driver` / `patch_playwright`，
 不装 playwright、不起浏览器也能测页面资产的 flow、插值、fallback 与断言：
 
 ```python

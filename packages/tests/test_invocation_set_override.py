@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from packages.api_test.model import APIModel
+from tuner_testkit.api_test.model import APIModel
 
 
 def test_set_query_merges_and_overrides_values():

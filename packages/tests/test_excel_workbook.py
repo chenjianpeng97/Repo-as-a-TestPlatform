@@ -1,9 +1,9 @@
-"""Tests for the :mod:`packages.excel` framework helpers.
+"""Tests for the :mod:`tuner_testkit.excel` framework helpers.
 
 Scope note: these tests cover the framework-level behaviour (reading xlsx
 bytes, header trimming, CSV fallback) — they intentionally do not exercise
 any domain model (AuthorizationRecord / whitelist / ...), which belongs in
-the ``packages/argon`` tests or the behave step layer.
+the project-level tests or the behave step layer.
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import io
 import pytest
 from openpyxl import Workbook
 
-from packages.excel import (
+from tuner_testkit.excel import (
     ExcelError,
     ExcelWorkbook,
     first_sheet_rows,

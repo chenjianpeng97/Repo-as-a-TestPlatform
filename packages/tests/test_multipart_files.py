@@ -5,9 +5,9 @@ from typing import Any, Dict
 
 import pytest
 
-from packages.api_test.client import ApiClient, normalize_file_input
-from packages.api_test.errors import FilesPolicyError
-from packages.api_test.model import APIModel
+from tuner_testkit.api_test.client import ApiClient, normalize_file_input
+from tuner_testkit.api_test.errors import FilesPolicyError
+from tuner_testkit.api_test.model import APIModel
 
 
 class _DummyResp:

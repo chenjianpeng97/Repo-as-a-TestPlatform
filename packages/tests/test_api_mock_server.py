@@ -9,8 +9,8 @@ pytest.importorskip("fastapi", reason="needs the 'mock' extra: uv sync --extra m
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from packages.api_mock import MockStore, create_app  # noqa: E402
-from packages.api_mock.spec import mock_relpath  # noqa: E402
+from tuner_testkit.api_mock import MockStore, create_app  # noqa: E402
+from tuner_testkit.api_mock.spec import mock_relpath  # noqa: E402
 
 ADMIN = "/__mock__"
 

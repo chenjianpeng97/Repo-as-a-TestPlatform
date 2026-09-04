@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import os
 
-from packages.api_objects.auth import assert_recorded_response, materialize_payload
-from packages.api_test.model import ApiResponse
+from tuner_testkit.api_objects.auth import assert_recorded_response, materialize_payload
+from tuner_testkit.api_test.model import ApiResponse
 
 
 def test_materialize_password_placeholder(monkeypatch):

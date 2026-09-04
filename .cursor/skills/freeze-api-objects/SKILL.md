@@ -63,9 +63,9 @@ description: Freezes sanitized Playwright MCP network captures into route-aligne
 
 ### Binary / non-JSON responses (Excel, PDF, file streams)
 
-- `packages.api_test` stores the raw body on **`ApiResponse.content`** (bytes) for every call; `json` is set only when the body parses as JSON.
+- `tuner_testkit.api_test` stores the raw body on **`ApiResponse.content`** (bytes) for every call; `json` is set only when the body parses as JSON.
 - For download routes, **assert HTTP success only** in the asset (e.g. `AssertOperation` on `$.http_status == 200`). Do **not** assert on `Content-Disposition` filenames, body length, or sheet row counts — those are scenario-specific and brittle.
-- **Do not** rely on `extracts` with `jsonpath: $.data.*` when the response is not JSON; document in `description` that consumers read **`resp.content`** after `execute()`. Parsing xlsx/CSV belongs in **`packages.excel`** (`ExcelWorkbook.from_bytes`, `first_sheet_rows`, etc.), not inside `packages/api_objects/`.
+- **Do not** rely on `extracts` with `jsonpath: $.data.*` when the response is not JSON; document in `description` that consumers read **`resp.content`** after `execute()`. Parsing xlsx/CSV belongs in **`tuner_testkit.excel`** (`ExcelWorkbook.from_bytes`, `first_sheet_rows`, etc.), not inside `packages/api_objects/`.
 
 ## Audit checklist (must pass)
 

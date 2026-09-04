@@ -20,8 +20,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from packages.api_test.model import APIModel
-from packages.logging import log_warn
+from tuner_testkit.api_test.model import APIModel
+from tuner_testkit.logging import log_warn
 
 __all__ = ["ApiModelRef", "find_api_model", "iter_api_models"]
 
@@ -55,7 +55,9 @@ def iter_api_models(root: str | Path | None = None) -> list[ApiModelRef]:
     tables, catalogs, seeds) see a deterministic order.
     """
     repo_root = Path(root) if root is not None else _repo_root()
-    base = repo_root / "packages" / "api_objects"
+    from tuner_testkit.project import api_objects_dir
+
+    base = api_objects_dir() if root is None else Path(root) / "packages" / "api_objects"
     if not base.is_dir():
         return []
 
@@ -137,8 +139,6 @@ def _load_module(path: Path):
 
 
 def _repo_root() -> Path:
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        if (parent / "pyproject.toml").is_file() and (parent / "packages").is_dir():
-            return parent
-    return here.parents[2]
+    from tuner_testkit.project import project_root
+
+    return project_root()

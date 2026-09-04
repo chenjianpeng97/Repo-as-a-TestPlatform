@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from packages.api_test.errors import SchemaValidationError
-from packages.api_test.model import APIModel
+from tuner_testkit.api_test.errors import SchemaValidationError
+from tuner_testkit.api_test.model import APIModel
 
 
 def test_set_query_autofills_missing_schema_keys_by_default():

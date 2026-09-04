@@ -8,8 +8,16 @@
 
 ```powershell
 uv venv # 创建虚拟环境
-uv sync # 同步依赖
+uv sync --extra dev # 同步本仓开发依赖（含 db/api/web-ui/recorder/test）
 ```
+
+本仓源码树含 `tuner_testkit/`，对外发行名 **`tuner-testkit` 4.x**。下游 SUT 仓：
+
+```toml
+dependencies = ["tuner-testkit[db,api,web-ui]==4.0.0"]
+```
+
+升平台 DNA：`uv add tuner-testkit==4.0.0` 然后 `tuner-dna sync`，再提交。迁移清单见 [`docs/changelog/TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。
 
 可选：激活虚拟环境（PowerShell）：
 
@@ -47,10 +55,11 @@ uv sync # 同步依赖
 
 ### 资产落库位置
 
-- `assets/`：存放具体项目的业务知识等资料，外部导入或转换后的“原始用例资产”（CSV/MD/XMind 导出物等）
-- `apps/`：存放可独立运行的测试工具，如 `dump_ddl`、`recorder`（HTTP 代理抓包生成 API Objects）
-- `packages/`：存放测试代码与资源技术方面的支撑库，如 db、excel、logging、`action_words`、录制的 api/ui objects 等会被测试代码调用的资源
-- `docs/`：存放测试代码与资源技术方面的docs
+- `assets/`：业务知识（DDL / SQL / 用例）
+- `tuner_testkit/`（PyPI `tuner-testkit`）：公共运行库与 CLI；录制产物仍写到本仓 `packages/`
+- `packages/`：本仓业务资产（page/api objects、action words），不是 kit 运行库
+- `apps/`：本仓私有工具；公共工具用 `tuner-recorder` / `python -m tuner_testkit.apps.*`
+- `docs/`：规范与说明
 
 > 原始资产的原则：尽量保持可追溯（保留来源、导出日期、版本），不在导入后随意重写其语义。
 
@@ -65,7 +74,7 @@ uv sync # 同步依赖
 - **Action Words（业务动作层）**：`packages/action_words/**`（DB 造数/断言、API 请求/断言等可独立运行单元；原 data_factory 已迁入此类）
 - **Page Objects（UI 资产层）**：`packages/page_objects/**`
 - **API Objects（接口资产层）**：`packages/api_objects/**`
-- **Packages（通用能力层）**：`packages/**`（db、logging、excel、api_test、config 等）
+- **Packages（运行库）**：`tuner_testkit/**`（db、logging、excel、api_test、config 解析器等）
 
 ### 核心工作流（与 `AI自动化仓库.canvas` 对齐）
 
@@ -125,7 +134,7 @@ Behave --> Report["report"]
 
 ### 3) 资产沉淀类
 
-- **Page Object 维护**：从上下文提取定位候选，或 `python -m apps.page_recorder` 手点冻结 `packages/page_objects/`
+- **Page Object 维护**：从上下文提取定位候选，或 `python -m tuner_testkit.apps.page_recorder` 手点冻结 `packages/page_objects/`
 - **API Object 固化**：从 capture / `apps.recorder` 合录 / `apps.api_recorder` 代理归一化/指纹匹配，生成/更新 `packages/api_objects/`（严格脱敏）
 - **Action Word 创建/维护**：按 `action-words-syntax.md` 新增或更新 `packages/action_words/**`
 - **复用分析**：对比现有 page/api objects / action words，判断“复用/新增/升级版本”
@@ -169,7 +178,7 @@ Behave --> Report["report"]
 - **写/导入用例资产**：将 CSV/MD 等放入 `assets/`
 - **编写 feature**：在 `tests/features/` 新建 `.feature`（遵循 `behave-gerkin-syntax.md`）
 - **运行与沉淀**：
-  - SKILL 驱动执行场景（Playwright MCP）或 `python -m apps.recorder` 合录 / `python -m apps.api_recorder` 代理抓包
+  - SKILL 驱动执行场景（Playwright MCP）或 `python -m tuner_testkit.apps.recorder` 合录 / `python -m tuner_testkit.apps.api_recorder` 代理抓包
   - 生成/更新 `packages/page_objects/`、`packages/api_objects/`、`packages/action_words/`
   - 自动/半自动补齐 `tests/features/*_steps/`
 - **执行回归**：使用 behave 运行并产出 report（可用 html-pretty formatter）

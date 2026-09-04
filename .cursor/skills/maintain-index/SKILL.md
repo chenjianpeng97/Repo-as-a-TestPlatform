@@ -31,7 +31,7 @@ version: 1.1.1
    - 用例/讲解/报告 → 第 1.3 节（读 front-matter 填 domain/source/confidence/用途）。
    - api_objects / page_objects → 第 2.1 / 2.2 节。
    - 新工具 → 第 3 节。
-3. **不要**把 `.cursor/**` 组件手写进 `INDEX.md`：运行 `python -m apps.index_ai` 重新生成
+3. **不要**把 `.cursor/**` 组件手写进 `INDEX.md`：运行 `python -m tuner_testkit.apps.index_ai` 重新生成
    `.cursor/REGISTRY.md`，`INDEX.md` 第 5 节只保留链接。
 4. 只更新变化的小节，保留其余原样。
 

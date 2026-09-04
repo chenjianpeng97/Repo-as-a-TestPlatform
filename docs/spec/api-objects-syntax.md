@@ -36,9 +36,9 @@ description: API Objects (APIModel) spec for an AI-assisted automation repo. Foc
 > 以“路由树”组织，便于人和 AI 通过路径快速定位。
 
 - **推荐结构**（示例）：
-  - `packages/api_objects/argon/mainData/getCategoryTree/GET.v1.py`
-  - `packages/api_objects/argon/mainData/getCategoryTree/GET.v2.py`（破坏性变更）
-  - `packages/api_objects/argon/mainData/getCategoryTree/__init__.py`（可选，导出别名）
+  - `packages/api_objects/example/users/list/GET.v1.py`
+  - `packages/api_objects/example/users/list/GET.v2.py`（破坏性变更）
+  - `packages/api_objects/example/users/list/__init__.py`（可选，导出别名）
 
 - **文件命名**：
   - `<METHOD>.v<MAJOR>.py`（如 `GET.v1.py`）
@@ -52,7 +52,7 @@ APIModel 的字段被分为三类：**Identity**、**Contract**、**Operations**
 
 - `id`: string
   - 规则：`<service>.<METHOD>.<normalized_path>@v<MAJOR>`
-  - 示例：`argon.GET./argon/mainData/getCategoryTree@v1`
+  - 示例：`example.GET./api/users/list@v1`
 - `name`: string（可中文）
 - `description`: string（允许 Markdown，建议结构化）
 - `method`: string（GET/POST/PUT/DELETE/…）
@@ -65,7 +65,7 @@ APIModel 的字段被分为三类：**Identity**、**Contract**、**Operations**
 - `files_schema`: dict（可选；仅 `body_format="multipart"`）：文件字段名 -> `{type:"file", required?, note?}`。**永不**写入文件内容或本地路径。
 - `body_format`（可选，默认 `json`）：
   - `json`：请求体以 JSON 发送（`requests` 的 `json=`），与历史行为一致。
-  - `form`：请求体以 `application/x-www-form-urlencoded` 发送（`data=`）。调用方仍使用 `set_json({...})` 传入键值，由 `packages.api_test` 映射为 form。**适用于**捕获显示为 form 的导出/筛选类 POST（如 DMS 授权结果导出）。
+  - `form`：请求体以 `application/x-www-form-urlencoded` 发送（`data=`）。调用方仍使用 `set_json({...})` 传入键值，由 `tuner_testkit.api_test` 映射为 form。**适用于**捕获显示为 form 的导出/筛选类 POST（如 DMS 授权结果导出）。
   - `multipart`：文本字段走 `set_json` → `data=`，文件字段走 `set_files` → `files=`。**适用于** Excel 导入等 `Content-Type: multipart/form-data`。不要手动设置 `Content-Type`（由 requests 生成 boundary）。
 - `response_hints`: dict（关键字段路径提示，用于断言/提取）
 - `headers_policy`: dict（见下）
@@ -151,8 +151,8 @@ steps 调用 APIModel 时允许在运行时调整参数，但必须通过 APIMod
 - 当响应为 **xlsx / 二进制** 时，`json` 解析通常失败，**`execute()` 仍返回** `ApiResponse`，其中：
   - `json` 可能为 `None`
   - **`content: bytes` 恒为原始响应体**（由 `ApiClient` 从 `requests.Response.content` 填充）
-- **资产内断言**：优先只断言 **`$.http_status == 200`**（评估对象在无非 dict JSON 时为 `{http_status, body}` 形态，见 `packages.api_test.model`）。**不要**在资产中断言响应体长度、Content-Type 具体值、或文件名（易随网关变化）。
-- **提取字段**：不要对二进制体写 `jsonpath: $.data.rows` 类 extracts。应在 **steps** 或 **`packages.excel`** 中读取 `resp.content` 并解析。`packages.excel` 为**无业务**的表读取（`ExcelWorkbook.from_bytes` / `first_sheet_rows` 等），列到领域模型的映射由调用方完成。
+- **资产内断言**：优先只断言 **`$.http_status == 200`**（评估对象在无非 dict JSON 时为 `{http_status, body}` 形态，见 `tuner_testkit.api_test.model`）。**不要**在资产中断言响应体长度、Content-Type 具体值、或文件名（易随网关变化）。
+- **提取字段**：不要对二进制体写 `jsonpath: $.data.rows` 类 extracts。应在 **steps** 或 **`tuner_testkit.excel`** 中读取 `resp.content` 并解析。`tuner_testkit.excel` 为**无业务**的表读取（`ExcelWorkbook.from_bytes` / `first_sheet_rows` 等），列到领域模型的映射由调用方完成。
 
 ### 不允许放在 API Object 的（场景相关）
 
@@ -183,10 +183,10 @@ steps 调用 APIModel 时允许在运行时调整参数，但必须通过 APIMod
 > 注意：示例中不包含真实 token/cookie。
 
 ```python
-from packages.api_test.model import APIModel, AssertOperation, ExtractVariableOperation
+from tuner_testkit.api_test.model import APIModel, AssertOperation, ExtractVariableOperation
 
 get_category_tree_v1 = APIModel(
-    id="argon.GET./argon/mainData/getCategoryTree@v1",
+    id="example.GET./api/users/list@v1",
     name="获取用户可授权产品",
     description="""
 inputs:
@@ -197,7 +197,7 @@ notes:
   - 资产按路由对齐；认证由运行时注入，不在此处固化
 """.strip(),
     method="GET",
-    path="/argon/mainData/getCategoryTree",
+    path="/api/users/list",
     query_schema={
         "categoryName": {"type": "string", "required": False, "note": "按名称过滤"},
     },

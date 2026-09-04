@@ -1,33 +1,33 @@
 ---
-description: Require all run-time logging to go through packages.logging; forbid raw stdlib logging, print(), and ad-hoc log files
+description: Require all run-time logging to go through tuner_testkit.logging; forbid raw stdlib logging, print(), and ad-hoc log files
 globs: **/*.py
 alwaysApply: false
 version: 1.0.0
 ---
 
-# packages.logging — mandatory logging surface
+# tuner_testkit.logging — mandatory logging surface
 
-This repo ships a portable logging kit at `packages/logging/` (see
-`packages/logging/README.md` for the full API, env-var knobs, and FAQ).
+This repo ships a portable logging kit at `tuner_testkit/logging/` (see
+`tuner_testkit/logging/README.md` for the full API, env-var knobs, and FAQ).
 **All Python code that produces run-time log output must use it.**
 
 ## API to use
 
 ```python
-from packages.logging import (
+from tuner_testkit.logging import (
     log_data_setup,   # business data prepared (count / sample / ids)
     log_api_call,     # one API interaction summary
     log_ui_action,    # one UI action summary
     log_assertion,    # claim + expected/actual + passed outcome
     log_info, log_warn, log_error,
 )
-from packages.logging import hooks as log_hooks  # only inside tests/features/*_environment.py
+from tuner_testkit.logging import hooks as log_hooks  # only inside tests/features/*_environment.py
 ```
 
 ## Hard rules
 
 - `print(...)` for diagnostic/trace output → **forbidden**. Use `log_info` / `log_warn` / `log_error`.
-- `logging.getLogger(...)` / `logging.basicConfig(...)` in project code → **forbidden**. Framework code may call `from packages.logging import get_logger`; business/step/script code must prefer the semantic helpers.
+- `logging.getLogger(...)` / `logging.basicConfig(...)` in project code → **forbidden**. Framework code may call `from tuner_testkit.logging import get_logger`; business/step/script code must prefer the semantic helpers.
 - Writing to a custom log file via `open(...)` / file handles → **forbidden**. Route through the kit; tune file location via `TEST_LOG_DIR` / stem via `TEST_LOG_NAME` (default stem is the entry-point name).
 - In `tests/features/<stage>_environment.py`: wire all eight lifecycle hooks (`on_run_begin` / `on_feature_begin` / `on_scenario_begin` / `on_step_begin` and their `_end` counterparts).
 - Pytest / CLI tools: skip behave hooks; call helpers (or `get_logger`) directly.
@@ -52,7 +52,7 @@ logger.info("total=%s", total)               # stdlib logger bypasses the kit
 **Good**
 
 ```python
-from packages.logging import log_api_call, log_assertion
+from tuner_testkit.logging import log_api_call, log_assertion
 log_api_call("GET", "/api/v1/items",
              status=200, total=total, page=1)
 log_assertion("count_equal", expected=expected, actual=total,

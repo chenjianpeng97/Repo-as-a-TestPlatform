@@ -1,16 +1,16 @@
 ---
-description: Require all DB access to go through packages.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL coexist); forbid direct pymssql/pymysql/psycopg, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
+description: Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL coexist); forbid direct pymssql/pymysql/psycopg, ad-hoc SQLAlchemy engines, hardcoded DSNs, and SQL string interpolation
 globs: **/*.py
 alwaysApply: false
-version: 1.2.0
+version: 1.3.0
 ---
 
-# packages.db — mandatory multi-datasource surface
+# tuner_testkit.db — mandatory multi-datasource surface
 
 Every database interaction in this repo must go through
-`packages.db.DbClient`. Direct `pymssql.connect(...)` / `pymysql.connect(...)` /
+`tuner_testkit.db.DbClient`. Direct `pymssql.connect(...)` / `pymysql.connect(...)` /
 `psycopg.connect(...)`, ad-hoc `sqlalchemy.create_engine(...)` calls outside
-`packages/db`, and hardcoded DSNs are forbidden.
+`tuner_testkit/db`, and hardcoded DSNs are forbidden.
 
 The framework supports **MySQL, SQL Server, and PostgreSQL side by side**. Named
 datasources live in `config/env.py` -> `DATABASES` (business alias ->
@@ -25,7 +25,7 @@ engines or sessions.
 ## API to use
 
 ```python
-from packages.db import DbClient
+from tuner_testkit.db import DbClient
 
 # Default datasource ("main", MySQL)
 with DbClient.default() as db:
@@ -60,17 +60,17 @@ class SeedOnSqlServer(ActionWord):
 ## Hard rules
 
 - Credentials come from `config.env.DATABASES` + env overrides
-  (`ARGON_DB_<ALIAS>_HOST` / `PORT` / `USER` / `PASSWORD` / `NAME`; legacy
-  `ARGON_DB_HOST`/... still override the default `main` alias). Named
+  (`TUNER_DB_<ALIAS>_HOST` / `PORT` / `USER` / `PASSWORD` / `NAME`; legacy
+  `ARGON_DB_*` and unprefixed `TUNER_DB_HOST` / `ARGON_DB_HOST` still override the default `main` alias). Named
   prd/uat/dev profiles in gitignored `env_local.ENVIRONMENTS` are resolved by
-  `packages.config` (`ARGON_ENV` > `config/.active_env` > `ACTIVE_ENV`) before
+  `tuner_testkit.config` (`TUNER_ENV` > `ARGON_ENV` > `config/.active_env` > `ACTIVE_ENV`) before
   those field-level overrides. Hardcoding any credential in code → **forbidden**.
 - Both drivers use pyformat, so SQL must be parameterised with `%s`
   placeholders (or named `%(key)s`) on **every** datasource. Building SQL with
   `f"..."` / `.format()` / `%` string ops for **values** → **forbidden**
   (SQL injection + quoting bugs). Identifier quoting for whitelist
   table/column constants uses
-  `packages.action_words._internal.db.quote_ident(name, dialect)`
+  `tuner_testkit.action_words._internal.db.quote_ident(name, dialect)`
   (`[name]` for mssql, `` `name` `` for mysql, `"name"` for postgresql);
   `bulk_insert` picks the dialect from `client.dialect` automatically.
 - **Write SQL in the dialect of the target datasource** (check
@@ -90,14 +90,14 @@ class SeedOnSqlServer(ActionWord):
 - Mirror every non-trivial SQL as a human-readable copy in
   `assets/sql/<name>.sql` (existing convention). Docstrings in the service
   should reference the file. Table DDL references live under
-  `assets/ddl/<alias>/<table>.sql` (`python apps/dump_ddl.py <table>
+  `assets/ddl/<alias>/<table>.sql` (`python -m tuner_testkit.apps.dump_ddl <table>
   --datasource <alias>`).
 - One `DbClient` per logical unit of work — typically opened in a `Given`
   step, stored on context, and closed in `after_scenario`. Do not leak
   connections across scenarios. `ActionContext.get_db(alias)` caches one
   client per alias per scenario.
 - Every DB operation that drives an assertion (count / sample / negative
-  probe) should be paired with a `packages.logging.log_data_setup(...)` line
+  probe) should be paired with a `tuner_testkit.logging.log_data_setup(...)` line
   so the evidence ends up in `logs/`.
 
 ## Examples
@@ -119,8 +119,8 @@ engine = create_engine("mssql+pymssql://sa:***@10.0.0.8/ssdb")  # ad-hoc engine 
 **Good**
 
 ```python
-from packages.db import DbClient
-from packages.logging import log_data_setup
+from tuner_testkit.db import DbClient
+from tuner_testkit.logging import log_data_setup
 
 with DbClient.default() as db:
     rows = db.fetch_all(

@@ -38,8 +38,8 @@
 | scope | 对应路径 | 典型场景 |
 | --- | --- | --- |
 | `assets` | `assets/**` | 更新 DDL/用例/业务 SQL/报告 |
-| `apps` | `apps/**` | 新增/修改工具 |
-| `packages` | `packages/**`（通用层） | db/logging/api_test/excel/config |
+| `apps` | `apps/**`、`tuner_testkit/apps/**` | 新增/修改工具（SUT 私有 + kit CLI） |
+| `packages` | `packages/**`、`tuner_testkit/**`（通用运行库） | db/logging/api_test/excel/config |
 | `api_objects` | `packages/api_objects/**` | 录制/冻结接口资产 |
 | `page_objects` | `packages/page_objects/**` | UI 资产 |
 | `action_words` | `packages/action_words/**` | 业务动作 |
@@ -49,7 +49,7 @@
 | `skills` | `.cursor/skills/**` | 技能 |
 | `agents` | `.cursor/agents/**` | 编排 |
 | `hooks` | `.cursor/hooks*`、`tools/git-hooks/**` | 钩子 |
-| `init_repo` | `apps/init_repo/**` | 初始化工具与 release |
+| `init_repo` | `tuner_testkit/apps/init_repo/**` | 初始化工具与 release |
 | `index` | `INDEX.md`、`INDEX.project.md`、`.cursor/REGISTRY.md` | 索引/注册表 |
 
 > `packages` 视为 `api_objects` / `page_objects` / `action_words` 的**上位 scope**：

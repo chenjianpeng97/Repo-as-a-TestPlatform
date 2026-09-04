@@ -1,17 +1,17 @@
 ---
 name: maintain-page-objects
 version: 2.0.1
-description: Creates or updates page assets under packages/page_objects/ on the packages.page_test runtime (PageModel element table + declarative flows, or BasePage escape hatch) following page-objects-syntax.md. Use when UI steps fail due to locators, new UI flows are needed, selector leakage must be removed from steps, or doctor reports locator rot.
+description: Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element table + declarative flows, or BasePage escape hatch) following page-objects-syntax.md. Use when UI steps fail due to locators, new UI flows are needed, selector leakage must be removed from steps, or doctor reports locator rot.
 ---
 
-# Maintain Page Objects (packages.page_test)
+# Maintain Page Objects (tuner_testkit.page_test)
 
 ## Scope
 
 - **Primary goal**: 把 UI 定位与交互封装成可被驱动直跑、可被平台可视化的页面资产。
 - **Write scope**: `packages/page_objects/**` only.
-- **Must follow**: `docs/spec/page-objects-syntax.md`；API 用法见 `packages/page_test/USAGE.md`。
-- **Runtime**: `packages.page_test`（与 `packages.api_test` 同构的三层解耦）。
+- **Must follow**: `docs/spec/page-objects-syntax.md`；API 用法见 `tuner_testkit/page_test/USAGE.md`。
+- **Runtime**: `tuner_testkit.page_test`（与 `tuner_testkit.api_test` 同构的三层解耦）。
 
 ## 选范式
 
@@ -55,8 +55,8 @@ description: Creates or updates page assets under packages/page_objects/ on the 
 ## Quick validation（必须跑）
 
 ```bash
-python -m packages.page_test validate            # policy + 元素/flow 引用完整性，不启浏览器
-python -m packages.page_test describe <page_id>  # 确认平台看到的元素表与步骤表
+python -m tuner_testkit.page_test validate            # policy + 元素/flow 引用完整性，不启浏览器
+python -m tuner_testkit.page_test describe <page_id>  # 确认平台看到的元素表与步骤表
 ```
 
 自检清单：
@@ -69,7 +69,7 @@ python -m packages.page_test describe <page_id>  # 确认平台看到的元素�
 ## 处理 locator 失效（doctor 驱动）
 
 ```bash
-python -m packages.page_test doctor <page_id>
+python -m tuner_testkit.page_test doctor <page_id>
 ```
 
 - 报告说「首选定位器连续失效，实际靠 [i] ... 兜住」→ 把命中的候选提到首选，
@@ -89,5 +89,5 @@ python -m packages.page_test doctor <page_id>
 
 ## 离线单测
 
-用 `packages.page_test.testing` 的 `FakePage` / `make_driver` / `patch_playwright`
+用 `tuner_testkit.page_test.testing` 的 `FakePage` / `make_driver` / `patch_playwright`
 给新资产补一条 happy path 与一条 fallback 用例（不装 playwright 也能跑）。

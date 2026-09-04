@@ -1,7 +1,7 @@
 """packages.fake China identifiers."""
 from __future__ import annotations
 
-from packages.fake import company_name, is_valid_uscc, seed, uscc
+from tuner_testkit.fake import company_name, is_valid_uscc, seed, uscc
 
 
 def test_uscc_checksum_valid():

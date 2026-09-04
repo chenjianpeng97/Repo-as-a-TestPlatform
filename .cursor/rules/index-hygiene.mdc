@@ -23,7 +23,7 @@ version: 1.1.1
 
 - 更新 `INDEX.md` 时**优先读各区 `CHANGELOG` 的 delta**，据此补条目；
   **不要为维护索引而全量读取 `assets/ddl/*.sql` 正文**。
-- AI 组件区（`.cursor/**`）不手写进 `INDEX.md`：由 `python -m apps.index_ai`
+- AI 组件区（`.cursor/**`）不手写进 `INDEX.md`：由 `python -m tuner_testkit.apps.index_ai`
   确定性生成 `.cursor/REGISTRY.md`，`INDEX.md` 只链接过去。
 
 ## 一致性

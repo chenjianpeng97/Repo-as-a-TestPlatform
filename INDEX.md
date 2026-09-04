@@ -1,4 +1,4 @@
-<!-- version: 1.1.0 -->
+<!-- version: 1.2.0 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -14,11 +14,11 @@
 
 规范：`docs/spec/assets-knowledge-syntax.md`。字段：domain / source / date / version / confidence。
 
-### 1.1 DDL（自动区，apps/dump_ddl 产出）
+### 1.1 DDL（自动区，dump_ddl 产出）
 
 | datasource | 表 | 更新 | 备注 |
 | --- | --- | --- | --- |
-| _(暂无平台内置 DDL)_ | | | 运行 `python apps/dump_ddl.py --all --datasource <alias>`；MySQL / SQL Server / PostgreSQL。业务库 DDL 写 `INDEX.project.md` |
+| _(暂无平台内置 DDL)_ | | | 运行 `python -m tuner_testkit.apps.dump_ddl --all --datasource <alias>`；MySQL / SQL Server / PostgreSQL。业务库 DDL 写 `INDEX.project.md` |
 
 变更流水：`assets/CHANGELOG.md`
 
@@ -34,48 +34,63 @@
 | --- | --- | --- | --- | --- |
 | _(暂无)_ | | | | |
 
-## 2. 组件层（packages/）
+## 2. 运行库（`tuner_testkit/`，PyPI：`tuner-testkit`）与本仓资产（`packages/`）
+
+发行名 `tuner-testkit`，导入名 `tuner_testkit`。下游用 extras 按需安装；本仓 editable 开发用 `uv sync --extra dev`。
+
+| extra | 模块 | 用途 |
+| --- | --- | --- |
+| （默认） | `tuner_testkit.config` / `logging` | 命名环境解析（`TUNER_ENV` > 旧名 `ARGON_ENV` > `.active_env`）；统一日志 |
+| `[db]` | `tuner_testkit.db` | 多数据源 DB |
+| `[api]` | `tuner_testkit.api_test` | APIModel 运行框架 |
+| `[web-ui]` | `tuner_testkit.page_test` | Web UI（Playwright）；Python 模块名仍为 `page_test` |
+| `[phone-ui]` | — | **预留**，4.0 未实现 |
+| `[excel]` / `[fake]` / `[mock]` | 对应模块 | 表格 / 假数据 / api_mock |
+| `[recorder]` | `tuner_testkit.apps.{recorder,page_recorder,api_recorder}` | 合录 / 仅 UI / 代理 |
+| （默认 wheel） | `tuner_testkit.apps.dna` / dump_ddl / init_repo | `tuner-dna`、`tuner-dump-ddl`、`tuner-init` 等 scripts；mock 运行时仍需 `[mock]` |
+
+console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`、`tuner-dump-ddl` 等，等价于 `python -m tuner_testkit.…`。
 
 | 包 | 用途 | 规范 |
 | --- | --- | --- |
-| `packages/config` | 命名环境解析与切换（`ENVIRONMENTS` + `.active_env` / `ARGON_ENV`）；API / UI base URL | `python -m packages.config` |
-| `packages/db` | 多数据源 DB 访问（MySQL / SQL Server / PostgreSQL） | `.cursor/rules/packages-db.mdc` |
-| `packages/logging` | 统一日志 | `.cursor/rules/packages-logging.mdc`，`packages/logging/README.md` |
-| `packages/api_test` | APIModel 运行框架 | `packages/api_test/USAGE.md` |
-| `packages/api_mock` | 用 api_objects + `data/mocks` 起可改返回值的 mock server（需 `mock` extra） | `packages/api_mock/README.md` |
-| `packages/page_test` | PageModel 运行框架（元素表 + 声明式 flow、多定位器备用、locator 体检、CLI 独立运行） | `packages/page_test/USAGE.md`，`.cursor/rules/packages-page-test.mdc` |
-| `packages/excel` | xlsx/CSV 解析 | — |
-| `packages/fake` | 假数据（UDI/USCC/Faker zh_CN）；`run`/`catalog` CLI | `packages/fake/USAGE.md`，`.cursor/rules/packages-fake.mdc` |
-| `packages/action_words` | 业务动作层 | `docs/spec/action-words-syntax.md` |
-| `packages/api_objects` | 路由对齐 API 资产；`registry.iter_api_models()` 枚举全部 APIModel；冻结内核 `recording/` | `docs/spec/api-objects-syntax.md` |
-| `packages/page_objects` | UI 资产（`PageModel` / `BasePage`，`python -m packages.page_test list` 可查） | `docs/spec/page-objects-syntax.md` |
+| `tuner_testkit.config` | 解析器；读写 **SUT** `config/`（密钥不进 wheel） | `python -m tuner_testkit.config` / `tuner-config` |
+| `tuner_testkit.db` | 多数据源 DB（MySQL / SQL Server / PostgreSQL） | `.cursor/rules/packages-db.mdc` |
+| `tuner_testkit.logging` | 统一日志 | `.cursor/rules/packages-logging.mdc` |
+| `tuner_testkit.api_test` | APIModel 运行框架 | `tuner_testkit/api_test/USAGE.md` |
+| `tuner_testkit.api_mock` | 用 api_objects + `data/mocks` 起 mock server | `tuner_testkit/api_mock/README.md` |
+| `tuner_testkit.page_test` | PageModel 运行框架（`[web-ui]`） | `tuner_testkit/page_test/USAGE.md` |
+| `tuner_testkit.excel` / `fake` | 表格解析 / 假数据 | 对应 USAGE |
+| `packages/action_words` | **本仓**业务动作；基类在 kit | `docs/spec/action-words-syntax.md` |
+| `packages/api_objects` | **本仓**路由资产；冻结内核在 kit `recording/` | `docs/spec/api-objects-syntax.md` |
+| `packages/page_objects` | **本仓** UI 资产 | `docs/spec/page-objects-syntax.md` |
 
 ### 2.1 已冻结的 API Objects（自动/半自动区）
 
 | method + path | 资产文件 | 来源 | 备注 |
 | --- | --- | --- | --- |
-| _(暂无)_ | | | `python -m apps.recorder` / `python -m apps.api_recorder` 或 freeze-api-objects 产出 |
+| _(暂无)_ | | | `python -m tuner_testkit.apps.recorder` / `python -m tuner_testkit.apps.api_recorder` 或 freeze-api-objects 产出 |
 
 ### 2.2 已有的 Page Objects
 
 | page_id | 文件 | 范式 | 备注 |
 | --- | --- | --- | --- |
-| _(暂无)_ | | | `python -m packages.page_test list` 列出实际发现的资产 |
+| _(暂无)_ | | | `python -m tuner_testkit.page_test list` 列出实际发现的资产 |
 
-## 3. 工具层（apps/）
+## 3. 工具层（kit CLI + 本仓 `apps/`）
 
-规范：`docs/spec/apps-authoring-syntax.md`。
+公共工具在 **`tuner_testkit.apps`**（`tuner-*` scripts）。本仓 `apps/` 只放 **SUT 私有**工具。规范：`docs/spec/apps-authoring-syntax.md`。
 
 | 工具 | 运行 | 用途 | 交接文档 |
 | --- | --- | --- | --- |
-| `dump_ddl` | `python apps/dump_ddl.py <table> --datasource <alias>` 或 `--all` | **本地**拉取表结构到 `assets/ddl/<alias>/`（不上 Plane） | `apps/README.md`；skill `/dump-ddl` |
-| `recorder` | `python -m apps.recorder --app <app>` | **本地** headed 合录：默认同时冻 PageObject 与 APIObject（`--page-only` / `--api-only`） | `apps/recorder/README.md` |
-| `api_recorder` | `python -m apps.api_recorder` | **本地** mitmproxy 代理抓包生成 `packages/api_objects`（非浏览器流量；不含 UI 元素表） | `apps/api_recorder/README.md` |
-| `page_recorder` | `python -m apps.page_recorder --app <app>` | **本地** headed 浏览器手点冻结 `packages/page_objects`（仅 UI） | `apps/page_recorder/README.md` |
-| `index_ai` | `python -m apps.index_ai` | **本地**扫描 `.cursor/**` 生成 `.cursor/REGISTRY.md`（不上 Plane） | `apps/index_ai/README.md` |
-| `init_repo` | `python -m apps.init_repo --help` | **本地**生成/更新项目仓骨架（不上 Plane） | `apps/init_repo/README.md` |
-| `index_platform` | `python -m apps.index_platform --out -` | **Plane Sync** 扫描 catalog JSON（不写 git） | `apps/index_platform/README.md` |
-| `mock_server` | `python -m apps.mock_server serve` / `seed` / `routes` | **常驻服务**（Plane `long_lived`）：按 `data/mocks` 回放 api_objects 路由，控制面可运行时改返回值 | `apps/mock_server/README.md` |
+| `dump_ddl` | `tuner-dump-ddl` / `python -m tuner_testkit.apps.dump_ddl` | 拉取表结构到 `assets/ddl/<alias>/` | skill `/dump-ddl` |
+| `recorder` | `tuner-recorder --app <app>` | headed 合录 Page + API | `tuner_testkit/apps/recorder/README.md` |
+| `api_recorder` | `tuner-api-recorder` | mitmproxy 代理冻 API | `tuner_testkit/apps/api_recorder/README.md` |
+| `page_recorder` | `tuner-page-recorder --app <app>` | headed 仅冻 Page | `tuner_testkit/apps/page_recorder/README.md` |
+| `dna` | `tuner-dna sync` / `check` | 把 kit 所带 DNA merge 进项目 `.cursor/` / `docs/spec/` / git-hooks | `tuner-dna --help` |
+| `index_ai` | `tuner-index-ai` | 生成 `.cursor/REGISTRY.md` | `tuner_testkit/apps/index_ai/README.md` |
+| `init_repo` | `tuner-init scaffold <dir>` | 新仓骨架 + 一次 `dna sync`（**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
+| `index_platform` | `tuner-index-platform --out -` | Plane Sync catalog JSON | `tuner_testkit/apps/index_platform/README.md` |
+| `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
 
 ## 4. 测试层（tests/）
 
@@ -86,4 +101,4 @@
 
 ## 5. AI 组件（.cursor/）
 
-完整注册表（含类型/触发/版本）：[`.cursor/REGISTRY.md`](.cursor/REGISTRY.md)（`python -m apps.index_ai` 生成）。
+完整注册表（含类型/触发/版本）：[`.cursor/REGISTRY.md`](.cursor/REGISTRY.md)（`python -m tuner_testkit.apps.index_ai` 生成）。

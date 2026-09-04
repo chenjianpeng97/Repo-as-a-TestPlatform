@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 import os
 
-from config import env as env_config
-
 
 @dataclass(frozen=True)
 class UIConfig:
@@ -18,6 +16,9 @@ class UIConfig:
     @staticmethod
     def from_runtime(*, userdata: dict[str, str] | None = None) -> "UIConfig":
         userdata = userdata or {}
+        from tuner_testkit.config import load_project_env
+
+        env_config = load_project_env()
 
         # DMS system (auth/authorization management)
         dms_base_url = (
@@ -69,4 +70,3 @@ class UIConfig:
             home_url_keyword=home_url_keyword,
             password_error_keywords=password_error_keywords,
         )
-

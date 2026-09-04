@@ -1,19 +1,19 @@
 ---
-description: Require all UI locators to live in packages.page_test ElementSpec declarations with multiple fallback candidates; forbid raw page.locator/get_by_* outside page assets
+description: Require all UI locators to live in tuner_testkit.page_test ElementSpec declarations with multiple fallback candidates; forbid raw page.locator/get_by_* outside page assets
 globs: packages/page_objects/**,tests/features/**,packages/action_words/**
 alwaysApply: false
 version: 1.0.0
 ---
 
-# packages.page_test — mandatory UI locator surface
+# tuner_testkit.page_test — mandatory UI locator surface
 
-页面资产由 `packages/page_test/` 驱动（完整规范见 `docs/spec/page-objects-syntax.md`，
-用法见 `packages/page_test/USAGE.md`）。**所有 UI 定位都必须经 `ElementSpec` 声明**。
+页面资产由 `tuner_testkit/page_test/` 驱动（完整规范见 `docs/spec/page-objects-syntax.md`，
+用法见 `tuner_testkit/page_test/USAGE.md`）。**所有 UI 定位都必须经 `ElementSpec` 声明**。
 
 ## API to use
 
 ```python
-from packages.page_test import (
+from tuner_testkit.page_test import (
     BasePage, ElementSpec, LocatorSpec, PageDriver, PageFlow, PageModel,
     AssertVisible, Click, Fill, WaitForElement,
 )
@@ -40,14 +40,14 @@ from packages.page_test import (
 - **禁止固定 sleep**：等待用 `WaitForElement` / `WaitForUrl` / `WaitForResponse`，
   或类范式里的 `expect(...)` 轮询。
 - **无 host、无凭据**：`url_path` 与 `Goto(path=...)` 只写路径（host 由
-  `packages.config.get_ui_base_url()` 注入）；敏感值写 `{{password}}` 占位符，
+  `tuner_testkit.config.get_ui_base_url()` 注入）；敏感值写 `{{password}}` 占位符，
   运行时代入，**任何情况下不得把真实凭据写进资产**。
 - **id 约定**：`<app>.<page_slug>@v<major>`。破坏性变更才升 major。
 - 页面资产**不做**业务数据拉取、不发 API 请求、不写 SQL（那是 action words / api_objects
-  / packages.db 的职责）。
+  / `tuner_testkit.db` 的职责）。
 - 改动页面资产需有证据：Playwright MCP snapshot、`run_summary`，或
-  `python -m packages.page_test doctor <page_id>` 报告。
-- 新增/修改资产后必须跑 `python -m packages.page_test validate`（不启浏览器）。
+  `python -m tuner_testkit.page_test doctor <page_id>` 报告。
+- 新增/修改资产后必须跑 `python -m tuner_testkit.page_test validate`（不启浏览器）。
 
 ## 自愈边界
 

@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import pytest
 
-from packages.page_test.errors import (
+from tuner_testkit.page_test.errors import (
     ElementNotFoundError,
     ElementSpecError,
     LocatorPolicyError,
 )
-from packages.page_test.locator import (
+from tuner_testkit.page_test.locator import (
     DEFAULT_POLICY,
     ElementSpec,
     LocatorPolicy,
@@ -19,7 +19,7 @@ from packages.page_test.locator import (
     validate_element,
     validate_elements,
 )
-from packages.page_test.testing import FakePage
+from tuner_testkit.page_test.testing import FakePage
 
 
 def _element(*locators: LocatorSpec, name: str = "target") -> ElementSpec:

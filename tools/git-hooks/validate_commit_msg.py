@@ -65,8 +65,12 @@ def _path_to_layer(path: str) -> str | None:
         return "action_words"
     if p.startswith("packages/"):
         return "packages"
-    if p.startswith("apps/init_repo/"):
+    if p.startswith("tuner_testkit/apps/init_repo/"):
         return "init_repo"
+    if p.startswith("tuner_testkit/apps/"):
+        return "apps"
+    if p.startswith("tuner_testkit/"):
+        return "packages"
     if p.startswith("apps/"):
         return "apps"
     if p.startswith("assets/"):

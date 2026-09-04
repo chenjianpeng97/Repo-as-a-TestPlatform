@@ -30,7 +30,7 @@ def main() -> int:
 
     try:
         subprocess.run(
-            [sys.executable, "-m", "apps.index_ai"],
+            [sys.executable, "-m", "tuner_testkit.apps.index_ai"],
             cwd=str(REPO_ROOT),
             capture_output=True,
             timeout=30,

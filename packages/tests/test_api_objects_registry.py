@@ -7,7 +7,7 @@ from packages.api_objects.registry import find_api_model, iter_api_models
 ASSET = '''\
 """Test asset."""
 
-from packages.api_test.model import APIModel, AssertOperation
+from tuner_testkit.api_test.model import APIModel, AssertOperation
 
 {var} = APIModel(
     id="{ident}",

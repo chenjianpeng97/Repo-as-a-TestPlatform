@@ -1,7 +1,7 @@
 """packages.fake core / Faker wrappers / seed."""
 from __future__ import annotations
 
-from packages.fake import ean13, id_card, phone, run, seed, udi, uuid4
+from tuner_testkit.fake import ean13, id_card, phone, run, seed, udi, uuid4
 
 
 def test_seed_reproducible_sequence():
@@ -42,7 +42,7 @@ def test_run_count_unique():
 
 
 def test_action_words_generators_reexport():
-    from packages.action_words._internal import generators as gen
+    from tuner_testkit.action_words._internal import generators as gen
 
     assert gen.task_id()
     assert len(gen.digits(8)) == 8

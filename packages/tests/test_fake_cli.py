@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import json
 
-from packages.fake.catalog import catalog
-from packages.fake.cli import main
+from tuner_testkit.fake.catalog import catalog
+from tuner_testkit.fake.cli import main
 
 
 def test_cli_list_and_describe(capsys):

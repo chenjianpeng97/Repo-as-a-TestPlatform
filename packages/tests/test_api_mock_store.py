@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from packages.api_mock.errors import MockSpecError, RouteNotFoundError, ScenarioNotFoundError
-from packages.api_mock.spec import ResponseSpec, RouteMock, mock_relpath, route_key, scan_sensitive
-from packages.api_mock.store import MockStore
+from tuner_testkit.api_mock.errors import MockSpecError, RouteNotFoundError, ScenarioNotFoundError
+from tuner_testkit.api_mock.spec import ResponseSpec, RouteMock, mock_relpath, route_key, scan_sensitive
+from tuner_testkit.api_mock.store import MockStore
 
 
 def _write(mocks_dir: Path, payload: dict) -> Path:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from packages.api_objects.recording.normalize import (
+from tuner_testkit.api_objects.recording.normalize import (
     fingerprint,
     is_static_request,
     normalize_path,
@@ -11,8 +11,8 @@ from packages.api_objects.recording.normalize import (
 def test_normalize_path_int_and_uuid():
     assert normalize_path("/users/123/orders") == "/users/{id}/orders"
     assert (
-        normalize_path("/argon/item/550e8400-e29b-41d4-a716-446655440000/detail")
-        == "/argon/item/{uuid}/detail"
+        normalize_path("/api/item/550e8400-e29b-41d4-a716-446655440000/detail")
+        == "/api/item/{uuid}/detail"
     )
 
 
@@ -21,17 +21,17 @@ def test_is_static_js_css():
     assert is_static_request(path="/assets/main.css")
     assert is_static_request(path="/x", content_type="application/javascript")
     assert is_static_request(path="/x", response_content_type="text/css")
-    assert not is_static_request(path="/argon/mainData/getCategoryTree")
+    assert not is_static_request(path="/api/users/list")
 
 
 def test_fingerprint_stable():
     fp = fingerprint(
         method="get",
-        normalized_path="/argon/x",
+        normalized_path="/api/x",
         query_keys=["b", "a"],
         body_keys_=["z", "y"],
     )
-    assert fp == "GET /argon/x?a,b|y,z"
+    assert fp == "GET /api/x?a,b|y,z"
 
 
 def test_fingerprint_includes_files_keys():
@@ -46,11 +46,11 @@ def test_fingerprint_includes_files_keys():
 
 
 def test_service_from_path():
-    assert service_from_path("/argon/mainData/x") == "argon"
+    assert service_from_path("/api/users/x") == "api"
 
 
 def test_skip_api_flow_filters():
-    from packages.api_objects.recording.normalize import skip_api_flow
+    from tuner_testkit.api_objects.recording.normalize import skip_api_flow
 
     assert skip_api_flow(method="OPTIONS", url="http://example.com/api") == "method"
     assert skip_api_flow(method="HEAD", url="http://example.com/api") == "method"

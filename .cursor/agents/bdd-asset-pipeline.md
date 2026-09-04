@@ -69,7 +69,7 @@ Feature → (Playwright MCP) Run/Capture → Reuse vs Create decision → Freeze
 - Steps do not contain selectors or handcrafted requests.
 - Assertions are stable and observable; no scenario constants inside API Object asserts.
 - API execution is triggered via `APIModel.execute()` after `set_*` / `override_*` (no executor pattern).
-- **Binary / form APIs**: `packages.api_test` always returns `ApiResponse.content` (raw bytes). Use **`APIModel.body_format="form"`** when capture shows `application/x-www-form-urlencoded`. For xlsx/CSV exports, freeze a route-aligned asset that asserts **HTTP 200** only; parse bodies with **`packages.excel`** in steps or `packages/<domain>` — not in `packages/api_objects/`.
+- **Binary / form APIs**: `tuner_testkit.api_test` always returns `ApiResponse.content` (raw bytes). Use **`APIModel.body_format="form"`** when capture shows `application/x-www-form-urlencoded`. For xlsx/CSV exports, freeze a route-aligned asset that asserts **HTTP 200** only; parse bodies with **`tuner_testkit.excel`** in steps or `packages/<domain>` — not in `packages/api_objects/`.
 
 ## Repo conventions this agent must enforce
 

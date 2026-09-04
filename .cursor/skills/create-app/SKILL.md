@@ -15,13 +15,12 @@ version: 1.0.1
 
 ## Before creating（复用优先）
 
-1. 看 `apps/` 是否已有同类工具（`dump_ddl` 拉 DDL、`recorder` 合录冻 page+api、
-   `api_recorder` 代理抓包、`page_recorder` 仅冻 page_objects、`index_ai` 生成注册表、
-   `init_repo` 初始化）。能扩展就别新建。
-2. 查根 `INDEX.md`：要用到的知识（DDL/SQL/用例）是否已在 `assets/`；缺则先回填。
+1. 看 `INDEX.md` 工具层与 `tuner_testkit.apps` 是否已有同类平台工具（`dump_ddl`、`recorder` 合录、
+   `api_recorder`、`page_recorder`、`dna`、`index_ai`、`init_repo`）。能扩展 kit 就别在 SUT `apps/` 再建一份。
+2. 本仓 `apps/` 是否已有同类 **项目私有** 工具。能扩展就别新建。
 3. 明确工具的**输入/输出去向**：原始知识 → `assets/`；可复用资源 → `packages/`。
-4. 明确要复用哪些 packages：DB(`packages.db`)、日志(`packages.logging`)、
-   配置(`config/env.py`)、HTTP(`packages.api_test`)、表格(`packages.excel`)。
+4. 明确要复用哪些 packages：DB(`tuner_testkit.db`)、日志(`tuner_testkit.logging`)、
+   配置(`config/env.py`)、HTTP(`tuner_testkit.api_test`)、表格(`tuner_testkit.excel`)。
 
 ## 脚手架结构（包形式）
 
@@ -39,11 +38,11 @@ apps/<name>/
 
 ## Hard rules（强制）
 
-- 支持 `python -m apps.<name>`；参数用 `argparse`。
-- DB 只走 `packages.db.DbClient`；日志只走 `packages.logging`；凭据只从 `config/env.py`
+- 支持 `python -m apps.<name>`（SUT 私有工具）；参数用 `argparse`。
+- DB 只走 `tuner_testkit.db.DbClient`；日志只走 `tuner_testkit.logging`；凭据只从 `config/env.py`
   + 环境变量取；**禁止** `print`、直连驱动、硬编码 DSN、SQL 拼接、自建日志文件。
 - 覆盖式生成 `assets/**` / `packages/api_objects/**` / `packages/page_objects/**` 的工具，运行结束必须
-  `apps._shared.changelog.append_entry(...)` 追加对应区 `CHANGELOG.md`。
+  `tuner_testkit.apps._shared.changelog.append_entry(...)` 追加对应区 `CHANGELOG.md`。
 - 不得被 `tests/` import；不得写入 token/cookie/密码等敏感值；破坏性操作默认 dry-run/只读。
 
 ## 交接文档（完成期必产出）
@@ -53,7 +52,7 @@ apps/<name>/
 
 ## Verify
 
-1. `python -m apps.<name> --help` 正常输出用法。
+1. `python -m tuner_testkit.apps.<name> --help` 正常输出用法。
 2. 离线单测 `uv run pytest apps/<name>/tests -q`（若有）。
 3. 有环境时跑一条示例命令，确认产出位置与 `CHANGELOG` 追加正确。
 

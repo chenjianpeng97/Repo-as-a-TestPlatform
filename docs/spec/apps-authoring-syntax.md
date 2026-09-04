@@ -1,8 +1,7 @@
 # apps 工具编写规范（apps-authoring-syntax）
 
-> `apps/` 存放**可独立运行**的测试工具。分两类：
-> **本地维护**（`dump_ddl`、`recorder`、`api_recorder`、`page_recorder`、`index_ai`、`init_repo`）——产物进 git，不上 Plane；
-> **Plane Job**（`index_platform`）——`plane.py` + `@plane_app`。
+> `apps/` 存放 **SUT 私有**、可独立运行的测试工具（`python -m apps.<name>`）。
+> **平台**工具在 `tuner_testkit.apps`（`tuner-recorder`、`tuner-dump-ddl` 等），不要再拷进下游 `apps/`。
 > 领域动作（造数 / API / UI）留在 `packages/`，用 `@plane_db_seed` 等 opt-in 上架，不经 apps 冒充。
 > 供 `apps-authoring.mdc`（创建期）与 `apps-handover.mdc`（完成期）引用。
 
@@ -11,36 +10,33 @@
 单文件工具或包均可：
 
 ```text
-apps/
-├── __init__.py                 # 常规包，保证 python -m apps.<name> 可导入
-├── dump_ddl.py                 # 本地维护：python apps/dump_ddl.py <args>
-├── recorder/                   # 本地维护合录：python -m apps.recorder
-├── api_recorder/               # 本地维护代理：python -m apps.api_recorder
-├── page_recorder/              # 本地维护仅 UI：python -m apps.page_recorder
-├── index_platform/             # Plane Sync 引导扫描（expose=False）
-├── _shared/plane_app.py        # @plane_app 注册器（不是独立工具）
-├── _shared/plane_asset.py      # 收集 @plane_* 包资产（不是独立工具）
+apps/                            # 仅 SUT 私有工具
+├── __init__.py
 └── <your_tool>/
     ├── __init__.py __main__.py
-    ├── plane.py                # 仅当要在 Plane 跑时提供
     ├── cli.py
     ├── README.md
     └── tests/
+
+# 平台工具（已安装的 tuner-testkit，不要写进本仓 apps/）
+# tuner_testkit/apps/dump_ddl.py
+# tuner_testkit/apps/recorder/
+# tuner_testkit/apps/dna/
 ```
 
 - 包形式必须支持 `python -m apps.<name>`（提供 `__main__.py`）。仓库根须有
-  `apps/__init__.py`，否则 uv 把项目装进 venv 后可能出现 `No module named apps.*`。
-- 需要在仓库根外可运行时，脚本顶部把 `REPO_ROOT` 注入 `sys.path`（见 `apps/dump_ddl.py`）。
+  `apps/__init__.py`。平台 CLI 走 `python -m tuner_testkit.apps.<name>` / `tuner-*`。
+- 需要在仓库根外可运行时，用 `tuner_testkit.project.project_root()`（禁止 kit `__file__` 当 SUT 根）。
 
 ## 2. 必须复用 packages（不得重造轮子）
 
-- **DB** → `packages.db.DbClient`（多数据源，`config/env.py` 的别名）。禁止 `pymysql` /
+- **DB** → `tuner_testkit.db.DbClient`（多数据源，`config/env.py` 的别名）。禁止 `pymysql` /
   `pymssql` / `psycopg.connect`、硬编码 DSN、SQL 字符串拼接。见 `.cursor/rules/packages-db.mdc`。
-- **日志** → `packages.logging`（`log_info/log_warn/log_error/log_data_setup/...`）。禁止 `print`、
+- **日志** → `tuner_testkit.logging`（`log_info/log_warn/log_error/log_data_setup/...`）。禁止 `print`、
   stdlib `logging`、自建日志文件。见 `.cursor/rules/packages-logging.mdc`。
-- **配置/凭据** → `config/env.py`（`packages.config` 解析 `env_local` 命名环境；
-  再叠加 `ARGON_DB_*` / `TEST_*` 环境变量），不在代码里写死。
-- **HTTP/API** → 复用 `packages.api_test` / `packages.api_objects`；表格解析用 `packages.excel`。
+- **配置/凭据** → `config/env.py`（`tuner_testkit.config` 解析 `env_local` 命名环境；
+  再叠加 `TUNER_DB_*` / `TEST_*` 环境变量；旧名 `ARGON_DB_*` 仍可用），不在代码里写死。
+- **HTTP/API** → 复用 `tuner_testkit.api_test` / `packages.api_objects`；表格解析用 `tuner_testkit.excel`。
 
 ## 3. 产出去向
 
@@ -75,5 +71,5 @@ apps/
 ## 6. 测试
 
 - 纯逻辑（归一化、解析、代码生成）应可离线单测：可放 `packages/**/tests` 或 `apps/<name>/tests/`
-  （参考 `packages/tests/test_api_objects_recording_*.py`、`apps/api_recorder/tests`）。
+  （参考 `packages/tests/test_api_objects_recording_*.py`、`tuner_testkit/apps/api_recorder/tests`）。
 - 依赖真实环境的部分用参数/开关隔离，便于 CI 只跑离线单测。

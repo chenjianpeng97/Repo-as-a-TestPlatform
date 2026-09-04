@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from packages.page_test.health import (
+from tuner_testkit.page_test.health import (
     SEVERITY_ERROR,
     SEVERITY_OK,
     SEVERITY_WARN,
@@ -12,7 +12,7 @@ from packages.page_test.health import (
     build_report,
     load_events,
 )
-from packages.page_test.locator import ElementSpec, LocatorEvent, LocatorSpec
+from tuner_testkit.page_test.locator import ElementSpec, LocatorEvent, LocatorSpec
 
 ELEMENTS = {
     "username_input": ElementSpec(

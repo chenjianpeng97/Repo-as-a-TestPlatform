@@ -16,7 +16,7 @@ description: Creates or updates action words under packages/action_words/ follow
 
 ## Before creating (reuse first)
 
-1. `uv run python -m packages.action_words list` — 确认没有同义 word；有则
+1. `uv run python -m tuner_testkit.action_words list` — 确认没有同义 word；有则
    优先扩展其 Params（兼容性新增），而不是新建。
 2. 明确类别与 `word_id = "<category>.<snake_name>"`；一个模块默认一个 word，
    同一聚合的强相关 word 可同模块。
@@ -26,7 +26,7 @@ description: Creates or updates action words under packages/action_words/ follow
    `DATABASES`）；默认 `"main"`。
 4. 造数类：先在 `assets/ddl/<别名>/<table>.sql` 核对列名（generated/computed
    列**不得**出现在插入列表；缺 DDL 时先走 `/dump-ddl` 或
-   `python apps/dump_ddl.py <table> --datasource <别名>`），列名固化为模块级
+   `python -m tuner_testkit.apps.dump_ddl <table> --datasource <别名>`），列名固化为模块级
    `*_COLUMNS` 元组。
 5. API 类：只编排 `packages/api_objects/**` 冻结资产（`_internal/api.load_api`），
    缺资产时先走 freeze-api-objects / `apps.recorder` 合录 / `apps.api_recorder` 代理，**不得**手写 request 契约。
@@ -53,12 +53,12 @@ description: Creates or updates action words under packages/action_words/ follow
 - 纯构建函数 `build_<x>_rows(params, ids) -> dict[table, rows]`（无 DB，便于离线单测）
   与 `run` 内 `bulk_insert` 落库分离；
 - 默认值与真实主数据样例同源（`_internal/params.py`）；随机值用
-  `packages.fake`（`_internal/generators` 只是 re-export），id 用 `_internal/ids.default_id_generator`；
+  `tuner_testkit.fake`（`_internal/generators` 只是 re-export），id 用 `_internal/ids.default_id_generator`；
 - 跨 word 复用的行结构放 `packages/action_words/models.py`；
 - 文件末尾**必须**提供 `if __name__ == "__main__"` 手工改参入口：显式构造
   `Params(...)`（关键业务字段逐个列出，带行内注释），`with ActionContext()`
   执行并打印 Result JSON，保证 `python -m <module>` 可独立造数。
-- **DB 方言跟随 `datasource` 声明**（`packages.db.DbClient`，底层 SQLAlchemy
+- **DB 方言跟随 `datasource` 声明**（`tuner_testkit.db.DbClient`，底层 SQLAlchemy
   引擎自动路由 pymssql / pymysql / psycopg，值一律 `%s` 占位）：
   - 造数走 `_internal/db.bulk_insert`（标识符按 `client.dialect` 自动
     `[table]` / `` `table` `` / `"table"`）；
@@ -70,7 +70,7 @@ description: Creates or updates action words under packages/action_words/ follow
 
 ## Verify (must pass)
 
-1. `uv run python -m packages.action_words describe <word_id>` — schema/样例正常导出；
+1. `uv run python -m tuner_testkit.action_words describe <word_id>` — schema/样例正常导出；
 2. `uv run pytest packages/tests/test_action_word_template.py -q`；
 3. 有环境时 `... run <word_id> --example` 冒烟，确认 cleanup 登记完整；
 4. 若接线 behave：`uv run behave --stage api --dry-run <feature>` 步骤全匹配。

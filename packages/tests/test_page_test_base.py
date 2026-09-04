@@ -4,11 +4,11 @@ from __future__ import annotations
 import pytest
 from pydantic import Field
 
-from packages.page_test.base import BasePage
-from packages.page_test.locator import ElementSpec, LocatorSpec
-from packages.page_test.model import PageFlow
-from packages.page_test.steps import AssertVisible, Click, WaitForElement
-from packages.page_test.testing import FakePage, make_driver, patch_playwright
+from tuner_testkit.page_test.base import BasePage
+from tuner_testkit.page_test.locator import ElementSpec, LocatorSpec
+from tuner_testkit.page_test.model import PageFlow
+from tuner_testkit.page_test.steps import AssertVisible, Click, WaitForElement
+from tuner_testkit.page_test.testing import FakePage, make_driver, patch_playwright
 
 
 class OrderListPage(BasePage):
@@ -79,7 +79,7 @@ def page() -> FakePage:
 
 
 def test_subclass_is_auto_registered_for_discovery():
-    from packages.page_test.base import PAGE_CLASSES
+    from tuner_testkit.page_test.base import PAGE_CLASSES
 
     assert PAGE_CLASSES["example.order_list@v1"] is OrderListPage
 
@@ -164,7 +164,7 @@ def test_call_dispatches_public_actions_only(page):
 
     assert order_page.call("find_order_across_pages", order_no="INV-001") is True
 
-    from packages.page_test.errors import ElementSpecError
+    from tuner_testkit.page_test.errors import ElementSpecError
 
     with pytest.raises(ElementSpecError):
         order_page.call("el", name="row")

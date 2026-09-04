@@ -4,11 +4,12 @@ from __future__ import annotations
 import pytest
 
 from packages.page_objects import session
-from packages.page_test.base import BasePage
-from packages.page_test.locator import ElementSpec, LocatorSpec
-from packages.page_test.model import PageFlow, PageModel
-from packages.page_test.steps import AssertVisible, Click, Fill, WaitForElement
-from packages.page_test.testing import FakePage, make_driver, patch_playwright
+from tuner_testkit.page_test import session as kit_session
+from tuner_testkit.page_test.base import BasePage
+from tuner_testkit.page_test.locator import ElementSpec, LocatorSpec
+from tuner_testkit.page_test.model import PageFlow, PageModel
+from tuner_testkit.page_test.steps import AssertVisible, Click, Fill, WaitForElement
+from tuner_testkit.page_test.testing import FakePage, make_driver, patch_playwright
 
 LOGIN_PAGE = PageModel(
     id="fixture.session_login@v1",
@@ -60,7 +61,7 @@ def stub_launch(monkeypatch, page):
     """把 launch_driver 换成 FakePage 驱动，避免真起浏览器。"""
     patch_playwright(monkeypatch)
     driver = make_driver(page)
-    monkeypatch.setattr(session, "launch_driver", lambda **_: driver)
+    monkeypatch.setattr(kit_session, "launch_driver", lambda **_: driver)
     return driver
 
 

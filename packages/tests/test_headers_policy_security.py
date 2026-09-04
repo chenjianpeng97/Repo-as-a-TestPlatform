@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from packages.api_test.errors import HeadersPolicyError
-from packages.api_test.model import APIModel
+from tuner_testkit.api_test.errors import HeadersPolicyError
+from tuner_testkit.api_test.model import APIModel
 
 
 def test_set_headers_rejects_non_allowlisted_header():

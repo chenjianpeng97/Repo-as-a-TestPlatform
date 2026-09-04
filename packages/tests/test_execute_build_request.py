@@ -4,8 +4,8 @@ from typing import Any, Dict
 
 import pytest
 
-from packages.api_test.client import ApiClient
-from packages.api_test.model import APIModel
+from tuner_testkit.api_test.client import ApiClient
+from tuner_testkit.api_test.model import APIModel
 
 
 class _DummyResp:

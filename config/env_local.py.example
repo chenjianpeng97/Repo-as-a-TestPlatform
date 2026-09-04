@@ -3,8 +3,8 @@
 # type 可写 mysql / sqlserver / postgres；不写则沿用 env.py / env_overlay 的 type。
 #
 # 多套环境：把每套 url+db+account 放进 ENVIRONMENTS，用下面任一方式激活一套：
-#   python -m packages.config use dev          # 写入 config/.active_env（仓库全局）
-#   set ARGON_ENV=uat                          # 仅当前进程，不改指针
+#   python -m tuner_testkit.config use dev     # 写入 config/.active_env（仓库全局）
+#   set TUNER_ENV=uat                          # 仅当前进程，不改指针（旧名 ARGON_ENV 仍可用）
 #   ACTIVE_ENV = "dev"                         # 尚未 use 过时的默认
 # 只要 ENVIRONMENTS 非空，就只套用激活那一套（忽略本文件顶层 DATABASES / TEST_*）。
 

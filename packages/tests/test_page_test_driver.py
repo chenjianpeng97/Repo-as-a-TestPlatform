@@ -1,6 +1,6 @@
 """执行引擎端到端 —— 全程离线（不装 playwright、不起浏览器）。
 
-用 ``packages.page_test.testing`` 的 FakePage 替身验证 step 分派、参数插值、
+用 ``tuner_testkit.page_test.testing`` 的 FakePage 替身验证 step 分派、参数插值、
 多定位器 fallback、断言、提取与日志脱敏。这也顺带证明 driver 的惰性 import
 设计成立：没有 playwright 也能测页面资产。
 """
@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import pytest
 
-from packages.page_test.errors import ElementNotFoundError, PageAssertError
-from packages.page_test.locator import ElementSpec, LocatorSpec
-from packages.page_test.model import PageFlow, PageModel
-from packages.page_test.steps import (
+from tuner_testkit.page_test.errors import ElementNotFoundError, PageAssertError
+from tuner_testkit.page_test.locator import ElementSpec, LocatorSpec
+from tuner_testkit.page_test.model import PageFlow, PageModel
+from tuner_testkit.page_test.steps import (
     AssertCount,
     AssertHidden,
     AssertText,
@@ -31,7 +31,7 @@ from packages.page_test.steps import (
     WaitForResponse,
     WaitForUrl,
 )
-from packages.page_test.testing import FakePage, make_driver, patch_playwright
+from tuner_testkit.page_test.testing import FakePage, make_driver, patch_playwright
 
 ELEMENTS = {
     "username_input": ElementSpec(
@@ -200,7 +200,7 @@ def test_repeated_resolution_reuses_hint_but_keeps_real_indexes(page):
 def test_fallback_is_logged_once_per_run(page, monkeypatch):
     calls: list[str] = []
     monkeypatch.setattr(
-        "packages.page_test.driver.log_ui_action",
+        "tuner_testkit.page_test.driver.log_ui_action",
         lambda action, **fields: calls.append(action),
     )
     page.unregister("label=用户名")
@@ -289,7 +289,7 @@ def test_assert_visible_fails_when_element_present_but_invisible(page):
 def test_secret_values_are_masked_in_logs(page, monkeypatch):
     calls: list[tuple[str, dict]] = []
     monkeypatch.setattr(
-        "packages.page_test.driver.log_ui_action",
+        "tuner_testkit.page_test.driver.log_ui_action",
         lambda action, **fields: calls.append((action, fields)),
     )
     model = build_model()
@@ -319,7 +319,7 @@ def test_wait_for_response_matches_buffered_response(page):
 
 
 def test_wait_for_response_times_out_without_match(page):
-    from packages.page_test.errors import StepExecutionError
+    from tuner_testkit.page_test.errors import StepExecutionError
 
     model = build_model(
         flows={
@@ -440,7 +440,7 @@ def test_retry_recovers_when_element_appears_late(page):
 def test_each_run_archives_only_its_own_events(page, tmp_path, monkeypatch):
     """否则 doctor 的命中率会被重复计数污染，fallbacks 也会把历史降级算进来。"""
     monkeypatch.setenv("PAGE_TEST_ARTIFACTS_DIR", str(tmp_path / "page_test"))
-    from packages.page_test.health import load_events
+    from tuner_testkit.page_test.health import load_events
 
     model = build_model(
         flows={"check": PageFlow(name="check", steps=(Fill("username_input", "a"),))}
@@ -461,7 +461,7 @@ def test_each_run_archives_only_its_own_events(page, tmp_path, monkeypatch):
 def test_close_archives_events_from_python_actions(page, tmp_path, monkeypatch):
     """类范式的自定义动作不走 execute，事件要在 close 时补归档。"""
     monkeypatch.setenv("PAGE_TEST_ARTIFACTS_DIR", str(tmp_path / "page_test"))
-    from packages.page_test.health import load_events
+    from tuner_testkit.page_test.health import load_events
 
     driver = make_driver(page, persist_health=True)
     driver.resolve("username_input", elements=ELEMENTS, page_id="example.login@v1")
@@ -480,7 +480,7 @@ def test_bind_driver_allows_calling_without_explicit_driver(page):
 
 
 def test_driver_without_binding_reports_clear_error():
-    from packages.page_test.errors import DriverError
+    from tuner_testkit.page_test.errors import DriverError
 
     with pytest.raises(DriverError, match="PageDriver"):
         build_model().open()

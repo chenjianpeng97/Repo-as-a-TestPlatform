@@ -3,18 +3,18 @@ from __future__ import annotations
 
 import pytest
 
-from packages.page_test.errors import (
+from tuner_testkit.page_test.errors import (
     ElementSpecError,
     FlowNotFoundError,
     SchemaValidationError,
 )
-from packages.page_test.locator import ElementSpec, LocatorSpec
-from packages.page_test.model import (
+from tuner_testkit.page_test.locator import ElementSpec, LocatorSpec
+from tuner_testkit.page_test.model import (
     PageFlow,
     PageModel,
     normalize_url_path,
 )
-from packages.page_test.steps import (
+from tuner_testkit.page_test.steps import (
     AssertVisible,
     Click,
     ExtractText,

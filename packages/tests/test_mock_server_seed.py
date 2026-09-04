@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from apps.mock_server.seed import (
+from tuner_testkit.apps.mock_server.seed import (
     extract_recorded_response,
     seed_mocks,
     strip_truncation_markers,
@@ -12,7 +12,7 @@ from apps.mock_server.seed import (
 ASSET_WITH_RECORDING = '''\
 """Auto-maintained by apps.recorder."""
 
-from packages.api_test.model import APIModel, AssertOperation
+from tuner_testkit.api_test.model import APIModel, AssertOperation
 
 query_items_post_v1 = APIModel(
     id="svc.POST./svc/items@v1",
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 '''
 
 ASSET_WITHOUT_RECORDING = '''\
-from packages.api_test.model import APIModel, AssertOperation
+from tuner_testkit.api_test.model import APIModel, AssertOperation
 
 get_thing_get_v1 = APIModel(
     id="svc.GET./svc/thing@v1",
@@ -171,7 +171,7 @@ def test_seed_dry_run_writes_nothing(tmp_path: Path) -> None:
 
 
 def test_seeded_files_load_back_into_the_store(tmp_path: Path) -> None:
-    from packages.api_mock.store import MockStore
+    from tuner_testkit.api_mock.store import MockStore
 
     _write_asset(tmp_path, "svc/items", "POST.v1.py", ASSET_WITH_RECORDING)
     _write_asset(tmp_path, "svc/thing", "GET.v1.py", ASSET_WITHOUT_RECORDING)

@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from packages.config import (
+from tuner_testkit.config import (
     EnvProfileError,
     apply_selected_environment,
     environments_of,
@@ -52,7 +52,25 @@ _UAT = {
 
 
 class TestResolveActiveName:
-    def test_argon_env_wins_over_file_and_default(self):
+    def test_tuner_env_wins_over_file_and_default(self):
+        name = resolve_active_name(
+            available=("dev", "uat"),
+            module_default="dev",
+            environ={"TUNER_ENV": "uat"},
+            active_file_text="dev",
+        )
+        assert name == "uat"
+
+    def test_tuner_env_wins_over_legacy_argon(self):
+        name = resolve_active_name(
+            available=("dev", "uat"),
+            module_default="dev",
+            environ={"TUNER_ENV": "dev", "ARGON_ENV": "uat"},
+            active_file_text="uat",
+        )
+        assert name == "dev"
+
+    def test_legacy_argon_env_still_accepted(self):
         name = resolve_active_name(
             available=("dev", "uat"),
             module_default="dev",
@@ -179,14 +197,15 @@ class TestActiveEnvFile:
 
 class TestCli:
     @pytest.fixture(autouse=True)
-    def _clear_argon_env(self, monkeypatch):
+    def _clear_env_vars(self, monkeypatch):
+        monkeypatch.delenv("TUNER_ENV", raising=False)
         monkeypatch.delenv("ARGON_ENV", raising=False)
 
     def test_show_lists_and_marks_active(self, monkeypatch, capsys):
         source = _catalog(dev=_DEV, uat=_UAT)
         source.ACTIVE_ENV = "dev"
-        monkeypatch.setattr("packages.config.load_env_local", lambda: source)
-        monkeypatch.setattr("packages.config.read_active_env_file", lambda path=None: None)
+        monkeypatch.setattr("tuner_testkit.config.load_env_local", lambda: source)
+        monkeypatch.setattr("tuner_testkit.config.read_active_env_file", lambda path=None: None)
         rc = main(["show"])
         assert rc == 0
         out = capsys.readouterr().out
@@ -198,8 +217,8 @@ class TestCli:
     def test_use_writes_pointer(self, monkeypatch, tmp_path, capsys):
         source = _catalog(dev=_DEV, uat=_UAT)
         pointer = tmp_path / ".active_env"
-        monkeypatch.setattr("packages.config.load_env_local", lambda: source)
-        monkeypatch.setattr("packages.config.active_env_path", lambda: pointer)
+        monkeypatch.setattr("tuner_testkit.config.load_env_local", lambda: source)
+        monkeypatch.setattr("tuner_testkit.config.active_env_path", lambda: pointer)
         rc = main(["use", "uat"])
         assert rc == 0
         assert pointer.read_text(encoding="utf-8").strip() == "uat"
@@ -210,8 +229,8 @@ class TestCli:
     def test_use_prod_warns_but_writes(self, monkeypatch, tmp_path, capsys):
         source = _catalog(prd={**_UAT, "TEST_BASE_URL": "https://prd.example"})
         pointer = tmp_path / ".active_env"
-        monkeypatch.setattr("packages.config.load_env_local", lambda: source)
-        monkeypatch.setattr("packages.config.active_env_path", lambda: pointer)
+        monkeypatch.setattr("tuner_testkit.config.load_env_local", lambda: source)
+        monkeypatch.setattr("tuner_testkit.config.active_env_path", lambda: pointer)
         rc = main(["use", "prd"])
         assert rc == 0
         err = capsys.readouterr().err
@@ -220,14 +239,14 @@ class TestCli:
 
     def test_use_unknown_name(self, monkeypatch, capsys):
         source = _catalog(dev=_DEV)
-        monkeypatch.setattr("packages.config.load_env_local", lambda: source)
+        monkeypatch.setattr("tuner_testkit.config.load_env_local", lambda: source)
         rc = main(["use", "nope"])
         assert rc == 1
         assert "未知环境" in capsys.readouterr().err
 
     def test_use_without_environments(self, monkeypatch, capsys):
         monkeypatch.setattr(
-            "packages.config.load_env_local",
+            "tuner_testkit.config.load_env_local",
             lambda: SimpleNamespace(DATABASES={}, TEST_BASE_URL="http://x"),
         )
         rc = main(["use", "dev"])
@@ -236,7 +255,7 @@ class TestCli:
 
     def test_default_argv_is_show(self, monkeypatch, capsys):
         source = _catalog(dev=_DEV)
-        monkeypatch.setattr("packages.config.load_env_local", lambda: source)
-        monkeypatch.setattr("packages.config.read_active_env_file", lambda path=None: None)
+        monkeypatch.setattr("tuner_testkit.config.load_env_local", lambda: source)
+        monkeypatch.setattr("tuner_testkit.config.read_active_env_file", lambda path=None: None)
         assert main([]) == 0
         assert "active: dev" in capsys.readouterr().out

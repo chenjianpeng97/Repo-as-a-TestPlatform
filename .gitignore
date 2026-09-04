@@ -38,3 +38,9 @@ logs/
 !.env.example
 config/env_local.py
 config/.active_env
+
+# DNA overlay pointer written by tuner-dna sync (project-local)
+.tuner-dna-version
+
+# Wheel-only copy of .cursor/docs/spec/git-hooks; editable installs read the source tree
+tuner_testkit/apps/dna/dna_payload/

@@ -3,15 +3,15 @@ from __future__ import annotations
 
 import pytest
 
-from packages.page_test import registry
-from packages.page_test.base import BasePage
-from packages.page_test.errors import PageTestError
-from packages.page_test.locator import ElementSpec, LocatorSpec
+from tuner_testkit.page_test import registry
+from tuner_testkit.page_test.base import BasePage
+from tuner_testkit.page_test.errors import PageTestError
+from tuner_testkit.page_test.locator import ElementSpec, LocatorSpec
 
 DECLARATIVE_ASSET = '''\
 """示例登录页（测试夹具）。"""
 
-from packages.page_test import (
+from tuner_testkit.page_test import (
     AssertVisible,
     Click,
     ElementSpec,
@@ -62,7 +62,7 @@ fixture_login_page_v1 = PageModel(
 CLASS_ASSET = '''\
 """示例列表页（测试夹具）。"""
 
-from packages.page_test import BasePage, ElementSpec, LocatorSpec
+from tuner_testkit.page_test import BasePage, ElementSpec, LocatorSpec
 
 
 class FixtureListPage(BasePage):

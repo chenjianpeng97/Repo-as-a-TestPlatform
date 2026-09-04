@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from packages.api_mock.router import PathPattern, RouteTable, path_matches
+from tuner_testkit.api_mock.router import PathPattern, RouteTable, path_matches
 
 
 @pytest.mark.parametrize(

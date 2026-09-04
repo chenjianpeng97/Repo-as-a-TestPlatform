@@ -18,8 +18,8 @@ import inspect
 import pytest
 from pydantic import BaseModel
 
-from packages.action_words.base import ActionResult, ActionWord
-from packages.action_words.registry import list_all
+from tuner_testkit.action_words.base import ActionResult, ActionWord
+from tuner_testkit.action_words.registry import list_all
 
 ALL_WORDS = list_all()
 WORD_IDS = [cls.word_id for cls in ALL_WORDS]

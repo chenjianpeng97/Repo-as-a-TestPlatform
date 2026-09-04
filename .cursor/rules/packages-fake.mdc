@@ -1,19 +1,19 @@
 ---
-description: Require business random/fake values to go through packages.fake; forbid ad-hoc random.choices and checksum-less USCC/UDI
+description: Require business random/fake values to go through tuner_testkit.fake; forbid ad-hoc random.choices and checksum-less USCC/UDI
 globs: **/*.py
 alwaysApply: false
 version: 1.0.0
 ---
 
-# packages.fake — mandatory fake-data surface
+# tuner_testkit.fake — mandatory fake-data surface
 
 测试里需要的假数据（UDI、社信码、姓名、手机、金额、单据号等）必须走
-`packages.fake`。完整用法见 `packages/fake/USAGE.md`。
+`tuner_testkit.fake`。完整用法见 `tuner_testkit/fake/USAGE.md`。
 
 ## API to use
 
 ```python
-from packages.fake import udi, uscc, seed, run
+from tuner_testkit.fake import udi, uscc, seed, run
 
 seed(1)
 code = udi(with_gs=True)  # 单值，给 db_seed / pytest
@@ -23,8 +23,8 @@ batch = run("udi", count=10, inputs={"with_gs": True}).values
 CLI（手工临时数据，与平台 catalog 同一契约）：
 
 ```bash
-uv run python -m packages.fake list
-uv run python -m packages.fake run udi --count 10 --set with_gs=true
+uv run python -m tuner_testkit.fake list
+uv run python -m tuner_testkit.fake run udi --count 10 --set with_gs=true
 ```
 
 生成器只产 **1 条**；条数是 runner 的 `count`（不要把 `amount` 当条数，本仓里
@@ -33,12 +33,12 @@ uv run python -m packages.fake run udi --count 10 --set with_gs=true
 ## Hard rules
 
 - `random.choices` / `uuid.uuid4()` / 手写无校验的社信码 / 手写 GS1 UDI 字符串
-  出现在 `tests/**` 或 `packages/action_words/**` → **禁止**（用 `packages.fake`）。
-- 雪花主键仍用 `packages.action_words._internal.ids`，不要放进 fake。
+  出现在 `tests/**` 或 `packages/action_words/**` → **禁止**（用 `tuner_testkit.fake`）。
+- 雪花主键仍用 `tuner_testkit.action_words._internal.ids`，不要放进 fake。
 - 主数据夹具常量（`DEFAULT_DISTRIBUTOR_NAME` 等）留在 `params` / `params_project`，
   不是生成器。
 - `ean13` 不是医疗 DI/UDI；医疗码用 `udi` / `product_di` / `sn_code`。
-- Faker 未包装的方法经 `packages.fake.raw`，不要直接 `from faker import Faker`。
+- Faker 未包装的方法经 `tuner_testkit.fake.raw`，不要直接 `from faker import Faker`。
 - 步骤层 / page objects 不造业务假数据；造数在 action words 或 pytest 里调用 fake。
 
 ## Examples
@@ -53,7 +53,7 @@ udi = "01" + di + "21" + sn  # 无 GS、无 AI 布局
 **Good**
 
 ```python
-from packages.fake import uscc, udi
+from tuner_testkit.fake import uscc, udi
 code = uscc()
 label = udi(with_gs=True)
 ```

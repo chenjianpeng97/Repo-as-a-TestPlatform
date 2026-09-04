@@ -1,5 +1,5 @@
-"""Support libraries for the automation repo.
+"""SUT-side packages: frozen page/api objects and business action words.
 
-High-level packages live under `packages/`, e.g. `packages.api_test`.
+Runtime libraries live in ``tuner_testkit`` (installed from PyPI). This tree
+holds per-project assets only.
 """
-

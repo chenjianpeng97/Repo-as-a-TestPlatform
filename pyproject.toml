@@ -1,11 +1,56 @@
 [project]
-name = "innovammed-test-project-example"
-version = "3.0.0"
-description = "Add your description here"
+name = "tuner-testkit"
+version = "4.0.0"
+description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "tuner-testkit contributors"}]
 requires-python = ">=3.12"
-# 最小安装：packages.api_test（HTTP 客户端等）仅需 requests；避免 CI 单测拉 Playwright
 dependencies = [
+    "pydantic>=2",
+]
+
+[project.optional-dependencies]
+db = [
+    "pymysql>=1.2.0",
+    "pymssql>=2.3.0",
+    "psycopg[binary]>=3.2",
+    "sqlalchemy>=2.0",
+]
+api = [
+    "requests>=2.33.1",
+]
+web-ui = [
+    "playwright>=1.54.0",
+]
+# Reserved extra name for a future mobile stack (not implemented in 4.0).
+phone-ui = []
+excel = [
+    "openpyxl>=3.1.0",
+]
+fake = [
+    "faker>=37.0.0",
+]
+mock = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "httpx>=0.28.0",
+]
+recorder = [
+    "playwright>=1.54.0",
+    "mitmproxy>=11.1.3",
+]
+test = [
+    "pytest>=9.0.3",
+    "openpyxl>=3.1.0",
+    "httpx>=0.28.0",
+]
+bdd = [
+    "behave>=1.2.6",
+    "playwright>=1.54.0",
+    "behave-html-pretty-formatter>=1.16.1",
+]
+dev = [
     "pymysql>=1.2.0",
     "pymssql>=2.3.0",
     "psycopg[binary]>=3.2",
@@ -13,44 +58,54 @@ dependencies = [
     "requests>=2.33.1",
     "pydantic>=2",
     "faker>=37.0.0",
-]
-
-[project.optional-dependencies]
-# 跑 packages/tests 等单元测试（含 packages/excel、test_excel_workbook 等）
-test = [
-    "pytest>=9.0.3",
     "openpyxl>=3.1.0",
-]
-# Behave + Playwright（BDD / UI 自动化）
-bdd = [
-    "behave>=1.2.6",
-    "playwright>=1.54.0",
-    "behave-html-pretty-formatter>=1.16.1",
-]
-# 终端代理抓包 → 自动维护 packages/api_objects（apps.api_recorder；extra 名保留 recorder）
-recorder = [
-    "mitmproxy>=11.1.3",
-]
-# 用 api_objects + data/mocks 起 mock server（packages.api_mock / apps.mock_server）
-# httpx 供 fastapi.testclient 跑 packages/tests 里的 mock 单测
-mock = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
     "httpx>=0.28.0",
-]
-# 本地全套：单测 + BDD/UI（等价于同时装 test 与 bdd）
-dev = [
     "pytest>=9.0.3",
-    "openpyxl>=3.1.0",
     "behave>=1.2.6",
     "playwright>=1.54.0",
     "behave-html-pretty-formatter>=1.16.1",
+    "mitmproxy>=11.1.3",
 ]
+
+[project.scripts]
+tuner-config = "tuner_testkit.config:main"
+tuner-recorder = "tuner_testkit.apps.recorder.cli:main"
+tuner-page-recorder = "tuner_testkit.apps.page_recorder.cli:main"
+tuner-api-recorder = "tuner_testkit.apps.api_recorder.cli:main"
+tuner-dump-ddl = "tuner_testkit.apps.dump_ddl:main"
+tuner-mock-server = "tuner_testkit.apps.mock_server.cli:main"
+tuner-dna = "tuner_testkit.apps.dna.cli:main"
+tuner-init = "tuner_testkit.apps.init_repo.__main__:main"
+tuner-index-ai = "tuner_testkit.apps.index_ai.__main__:main"
+tuner-index-platform = "tuner_testkit.apps.index_platform.__main__:main"
+tuner-fake = "tuner_testkit.fake.cli:main"
+tuner-page-test = "tuner_testkit.page_test.__main__:main"
+tuner-action-words = "tuner_testkit.action_words.__main__:main"
 
 [build-system]
 requires = ["setuptools>=75", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+license-files = ["LICENSE"]
+
 [tool.setuptools.packages.find]
-include = ["packages*", "config*", "assets*", "apps*"]
-namespaces = true
+include = ["tuner_testkit*"]
+
+[tool.setuptools.package-data]
+"tuner_testkit.apps.dna" = ["dna_payload/**/*"]
+
+[tool.setuptools.cmdclass]
+build_py = "tuner_testkit.apps.dna.build.BuildPyWithDna"
+sdist = "tuner_testkit.apps.dna.build.SdistWithDna"
+
+[tool.tuner-testkit]
+page_objects = "packages/page_objects"
+api_objects = "packages/api_objects"
+mocks = "data/mocks"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["packages/tests", "tuner_testkit"]

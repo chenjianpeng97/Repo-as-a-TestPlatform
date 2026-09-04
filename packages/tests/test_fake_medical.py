@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from packages.fake.catalog import GS
-from packages.fake.medical import gtin14_check_digit, parse_udi, sn_code, strip_gs, udi, unique_code
+from tuner_testkit.fake.catalog import GS
+from tuner_testkit.fake.medical import gtin14_check_digit, parse_udi, sn_code, strip_gs, udi, unique_code
 
 
 def test_udi_with_gs_inserts_separator_only_before_ai21():
