@@ -1,6 +1,6 @@
 [project]
 name = "tuner-testkit"
-version = "4.0.0"
+version = "4.0.1"
 description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
 license = "MIT"

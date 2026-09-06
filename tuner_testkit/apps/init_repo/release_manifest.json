@@ -1,6 +1,6 @@
 {
-  "template_version": "4.0.0",
-  "generated_at": "2026-09-04T22:12:05+0800",
+  "template_version": "4.0.1",
+  "generated_at": "2026-09-06T17:18:56+0800",
   "tracked_paths": [
     ".cursor/rules",
     ".cursor/skills",
