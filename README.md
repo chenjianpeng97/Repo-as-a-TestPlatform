@@ -33,7 +33,7 @@ cd ../my-sut-tests
 uv sync
 ```
 
-`scaffold` 会铺六层目录、写入依赖 `tuner-testkit` 的 `pyproject.toml`，并执行一次 `tuner-dna sync`（把 `.cursor/`、`docs/spec/`、`tools/git-hooks/` 放进**项目树**）。不要用 `tuner-testkit init repo`。
+`scaffold` 会铺六层目录、写入依赖 `tuner-testkit` 的 `pyproject.toml`，并执行一次 `tuner-dna sync`（把 `.cursor/`、`docs/spec/`、`tools/git-hooks/` 放进**项目树**）。可在任意目录运行，不必先有测试仓。不要用 `tuner-testkit init repo`。
 
 Web UI / 合录按需再加 extra：
 

@@ -51,10 +51,21 @@ _STUB_FILES: tuple[str, ...] = (
 )
 
 
-def _template_root() -> pathlib.Path:
-    from tuner_testkit.project import template_source_root, project_root
+def _stub_root() -> pathlib.Path | None:
+    """Directory that contains thin SUT stub files (``config/env.py``, …).
 
-    return template_source_root() or project_root()
+    Wheel installs have no template checkout beside site-packages, and
+    ``project_root()`` must not be used: scaffold is how a project is created.
+    """
+    from tuner_testkit.project import template_source_root
+
+    editable = template_source_root()
+    if editable is not None:
+        return editable
+    bundled = pathlib.Path(__file__).resolve().parent / "stubs"
+    if (bundled / "config" / "env.py").is_file():
+        return bundled
+    return None
 
 
 def _copy_file(src: pathlib.Path, dst: pathlib.Path, *, overwrite: bool) -> bool:
@@ -112,7 +123,7 @@ def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = Fa
     actions: list[str] = []
     target = target.resolve()
     target.mkdir(parents=True, exist_ok=True)
-    src_root = _template_root()
+    src_root = _stub_root()
 
     for rel in SKELETON_DIRS:
         d = target / rel
@@ -127,14 +138,17 @@ def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = Fa
     else:
         actions.append("skip pyproject.toml (exists)")
 
-    for rel in _STUB_FILES:
-        src = src_root / rel
-        if not src.exists():
-            continue
-        if _copy_file(src, target / rel, overwrite=overwrite):
-            actions.append(f"copy {rel}")
-        else:
-            actions.append(f"skip {rel} (exists)")
+    if src_root is None:
+        actions.append("skip stubs (not bundled in this install)")
+    else:
+        for rel in _STUB_FILES:
+            src = src_root / rel
+            if not src.exists():
+                continue
+            if _copy_file(src, target / rel, overwrite=overwrite):
+                actions.append(f"copy {rel}")
+            else:
+                actions.append(f"skip {rel} (exists)")
 
     if with_ai:
         from types import SimpleNamespace

@@ -44,6 +44,17 @@
 
 ---
 
+## 2026-09-06 — tuner-init scaffold works from a blank directory
+
+- **commit**: `TBD`
+- **目的**: `uv tool install` 后在非 SUT 目录执行 `tuner-init scaffold` 不再调用
+  `project_root()`（鸡生蛋）。骨架文件打进 wheel 的 `init_repo/stubs/`。发布 **4.0.2**。
+- **路径**:
+  - `tuner_testkit/apps/init_repo/scaffold.py`
+  - `tuner_testkit/apps/init_repo/stubs/**`
+- **不在同步范围**: 业务资产
+- **验证**: 在空目录 `tuner-init scaffold ./new-repo`；pytest `test_scaffold.py`
+
 ## 2026-09-06 — isolated `uv build` can bundle DNA
 
 - **commit**: `TBD`

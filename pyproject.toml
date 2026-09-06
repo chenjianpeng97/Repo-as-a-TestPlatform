@@ -1,6 +1,6 @@
 [project]
 name = "tuner-testkit"
-version = "4.0.1"
+version = "4.0.2"
 description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
 license = "MIT"
@@ -94,6 +94,7 @@ include = ["tuner_testkit*"]
 
 [tool.setuptools.package-data]
 "tuner_testkit.apps.dna" = ["dna_payload/**/*"]
+"tuner_testkit.apps.init_repo" = ["stubs/**/*"]
 
 [tool.setuptools.cmdclass]
 build_py = "tuner_testkit.apps.dna.build.BuildPyWithDna"
