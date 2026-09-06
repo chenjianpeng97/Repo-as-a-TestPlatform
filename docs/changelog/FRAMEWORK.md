@@ -44,6 +44,18 @@
 
 ---
 
+## 2026-09-06 — isolated `uv build` can bundle DNA
+
+- **commit**: `TBD`
+- **目的**: PEP 517 隔离构建里尚未安装本包，`dna/build.py` 直接 `import tuner_testkit` 会失败。
+  构建钩子先把源码根加入 `sys.path` 再 bundle。setuptools sdist 会丢掉 ``.*``，
+  因此额外把 `dna_payload/.cursor` 拷进 sdist/wheel。顺带改 `project.license` 为 SPDX。
+- **路径**:
+  - `tuner_testkit/apps/dna/build.py`
+  - `pyproject.toml`
+- **不在同步范围**: 业务资产
+- **验证**: `uv build` 产出 wheel/sdist；wheel 内含 `dna_payload/.cursor/rules`
+
 ## 2026-09-04 — DNA 描述对齐 tuner-testkit 分层
 
 - **commit**: `TBD`

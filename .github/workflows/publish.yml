@@ -1,0 +1,30 @@
+# Trusted Publisher: filename must match PyPI → Publishing → Workflow (publish.yml).
+# If PyPI Environment was left empty, delete the `environment:` key below.
+# If PyPI Environment is `pypi`, also create Settings → Environments → pypi on GitHub.
+name: publish
+
+on:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+
+concurrency:
+  group: pypi-publish
+  cancel-in-progress: false
+
+jobs:
+  pypi:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Build sdist and wheel
+        run: uv build
+      - name: Publish to PyPI
+        run: uv publish
