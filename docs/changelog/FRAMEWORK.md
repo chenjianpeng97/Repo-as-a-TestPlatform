@@ -44,6 +44,19 @@
 
 ---
 
+## 2026-09-07 — tuner-testkit 4.1.0（元 extra `[all]`）
+
+- **commit**: `TBD`
+- **目的**: 新增元 extra `[all]`（能力 extra 并集）；`[dev]` 改为引用 `[all]`。
+  下游 tool 域只装默认 wheel 跑 `tuner-init`；`[db]`/`[api]` 等装进业务仓 `.venv`。
+  狗食/全能力仓用 `tuner-testkit[all]`。无运行库行为变更。
+- **路径**:
+  - `pyproject.toml`
+  - `README.md`、`INDEX.md`
+  - `docs/changelog/TEMPLATE-4.1.0.md`
+- **不在同步范围**: 业务资产；DNA 文件哈希未变
+- **验证**: `python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-09-06 — tuner-init scaffold works from a blank directory
 
 - **commit**: `TBD`

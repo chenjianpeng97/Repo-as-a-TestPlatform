@@ -36,7 +36,7 @@
 
 ## 2. 运行库（`tuner_testkit/`，PyPI：`tuner-testkit`）与本仓资产（`packages/`）
 
-发行名 `tuner-testkit`，导入名 `tuner_testkit`。下游用 extras 按需安装；本仓 editable 开发用 `uv sync --extra dev`。安装 → `tuner-init scaffold` → 写业务 → `uv add` + `tuner-dna sync` 的标准作业流程见根 [`README.md`](README.md)（即 PyPI 项目说明）。
+发行名 `tuner-testkit`，导入名 `tuner_testkit`。tool 域只装默认 wheel（`uv tool install tuner-testkit`，能 `tuner-init` 即可）；`[db]` / `[api]` 等 extra 装在业务仓 `.venv`。本仓 editable 开发用 `uv sync --extra all`（`[dev]` 引用 `[all]`）。标准作业流程见根 [`README.md`](README.md)（即 PyPI 项目说明）。
 
 | extra | 模块 | 用途 |
 | --- | --- | --- |
@@ -47,7 +47,9 @@
 | `[phone-ui]` | — | **预留**，4.0 未实现 |
 | `[excel]` / `[fake]` / `[mock]` | 对应模块 | 表格 / 假数据 / api_mock |
 | `[recorder]` | `tuner_testkit.apps.{recorder,page_recorder,api_recorder}` | 合录 / 仅 UI / 代理 |
-| （默认 wheel） | `tuner_testkit.apps.dna` / dump_ddl / init_repo | `tuner-dna`、`tuner-dump-ddl`、`tuner-init` 等 scripts；mock 运行时仍需 `[mock]` |
+| `[all]` | 元 extra | `db,api,web-ui,phone-ui,excel,fake,mock,recorder,test,bdd` 并集 |
+| `[dev]` | 引用 `[all]` | 本仓 editable 开发别名 |
+| （默认 wheel） | `tuner_testkit.apps.dna` / dump_ddl / init_repo | `tuner-init` / `tuner-dna` 可在 tool 域裸装使用；`tuner-dump-ddl` 等需业务仓 `[db]` 后 `uv run` |
 
 console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`、`tuner-dump-ddl` 等，等价于 `python -m tuner_testkit.…`。
 

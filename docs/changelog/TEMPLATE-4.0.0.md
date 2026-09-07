@@ -16,4 +16,5 @@
 
 - `[web-ui]`：现有 Playwright `page_test`（不是 `[page]`）。
 - `[phone-ui]`：预留空 extra，本版本无实现。
+- `[all]`：4.1.0 起提供，能力 extra 并集；见 [`TEMPLATE-4.1.0.md`](TEMPLATE-4.1.0.md)。
 - 一个 wheel 不能「只升 web-ui、钉死旧 db」；手机栈若将来独立再拆第二个发行版。
