@@ -1,22 +1,20 @@
 ---
 name: run-feature-playwright-mcp
-version: 1.0.0
-description: Runs behave Gherkin scenarios via Playwright MCP with Run→Capture→Freeze workflow and strict sanitization. Use when executing a .feature to capture network context for API asset generation. Do NOT require this skill when the user explicitly requests pytest-only work with no .feature/MCP capture need.
+version: 1.1.0
+description: Runs behave Gherkin scenarios (or records an explore session) via Playwright MCP with Run→Capture→Freeze workflow and strict sanitization. Evidence always lands under artifacts/evidence/<run_id>/. Do NOT require this skill when the user explicitly requests pytest-only work with no MCP capture need.
 ---
 
 # Run Feature via Playwright MCP (Run → Capture)
 
 ## Scope
 
-- **Primary goal**: execute a scenario and capture structured, sanitized network evidence.
-- **Write scope**:
-  - preferred: `report/` (run summaries only)
-  - optional: `testcase/` (capture bundles only if sanitized)
-- **Must follow**: `bdd-run-gherkin-in-playwrightMCP.md`.
+- **Primary goal**: execute a scenario **or explore session** and persist structured, sanitized network evidence.
+- **Write scope**: `artifacts/evidence/<run_id>/` (`run_summary.md` required; `network.jsonl` required; optional `actions.jsonl` / `snapshots/`).
+- **Must follow**: `bdd-run-gherkin-in-playwrightMCP.md`. Explore-first sessions are valid evidence (no `.feature` required).
 
 ## Hard requirement (do not skip)
 
-- If the user request is “generate automation assets” (steps/page/api objects), you **must** run at least one representative scenario via Playwright MCP and produce a sanitized `run_summary`.
+- If the user request is “generate automation assets” (steps/page/api objects / design notes), you **must** run at least one representative scenario **or explore session** via Playwright MCP and persist sanitized evidence under `artifacts/evidence/<run_id>/`.
 - If MCP execution cannot proceed (captcha/SSO/OTP/manual permission prompts/unreachable env), you must **stop** and report:
   - where it blocked (page/url)
   - what human action is needed
@@ -44,12 +42,14 @@ description: Runs behave Gherkin scenarios via Playwright MCP with Run→Capture
 
 ## Output artifacts
 
-- **run_summary** (required):
-  - scenarios pass/fail + high-level failure class (UI/API/env/script)
+- **`artifacts/evidence/<run_id>/run_summary.md`** (required):
+  - scenarios / explore intent, pass/fail + high-level failure class (UI/API/env/script)
   - captured routes list (method/path)
   - intended api_objects create/update list (by method/path + version intent)
-- **capture_bundle** (optional, sanitized only):
-  - one capture per route or per scenario aggregation
+  - sanitizer applied statement
+- **`artifacts/evidence/<run_id>/network.jsonl`** (required, sanitized):
+  - one capture per request (see spec minimum fields)
+- **`artifacts/evidence/<run_id>/actions.jsonl`** / `snapshots/` (optional)
 
 ## Verification checklist (must include in result)
 

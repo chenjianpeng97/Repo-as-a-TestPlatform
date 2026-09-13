@@ -17,8 +17,12 @@ wheels/
 # pdf files
 *.pdf
 
-# report files
+# report files (legacy path; new runs use artifacts/)
 report/
+
+# run-scope evidence / catalogs (sanitized, still local)
+artifacts/evidence/
+artifacts/catalogs/
 
 # run-scope logs produced by supports/logging
 logs/

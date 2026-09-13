@@ -176,7 +176,7 @@ class OrderListPage(BasePage):
 python -m tuner_testkit.page_test list
 python -m tuner_testkit.page_test describe example.login@v1
 python -m tuner_testkit.page_test validate                       # 不启浏览器
-python -m tuner_testkit.page_test catalog --out report/page_objects_catalog.json
+python -m tuner_testkit.page_test catalog --out artifacts/catalogs/page_objects_catalog.json
 python -m tuner_testkit.page_test run example.login@v1 --flow login --example --headed
 python -m tuner_testkit.page_test doctor example.login@v1
 ```

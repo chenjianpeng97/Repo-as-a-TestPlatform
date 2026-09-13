@@ -1,4 +1,4 @@
-<!-- version: 1.2.0 -->
+<!-- version: 1.3.0 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -13,6 +13,7 @@
 ## 1. 知识层（assets/）
 
 规范：`docs/spec/assets-knowledge-syntax.md`。字段：domain / source / date / version / confidence。
+SUT 自学习：`docs/spec/sut-self-learning.md`。design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
 
 ### 1.1 DDL（自动区，dump_ddl 产出）
 
@@ -28,11 +29,11 @@
 | --- | --- | --- | --- |
 | _(暂无)_ | | | |
 
-### 1.3 用例 / 业务讲解 / 报告（usecases / domain-notes / testreport）
+### 1.3 用例 / 业务讲解 / 报告 / 探索 / design
 
 | 路径 | domain | source | confidence | 一句话用途 |
 | --- | --- | --- | --- | --- |
-| _(暂无)_ | | | | |
+| _(暂无平台内置业务知识)_ | | | | 业务仓写 `INDEX.project.md`。平台约定目录：`usecases/` `domain-notes/` `explore/` `design/` `testreport/` |
 
 ## 2. 运行库（`tuner_testkit/`，PyPI：`tuner-testkit`）与本仓资产（`packages/`）
 
@@ -98,7 +99,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 
 | 类型 | 路径 | 说明 |
 | --- | --- | --- |
-| behave BDD | `tests/features/**` | UI/API 双 stage；见 `.cursor/agents/bdd-asset-pipeline.md` |
+| behave BDD | `tests/features/**` | UI/API 双 stage；下半程见 `.cursor/agents/bdd-asset-pipeline.md`；探索入口见 `docs/spec/sut-self-learning.md` |
 | pytest | `tests/pytest/**` | 性能/DB 核对等显式 pytest 套件 |
 
 ## 5. AI 组件（.cursor/）

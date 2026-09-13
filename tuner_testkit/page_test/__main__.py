@@ -5,7 +5,7 @@
     uv run python -m tuner_testkit.page_test list
     uv run python -m tuner_testkit.page_test describe plane.login@v1
     uv run python -m tuner_testkit.page_test validate
-    uv run python -m tuner_testkit.page_test catalog --out report/page_objects_catalog.json
+    uv run python -m tuner_testkit.page_test catalog --out artifacts/catalogs/page_objects_catalog.json
     uv run python -m tuner_testkit.page_test run plane.login@v1 --flow login --example --headed
     uv run python -m tuner_testkit.page_test doctor plane.login@v1
 

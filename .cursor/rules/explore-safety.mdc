@@ -1,0 +1,23 @@
+---
+description: Safety rails for live-SUT explore sessions (Playwright MCP). Attaches when writing evidence, explore notes, or design knowledge.
+globs: artifacts/evidence/**,assets/explore/**,assets/design/**
+alwaysApply: false
+version: 1.0.0
+---
+
+# Explore safety — live SUT
+
+Exploring a running web SUT is a real side-effecting session.
+
+## Must
+
+- Prefer create-on-throwaway-data over mutating shared fixtures.
+- Stop and ask before DELETE / archive / permission-admin / billing actions.
+- Persist only **sanitized** evidence (`artifacts/evidence/<run_id>/`).
+- Cite `run_id` from any `assets/explore` or `assets/design` write.
+
+## Must not
+
+- Persist Authorization / Cookie / Set-Cookie / tokens / passwords.
+- Treat captcha/SSO/OTP bypass as something the agent should solve.
+- Crawl the entire product in one session — stay on the agreed vertical slice.

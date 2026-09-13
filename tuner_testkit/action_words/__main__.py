@@ -7,7 +7,7 @@
     uv run python -m tuner_testkit.action_words run db_seed.create_example --params "{...}"
     uv run python -m tuner_testkit.action_words run db_seed.create_example --params-file p.json
     uv run python -m tuner_testkit.action_words run db_seed.create_example --example
-    uv run python -m tuner_testkit.action_words catalog --out report/action_words_catalog.json
+    uv run python -m tuner_testkit.action_words catalog --out artifacts/catalogs/action_words_catalog.json
 
 ``run`` 未提供 ``--params`` 时使用 ``{}``（即全部默认值）；``--example``
 使用 word 自带的 ``example_params`` 样例运行。

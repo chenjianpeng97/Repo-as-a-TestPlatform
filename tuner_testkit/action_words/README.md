@@ -50,7 +50,7 @@ uv run python -m tuner_testkit.action_words list
 uv run python -m tuner_testkit.action_words describe <word_id>
 uv run python -m tuner_testkit.action_words run <word_id> --example
 uv run python -m tuner_testkit.action_words run <word_id> --params "{\"count\": 3}"
-uv run python -m tuner_testkit.action_words catalog --out report/action_words_catalog.json
+uv run python -m tuner_testkit.action_words catalog --out artifacts/catalogs/action_words_catalog.json
 ```
 
 - `run` 不带 `--params` 时以 `{}` 运行（全部默认值）；

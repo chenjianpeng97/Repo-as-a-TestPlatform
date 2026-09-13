@@ -10,6 +10,8 @@ SKELETON_DIRS: tuple[str, ...] = (
     "assets/sql",
     "assets/usecases",
     "assets/domain-notes",
+    "assets/explore",
+    "assets/design",
     "assets/testreport",
     "packages/action_words/db_seed",
     "packages/action_words/db_assert",
@@ -28,6 +30,8 @@ SKELETON_DIRS: tuple[str, ...] = (
     "config",
     "logs",
     "artifacts",
+    "artifacts/evidence",
+    "artifacts/catalogs",
 )
 
 # Thin SUT files copied from this template (not the full kit runtime).

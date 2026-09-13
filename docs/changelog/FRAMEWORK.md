@@ -44,6 +44,22 @@
 
 ---
 
+## 2026-09-13 — tuner-testkit 4.2.0（SUT 自学习契约 / explore-first）
+
+- **commit**: `TBD`
+- **目的**: 纠偏 BDD 流水线为 explore-first；统一 evidence 落盘；新增 design/explore
+  知识类别与配套 skill/rule。下游 DNA 需 `tuner-dna sync`。
+- **路径**:
+  - `docs/spec/sut-self-learning.md`、`docs/spec/design-knowledge-syntax.md`
+  - `docs/spec/assets-knowledge-syntax.md`、`docs/spec/bdd-run-gherkin-in-playwrightMCP.md`
+  - `.cursor/rules/bdd-pipeline-gates.mdc`、`explore-safety.mdc`、`assets-knowledge.mdc`
+  - `.cursor/agents/bdd-asset-pipeline.md`
+  - `.cursor/skills/explore-sut/`、`derive-design-knowledge/`、`derive-feature-sets/`
+  - `AGENTS.md`、`INDEX.md`
+  - `tuner_testkit/apps/init_repo/scaffold.py`
+- **不在同步范围**: 业务资产（具体 api_objects / features）
+- **验证**: `python -m tuner_testkit.apps.init_repo manifest --check`；`tuner-index-ai --check`
+
 ## 2026-09-07 — tuner-testkit 4.1.0（元 extra `[all]`）
 
 - **commit**: `TBD`

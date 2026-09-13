@@ -2,28 +2,34 @@
 description: assets/ is the knowledge base for humans and the LLM; enforce provenance metadata, raw-vs-curated boundaries, and grounding (consult INDEX before generating)
 globs: assets/**
 alwaysApply: false
-version: 1.0.0
+version: 1.1.0
 ---
 
 # assets — 知识层硬约束
 
 `assets/` 存放给人和 LLM 阅读、作为生成测试代码/工具依据的知识。完整规范见
 `docs/spec/assets-knowledge-syntax.md`；全局发现入口见根 `INDEX.md`。
+SUT 自学习见 `docs/spec/sut-self-learning.md`；design schema 见
+`docs/spec/design-knowledge-syntax.md`。
 
 ## Grounding（生成前必读）
 
 - **生成任何测试 / action word / api·page object / 工具之前**，先查根 `INDEX.md`
-  检索相关 domain 的知识（真实 DDL 列名、`assets/sql` 真实业务 SQL、`usecases` /
-  `domain-notes`），以此为依据，**不要凭空臆造**列名、接口字段、业务规则。
-- 缺知识时先回填：`/dump-ddl` 或 `python -m tuner_testkit.apps.dump_ddl --all --datasource <alias>`（DDL）、
-  `python -m tuner_testkit.apps.recorder`（合录）或 `python -m tuner_testkit.apps.api_recorder`（代理抓包），再进入生成。
+  （及存在时的 `INDEX.project.md`）检索相关 domain 的知识（真实 DDL 列名、
+  `assets/sql`、`usecases` / `domain-notes` / `explore` / `design`），
+  **不要凭空臆造**列名、接口字段、业务规则。
+- 缺知识时先回填：`/dump-ddl` 或 `python -m tuner_testkit.apps.dump_ddl`、
+  Playwright MCP 探索（落盘 `artifacts/evidence/<run_id>/`）、
+  `python -m tuner_testkit.apps.recorder` / `api_recorder`，再进入生成。
 
 ## 目录与元数据
 
 - 目录分类固定：`ddl/<datasource>/`、`sql/`、`usecases/<domain>/`、
-  `domain-notes/<domain>/`、`testreport/`（新增类别前先看 spec）。
+  `domain-notes/<domain>/`、`explore/<app>/`、`design/<app>/`、`testreport/`
+  （新增类别前先改 spec，再改本 rule）。
 - 人工/半自动区文件头必须带元数据：`domain / source / date / version / confidence`
   （Markdown 用 YAML front-matter，SQL 用顶部 `--` 注释）。
+- `explore/` 与 `design/` 还应填 `evidence`（run_id 列表）。
 - `confidence: high` 表示人工核实过——LLM 应优先采信。
 
 ## raw vs curated
@@ -33,10 +39,9 @@ version: 1.0.0
 
 ## 变更留痕
 
-- 自动区（`ddl/`）更新由工具写 `assets/CHANGELOG.md`（见 `apps-authoring-syntax.md`）；
-  人不手改自动区语义，要更新就重跑工具。
-- curated 更新 → bump `version` + 正文追加变更说明；随后由 `maintain-index` skill
-  增量更新根 `INDEX.md`。
+- 自动区（`ddl/`）更新由工具写 `assets/CHANGELOG.md`；人不手改自动区语义。
+- curated 更新 → bump `version` + 正文追加变更说明；随后由 `maintain-index`
+  增量更新 `INDEX.md` / `INDEX.project.md`。
 
 ## 禁止
 

@@ -15,7 +15,7 @@ CLI::
     uv run python -m tuner_testkit.action_words list
     uv run python -m tuner_testkit.action_words describe <word_id>
     uv run python -m tuner_testkit.action_words run <word_id> --params '{...}'
-    uv run python -m tuner_testkit.action_words catalog --out report/action_words_catalog.json
+    uv run python -m tuner_testkit.action_words catalog --out artifacts/catalogs/action_words_catalog.json
 """
 from __future__ import annotations
 

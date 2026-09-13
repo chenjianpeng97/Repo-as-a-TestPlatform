@@ -21,7 +21,7 @@ Page、以及 feature / pytest / DDL 等索引。
 python -m tuner_testkit.apps.index_platform --out -
 ```
 
-``--out -`` 打印到 stdout（Plane 使用）。也可 ``--out report/catalog.json``。
+``--out -`` 打印到 stdout（Plane 使用）。也可 ``--out artifacts/catalogs/catalog.json``。
 
 ## 运行示例
 
