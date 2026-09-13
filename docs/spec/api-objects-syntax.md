@@ -56,7 +56,9 @@ APIModel 的字段被分为三类：**Identity**、**Contract**、**Operations**
 - `name`: string（可中文）
 - `description`: string（允许 Markdown，建议结构化）
 - `method`: string（GET/POST/PUT/DELETE/…）
-- `path`: string（只允许 path，不允许写 host）
+- `path`: string（只允许 path，不允许写 host）。动态段写成 `{workspace_slug}` /
+  `{project_id}` / `{uuid}` 等；调用时用 **`set_path({...})`** 替换（4.3.0）。
+  `normalize_path` 只自动识别 uuid 与纯数字，**slug 不会被工具改写**，冻结时请手写占位名。
 
 ### 2) Contract（弱 schema 也可，但必须可约束）
 

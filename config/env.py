@@ -52,6 +52,7 @@ DATABASES: dict[str, dict[str, Any]] = {
 # API 执行的网关地址（仅 host，不带路径！）。
 # 环境变量 TEST_BASE_URL 优先于此处。
 TEST_BASE_URL = ""
+TEST_UI_BASE_URL = ""
 
 # behave api stage 登录账号。优先级：behave -D username/-D password
 # > 环境变量 TEST_USERNAME/TEST_PASSWORD > 此处。
@@ -75,10 +76,13 @@ def _apply_module(mod: Any) -> None:
     extra = getattr(mod, "DATABASES", None)
     if isinstance(extra, dict):
         _merge_databases(extra)
-    global TEST_BASE_URL, TEST_ACCOUNT
+    global TEST_BASE_URL, TEST_UI_BASE_URL, TEST_ACCOUNT
     url = getattr(mod, "TEST_BASE_URL", None)
     if url:
         TEST_BASE_URL = str(url)
+    ui_url = getattr(mod, "TEST_UI_BASE_URL", None)
+    if ui_url:
+        TEST_UI_BASE_URL = str(ui_url)
     account = getattr(mod, "TEST_ACCOUNT", None)
     if account:
         TEST_ACCOUNT = account

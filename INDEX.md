@@ -1,4 +1,4 @@
-<!-- version: 1.3.0 -->
+<!-- version: 1.4.0 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -94,6 +94,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `init_repo` | `tuner-init scaffold <dir>` | 任意目录铺新仓骨架 + 一次 `dna sync`（wheel 带 `stubs/`；**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
 | `index_platform` | `tuner-index-platform --out -` | Plane Sync catalog JSON | `tuner_testkit/apps/index_platform/README.md` |
 | `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
+| `evidence` | `tuner-evidence persist` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，stdout JSON | `tuner_testkit/apps/evidence/README.md` |
 
 ## 4. 测试层（tests/）
 

@@ -50,3 +50,42 @@ def test_execute_builds_url_params_headers_and_auth(monkeypatch):
     assert captured["headers"]["Accept"] == "application/json"
     assert captured["headers"]["Authorization"] == "Bearer t123"
 
+
+def test_set_path_interpolates_placeholders(monkeypatch):
+    captured: Dict[str, Any] = {}
+
+    def fake_request(self, **kwargs):
+        captured.update(kwargs)
+        return _DummyResp(status_code=201, json_obj={"id": "1"})
+
+    monkeypatch.setattr("requests.Session.request", fake_request, raising=True)
+
+    client = ApiClient(base_url="http://example.com")
+    m = APIModel(
+        id="api.POST./api/workspaces/{workspace_slug}/projects/{project_id}/issues/@v1",
+        name="create issue",
+        description="",
+        method="POST",
+        path="/api/workspaces/{workspace_slug}/projects/{project_id}/issues/",
+        body_schema={"name": {"type": "string", "required": True}},
+        headers_policy={"allowlist": ["Accept"], "forbidden": ["Authorization", "Cookie"]},
+        auth_policy={"required": False, "strategy": "none"},
+    ).bind(client)
+
+    resp = (
+        m.set_path({"workspace_slug": "tuner", "project_id": "abc"})
+        .set_json({"name": "x"})
+        .execute()
+    )
+
+    assert resp.ok is True
+    assert captured["url"] == "http://example.com/api/workspaces/tuner/projects/abc/issues/"
+
+
+def test_interpolate_path_rejects_leftover_placeholders():
+    from tuner_testkit.api_test.errors import SchemaValidationError
+    from tuner_testkit.api_test.model import interpolate_path
+
+    with pytest.raises(SchemaValidationError, match="placeholders"):
+        interpolate_path("/api/{workspace_slug}/x", {"project_id": "1"})
+

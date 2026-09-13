@@ -94,9 +94,19 @@ page_ref:
   标成 `observed`。
 - 更新文档必须 bump `version`。
 
-## 6. 实践待决（dogfood 回来改）
+## 6. 实践待决（Plane dogfood 2026-09-13 回来改）
 
-- 要不要按「一次用户动作」而不是「一条路由」成文（一个按钮打出多条 API）？
-- `page_ref` 一个文档是否允许多个 trigger？
-- `writes` 是否需要 `where` 条件模板（UPDATE 场景）？
-- 要不要独立的 `externals:`（发邮件 / 写 S3 / 调 webhook）？
+已用 workspace→project→issue 切片压过 v0.1。**本版不升 schema**，只把缺口记在这里，待积累第二条切片再升 v0.2。
+
+| 缺口 | 实践 |
+| --- | --- |
+| 按路由还是按用户动作成文？ | **继续按路由**。本切片 Save=1 POST；登录是多条 PATCH。动作视图可写在 `assets/explore`，design 保持一路由一文。 |
+| `page_ref` 多个 trigger | 需要。工具栏 `Add work item` 与侧栏 `New work item` 打同一 POST。v0.2 考虑 `triggers: []`。 |
+| `writes` 的 `when:` | 需要。`issue_assignees` 仅当 `assignee_ids` 非空。 |
+| 默认值 / 空 body → DB 有值 | `state_id=""` → `_ensure_default_state`。`correlate` 表达不了。 |
+| 业务 identity 双键 | UUID `id` + UI `TUNER-{sequence_id}`。考虑 `business_identity`。 |
+| slug 占位 | `normalize_path` 不替换非 uuid slug；冻结时手写 `{workspace_slug}`，运行时 `set_path`。 |
+| `externals:` | 本切片未遇到（无邮件/S3）。仍待决。 |
+| 源码表先于 DDL | 允许：先从 models 写 design，再 `tuner-dump-ddl` 补表。 |
+
+样本：下游 dogfood `assets/design/web/post-api-workspaces-projects-issues.md`。

@@ -1,6 +1,6 @@
 ---
 name: freeze-api-objects
-version: 1.0.0
+version: 1.1.0
 description: Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ following api-objects-syntax.md and bdd-run-gherkin-in-playwrightMCP.md. Use when creating/updating APIModel assets.
 ---
 
@@ -72,4 +72,5 @@ description: Freezes sanitized Playwright MCP network captures into route-aligne
 - No forbidden header keys or raw tokens in file content.
 - No host in APIModel path/url.
 - No scenario-specific constants asserted in APIModel.
-- File path follows route-tree naming and versioning: `<METHOD>.v<MAJOR>.py`.
+- Skip `POST /api/sign-in/` (and password-bearing login routes) unless explicitly required; never persist the password body.
+- If the path contains a workspace/org **slug**, freeze `{workspace_slug}` (not the live slug) and document `set_path`..

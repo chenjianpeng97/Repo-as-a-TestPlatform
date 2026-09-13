@@ -91,9 +91,9 @@ def _write_pyproject(target: pathlib.Path, *, overwrite: bool) -> bool:
             name = "sut-test-repo"
             version = "0.1.0"
             description = "Test repo created from tuner-testkit"
-            requires-python = ">=3.12"
+            requires-python = ">=3.12,<3.14"
             dependencies = [
-                "tuner-testkit[db,api]>=4.0.0",
+                "tuner-testkit[db,api]>=4.3.0",
             ]
 
             [project.optional-dependencies]
@@ -141,6 +141,13 @@ def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = Fa
         actions.append("write pyproject.toml")
     else:
         actions.append("skip pyproject.toml (exists)")
+
+    py_ver = target / ".python-version"
+    if py_ver.exists() and not overwrite:
+        actions.append("skip .python-version (exists)")
+    else:
+        py_ver.write_text("3.12\n", encoding="utf-8", newline="\n")
+        actions.append("write .python-version")
 
     if src_root is None:
         actions.append("skip stubs (not bundled in this install)")

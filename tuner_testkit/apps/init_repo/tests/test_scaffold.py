@@ -22,6 +22,8 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
     assert dest.is_dir()
     assert (dest / "pyproject.toml").is_file()
     assert "[tool.tuner-testkit]" in (dest / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'requires-python = ">=3.12,<3.14"' in (dest / "pyproject.toml").read_text(encoding="utf-8")
+    assert (dest / ".python-version").read_text(encoding="utf-8") == "3.12\n"
     assert (dest / "config" / "env.py").is_file()
     assert (dest / "packages" / "action_words" / "__init__.py").is_file()
     assert (dest / ".cursor" / "rules").is_dir()

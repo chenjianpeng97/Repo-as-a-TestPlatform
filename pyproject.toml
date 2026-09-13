@@ -1,6 +1,6 @@
 [project]
 name = "tuner-testkit"
-version = "4.2.0"
+version = "4.3.0"
 description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
 license = "MIT"
@@ -73,6 +73,7 @@ tuner-index-platform = "tuner_testkit.apps.index_platform.__main__:main"
 tuner-fake = "tuner_testkit.fake.cli:main"
 tuner-page-test = "tuner_testkit.page_test.__main__:main"
 tuner-action-words = "tuner_testkit.action_words.__main__:main"
+tuner-evidence = "tuner_testkit.apps.evidence.cli:main"
 
 [build-system]
 requires = ["setuptools>=77", "wheel"]

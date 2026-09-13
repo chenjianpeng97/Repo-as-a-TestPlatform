@@ -107,6 +107,25 @@ def test_open_navigates_and_waits_for_ready(page):
     assert [outcome.op for outcome in result.steps] == ["goto", "wait_for_element"]
 
 
+def test_open_interpolates_url_path_placeholders(page):
+    model = build_model(
+        url_path="/{{workspace_slug}}/projects/{{project_id}}/issues/",
+        ready=(),
+        inputs_schema={
+            "workspace_slug": {"type": "string", "required": True},
+            "project_id": {"type": "string", "required": True},
+        },
+    )
+    driver = make_driver(page)
+
+    result = model.set_inputs({"workspace_slug": "tuner", "project_id": "abc"}).open(
+        driver=driver
+    )
+
+    assert result.ok
+    assert page.navigations == ["http://localhost/tuner/projects/abc/issues/"]
+
+
 def test_flow_fills_clicks_extracts_and_asserts(page):
     model = build_model()
     driver = make_driver(page)

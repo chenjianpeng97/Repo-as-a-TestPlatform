@@ -1,6 +1,6 @@
 ---
 name: derive-design-knowledge
-version: 0.1.0
+version: 0.2.0
 description: Compile assets/design/<app>/<route-slug>.md from open evidence channels (MCP network, DDL, SUT source, optional logs). Schema is docs/spec/design-knowledge-syntax.md v0.1 (draft). Use after an explore session or API freeze when DB effects must ground assertions. Do not invent tables that are not in DDL or source.
 ---
 
@@ -19,9 +19,10 @@ description: Compile assets/design/<app>/<route-slug>.md from open evidence chan
 2. For each captured **non-static mutating** route (POST/PUT/PATCH/DELETE):
    - Draft front-matter (`confidence`: `observed` only if DB/log proved it; else `inferred`).
    - Fill `writes` / `noise` / `reads` from the **highest quality channel available**:
-     1. source (models/views/serializers)
-     2. SQL logs / DB diff
-     3. inference from response body + DDL names
+   1. source (models/views/serializers) — see `.cursor/agents/sut-source-to-design.md`
+   2. SQL logs / DB diff
+   3. inference from response body + DDL names
+   - If source names a table that is not in `assets/ddl`, dump it (`tuner-dump-ddl`) before writing `writes`.
    - Skip `operation_log` / `*_activities` / audit tables as `noise` unless the user says they are the assertion target.
 3. Every `writes` row must cite evidence or a source path in `## notes`.
 4. If the v0.1 schema cannot express something (multi-API button, external side effects), write it under `## notes` and do **not** invent new top-level keys yet — the draft must be stress-tested first.

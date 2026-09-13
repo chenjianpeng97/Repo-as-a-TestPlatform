@@ -93,10 +93,10 @@ uv tool upgrade tuner-testkit
 
 ```bash
 # 钉到某一发行版（推荐，和团队 lock 一致）
-uv add "tuner-testkit[db,api]==4.2.0"
+uv add "tuner-testkit[db,api]==4.3.0"
 
 # 或只抬下限，让解析器选允许范围内的最新
-# uv add "tuner-testkit[db,api]>=4.2.0"
+# uv add "tuner-testkit[db,api]>=4.3.0"
 
 uv sync
 ```
@@ -165,4 +165,4 @@ uv sync --extra all
 
 `uv sync --extra dev` 与 `--extra all` 等价（`dev` 只是引用 `[all]`）。
 
-4.2.0 发行说明见 [`docs/changelog/TEMPLATE-4.2.0.md`](docs/changelog/TEMPLATE-4.2.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。
+4.3.0 发行说明见 [`docs/changelog/TEMPLATE-4.3.0.md`](docs/changelog/TEMPLATE-4.3.0.md)；4.2.0 见 [`TEMPLATE-4.2.0.md`](docs/changelog/TEMPLATE-4.2.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。

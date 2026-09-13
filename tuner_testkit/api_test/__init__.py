@@ -6,7 +6,13 @@ Primary entrypoints:
 """
 
 from .client import ApiClient
-from .model import APIModel, ApiResponse, AssertOperation, ExtractVariableOperation
+from .model import (
+    APIModel,
+    ApiResponse,
+    AssertOperation,
+    ExtractVariableOperation,
+    interpolate_path,
+)
 
 __all__ = [
     "APIModel",
@@ -14,5 +20,5 @@ __all__ = [
     "AssertOperation",
     "ExtractVariableOperation",
     "ApiClient",
+    "interpolate_path",
 ]
-

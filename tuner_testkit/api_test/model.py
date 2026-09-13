@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field, replace
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional
 
@@ -102,6 +103,22 @@ def _required_file_fields(schema: Mapping[str, Any]) -> list[str]:
     return out
 
 
+_PATH_PLACEHOLDER_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
+
+
+def interpolate_path(path: str, params: Mapping[str, Any]) -> str:
+    """Replace ``{name}`` segments. Raises if any named placeholder remains."""
+    out = path
+    for key, value in params.items():
+        out = out.replace("{" + str(key) + "}", str(value))
+    leftover = _PATH_PLACEHOLDER_RE.findall(out)
+    if leftover:
+        raise SchemaValidationError(
+            f"path still has placeholders {leftover}; pass them via set_path"
+        )
+    return out
+
+
 @dataclass(frozen=True)
 class APIModel:
     # Identity
@@ -156,6 +173,9 @@ class APIModel:
     def set_headers(self, values: Optional[Mapping[str, Any]] = None) -> "APIInvocation":
         return APIInvocation(self).set_headers(values)
 
+    def set_path(self, values: Optional[Mapping[str, Any]] = None) -> "APIInvocation":
+        return APIInvocation(self).set_path(values)
+
     def override_query(self, values: Optional[Mapping[str, Any]] = None) -> "APIInvocation":
         return APIInvocation(self).override_query(values)
 
@@ -181,6 +201,7 @@ class APIInvocation:
     _set_json: Dict[str, Any] = field(default_factory=dict)
     _set_files: Dict[str, Any] = field(default_factory=dict)
     _set_headers: Dict[str, Any] = field(default_factory=dict)
+    _path_params: Dict[str, Any] = field(default_factory=dict)
     _override_query: Optional[Dict[str, Any]] = None
     _override_json: Any = None
     _override_json_set: bool = False
@@ -236,6 +257,10 @@ class APIInvocation:
         forbidden = hp.get("forbidden", [])
         checked = _enforce_headers_policy(headers=values, allowlist=allowlist, forbidden=forbidden)
         return replace(self, _set_headers=_merge_shallow(self._set_headers, checked))
+
+    def set_path(self, values: Optional[Mapping[str, Any]] = None) -> "APIInvocation":
+        values = {str(k): v for k, v in dict(values or {}).items()}
+        return replace(self, _path_params=_merge_shallow(self._path_params, values))
 
     def override_query(self, values: Optional[Mapping[str, Any]] = None) -> "APIInvocation":
         values = dict(values or {})
@@ -308,6 +333,8 @@ class APIInvocation:
         from .client import ApiClient  # local import to avoid cycles
 
         m = self._effective_model()
+        if self._path_params:
+            m = replace(m, path=interpolate_path(m.path, self._path_params))
         use_client = client or m._client or ApiClient.default()
         files = self._final_files()
         self._validate_required_files(m, files)

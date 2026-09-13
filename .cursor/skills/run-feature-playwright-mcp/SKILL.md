@@ -1,6 +1,6 @@
 ---
 name: run-feature-playwright-mcp
-version: 1.1.0
+version: 1.2.0
 description: Runs behave Gherkin scenarios (or records an explore session) via Playwright MCP with Run→Capture→Freeze workflow and strict sanitization. Evidence always lands under artifacts/evidence/<run_id>/. Do NOT require this skill when the user explicitly requests pytest-only work with no MCP capture need.
 ---
 
@@ -49,6 +49,7 @@ description: Runs behave Gherkin scenarios (or records an explore session) via P
   - sanitizer applied statement
 - **`artifacts/evidence/<run_id>/network.jsonl`** (required, sanitized):
   - one capture per request (see spec minimum fields)
+  - Prefer writing it via `tuner-evidence persist --network captures.jsonl` so the sanitizer is deterministic.
 - **`artifacts/evidence/<run_id>/actions.jsonl`** / `snapshots/` (optional)
 
 ## Verification checklist (must include in result)

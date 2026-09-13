@@ -141,6 +141,9 @@ def apply_profile(target: Any, profile: Mapping[str, Any]) -> None:
     url = profile.get("TEST_BASE_URL")
     if url:
         target.TEST_BASE_URL = str(url)
+    ui_url = profile.get("TEST_UI_BASE_URL")
+    if ui_url:
+        target.TEST_UI_BASE_URL = str(ui_url)
     account = profile.get("TEST_ACCOUNT")
     if account:
         target.TEST_ACCOUNT = account

@@ -20,7 +20,7 @@ python -m tuner_testkit.apps.init_repo manifest --write
 python -m tuner_testkit.apps.init_repo manifest --check
 ```
 
-无额外依赖（stdlib）。可在**任意目录**运行（不必先有测试仓）。DNA 源：本仓 `.cursor/` / `docs/spec/` / `tools/git-hooks/`（editable）；wheel 内 `dna_payload/`。薄骨架文件在 wheel 的 `init_repo/stubs/`。
+无额外依赖（stdlib）。可在**任意目录**运行（不必先有测试仓）。DNA 源：本仓 `.cursor/` / `docs/spec/` / `tools/git-hooks/`（editable）；wheel 内 `dna_payload/`。薄骨架文件在 wheel 的 `init_repo/stubs/`。`scaffold` 会写 `.python-version`（`3.12`）并把 `requires-python` 钉在 `>=3.12,<3.14`（Windows 上 CPython 3.14 可能缺 `msgpack` wheel）。
 
 ## 版本与漂移
 

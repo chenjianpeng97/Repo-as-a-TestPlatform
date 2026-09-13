@@ -44,6 +44,23 @@
 
 ---
 
+## 2026-09-13 — tuner-testkit 4.3.0（dogfood 回流：evidence CLI + path 插值）
+
+- **commit**: `TBD`
+- **来源**: Plane 下游 `tuner-test-platform-testrepo` workspace→project→issue 切片
+- **目的**: 把「capture 必须落盘」做成确定性 CLI；补齐 slug path / url_path 占位；把 UI base URL 纳入 named env；钉 Python 3.12。
+- **路径**:
+  - `tuner_testkit/apps/evidence/**`
+  - `tuner_testkit/api_test/model.py`（`set_path` / `interpolate_path`）
+  - `tuner_testkit/page_test/driver.py`（Goto 插值 `url_path`）
+  - `tuner_testkit/config.py` / `config/env.py`（`TEST_UI_BASE_URL` profile）
+  - `tuner_testkit/apps/init_repo/scaffold.py`（`.python-version`、`<3.14`）
+  - `.cursor/skills/analyze-mcp-network/`、`explore-sut`、`derive-design-knowledge`、`freeze-api-objects`
+  - `.cursor/agents/sut-source-to-design.md`
+  - `docs/spec/design-knowledge-syntax.md` §6、`docs/spec/api-objects-syntax.md`
+- **不在同步范围**: 下游 Plane 业务资产（testrepo 的 api/page/design）
+- **验证**: `uv run pytest packages/tests/test_execute_build_request.py packages/tests/test_page_test_driver.py packages/tests/test_config_env_profiles.py tuner_testkit/apps/evidence tuner_testkit/apps/init_repo/tests`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-09-13 — tuner-testkit 4.2.0（SUT 自学习契约 / explore-first）
 
 - **commit**: `c530bc3`

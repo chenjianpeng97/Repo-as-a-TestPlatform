@@ -139,6 +139,18 @@ class TestApplySelectedEnvironment:
         assert target.TEST_BASE_URL == "http://dev.example:8000"
         assert target.TEST_ACCOUNT["username"] == "dev-user"
 
+    def test_applies_test_ui_base_url(self):
+        target = _target()
+        source = _catalog(
+            dev={
+                **_DEV,
+                "TEST_UI_BASE_URL": "http://dev-ui.example:3000",
+            }
+        )
+        source.ACTIVE_ENV = "dev"
+        apply_selected_environment(target, source, environ={}, active_file_text=None)
+        assert target.TEST_UI_BASE_URL == "http://dev-ui.example:3000"
+
     def test_file_pointer_selects_uat(self, tmp_path):
         target = _target()
         source = _catalog(dev=_DEV, uat=_UAT)

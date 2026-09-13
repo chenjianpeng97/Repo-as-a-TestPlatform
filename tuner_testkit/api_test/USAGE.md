@@ -105,6 +105,17 @@ rows = first_sheet_rows(resp.content)
 resp = some_model.set_query({"pageNum": 1, "pageSize": 10}).execute(auth={"bearer_token": token})
 ```
 
+Path placeholders (slugs / ids that are not baked into the frozen `path`):
+
+```python
+resp = (
+    issues_post_v1
+    .set_path({"workspace_slug": "tuner", "project_id": project_id})
+    .set_json({"name": "dogfood"})
+    .execute(auth={"cookie": session_cookie})
+)
+```
+
 - **Big changes** (override-rebuild, replaces the whole JSON body):
 
 ```python

@@ -82,10 +82,10 @@ artifacts/evidence/<run_id>/     ← 统一落盘（强制）
 
 ## 5. 分阶段路线图
 
-- **阶段 0（本版）**：契约先行——本文件 + design schema v0.1 + gates/路径/分诊树纠偏。
-- **阶段 1 证据落盘**：`artifacts/evidence/<run_id>/` 约定（本版已写入 MCP spec）；后续可加 `tuner_testkit.evidence` 包与 `explore-sut` skill。
-- **阶段 2 design 闭环**：`derive-design-knowledge` skill；可选 `tuner-db-diff`；`create-app` 引导证据工具。
-- **阶段 3 双路汇合**：`derive-feature-sets`；bdd-asset-pipeline 下半程（本版已改定位）。
+- **阶段 0（4.2.0）**：契约先行——本文件 + design schema v0.1 + gates/路径/分诊树纠偏。
+- **阶段 1 证据落盘（4.3.0）**：`tuner-evidence persist|routes`；`explore-sut` 强制走 CLI；PageModel `url_path` 占位插值；API `set_path`。
+- **阶段 2 design 闭环**：`derive-design-knowledge` + `sut-source-to-design` agent；schema 仍为 v0.1（Plane 切片缺口记在 design spec §6）。
+- **阶段 3 双路汇合**：`derive-feature-sets`；bdd-asset-pipeline 下半程。
 - **阶段 4 知识自治**：knowledge-curator；确定性 `secret-scan` hook。
 
 内循环用 `uv tool install --from <platform-repo>`；阶段收口才打 tag 发 PyPI。

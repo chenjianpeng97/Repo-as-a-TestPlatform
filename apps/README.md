@@ -14,5 +14,6 @@
 | `tuner-init` | `python -m tuner_testkit.apps.init_repo` |
 | `tuner-mock-server` | `python -m tuner_testkit.apps.mock_server` |
 | `tuner-index-ai` | `python -m tuner_testkit.apps.index_ai` |
+| `tuner-evidence` | `python -m tuner_testkit.apps.evidence` |
 
 交接文档在 `tuner_testkit/apps/<name>/README.md`。新建 **项目专用** 工具仍用 `create-app` skill，写在本目录。

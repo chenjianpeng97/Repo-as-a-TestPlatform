@@ -465,7 +465,8 @@ class PageDriver:
 
         # ---- 导航 ----
         if isinstance(step, Goto):
-            path = self._value(step, step.path, ctx) if step.path else ctx.model.url_path
+            raw_path = step.path if step.path is not None else ctx.model.url_path
+            path = self._value(step, raw_path, ctx)
             url = f"{self.base_url}{path}"
             self.page.goto(url, timeout=timeout)
             log_ui_action("goto", target=url, page_id=ctx.model.id)

@@ -1,6 +1,6 @@
 ---
 name: explore-sut
-version: 1.0.0
+version: 1.1.0
 description: Explore-first Playwright MCP session against a live SUT. Produces sanitized artifacts/evidence/<run_id>/ plus assets/explore capability notes. Use when learning a web SUT, mapping pages/buttons, or gathering evidence before any .feature exists. Do NOT use when the user already has a feature to implement — use run-feature-playwright-mcp instead.
 ---
 
@@ -25,7 +25,17 @@ description: Explore-first Playwright MCP session against a live SUT. Produces s
 1. Read `INDEX.md` and `INDEX.project.md` if present. Note base URLs from `config`.
 2. Pick a **vertical slice** (e.g. workspace → project → issue), not a full-site crawl.
 3. Navigate with Playwright MCP. After each meaningful action, dump network + snapshot.
-4. Persist:
+4. Persist with **`tuner-evidence persist`** (do not leave captures only in chat):
+
+```bash
+uv run python -m tuner_testkit.apps.evidence persist \
+  --run-id YYYYMMDDTHHMMSSZ-<slice> \
+  --scenario explore:<intent> \
+  --network captures.jsonl \
+  --intent "short vertical-slice intent"
+```
+
+   Manual fallback (same files):
    - `artifacts/evidence/<run_id>/run_summary.md`
    - `artifacts/evidence/<run_id>/network.jsonl` (sanitized)
    - optional `actions.jsonl` / `snapshots/`
@@ -35,11 +45,11 @@ description: Explore-first Playwright MCP session against a live SUT. Produces s
    - primary actions (button labels)
    - APIs observed (method + path only)
    - blockers / i18n / env notes
-6. Stop. Do **not** freeze objects in this skill — tell the caller which run_id to freeze.
+6. Stop. Next: `tuner-evidence routes --run-id …` then freeze / derive-design / author feature.
 
 ## Output checklist
 
 - `run_id` and evidence directory exist.
 - Sanitizer applied statement in `run_summary.md`.
 - Explore note cites `evidence`.
-- Next-step suggestion: freeze / derive-design / author feature.
+- Next-step: `tuner-evidence routes` then freeze / derive-design / author feature.
