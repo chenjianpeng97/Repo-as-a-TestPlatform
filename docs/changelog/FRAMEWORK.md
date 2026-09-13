@@ -46,7 +46,7 @@
 
 ## 2026-09-13 — tuner-testkit 4.3.0（dogfood 回流：evidence CLI + path 插值）
 
-- **commit**: `TBD`
+- **commit**: `3697f41`
 - **来源**: Plane 下游 `tuner-test-platform-testrepo` workspace→project→issue 切片
 - **目的**: 把「capture 必须落盘」做成确定性 CLI；补齐 slug path / url_path 占位；把 UI base URL 纳入 named env；钉 Python 3.12。
 - **路径**:
