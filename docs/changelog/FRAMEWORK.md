@@ -46,7 +46,7 @@
 
 ## 2026-09-13 — tuner-testkit 4.2.0（SUT 自学习契约 / explore-first）
 
-- **commit**: `TBD`
+- **commit**: `c530bc3`
 - **目的**: 纠偏 BDD 流水线为 explore-first；统一 evidence 落盘；新增 design/explore
   知识类别与配套 skill/rule。下游 DNA 需 `tuner-dna sync`。
 - **路径**:
