@@ -47,6 +47,7 @@ def cmd_sync(args: argparse.Namespace) -> int:
                 continue
             if dst.is_file() and not args.overwrite:
                 skipped += 1
+                print(f"skip {rel} (differs; pass --overwrite)")
                 continue
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
@@ -82,7 +83,7 @@ def cmd_check(args: argparse.Namespace) -> int:
         print(f"  missing: {rel}", file=sys.stderr)
     for rel in changed:
         print(f"  changed: {rel}", file=sys.stderr)
-    print("Run `tuner-dna sync` to refresh platform DNA.", file=sys.stderr)
+    print("Run `tuner-dna sync --overwrite` to refresh platform DNA.", file=sys.stderr)
     return 1
 
 

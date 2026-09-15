@@ -6,12 +6,13 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**33**（rules 13 · skills 16 · agents 2 · hooks 2）
+> 组件总数：**35**（rules 14 · skills 16 · agents 3 · hooks 2）
 
 ## Rules（约束/边界）
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
+| `agent-task-log` | always | all files | 1.0.0 | Every agent run must leave a task log under artifacts/inbox/ (no secrets). | `.cursor/rules/agent-task-log.mdc` |
 | `apps-authoring` | glob | apps/**,tuner_testkit/apps/** | 1.4.0 | SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's package… | `.cursor/rules/apps-authoring.mdc` |
 | `apps-handover` | glob | apps/**,tuner_testkit/apps/** | 1.1.0 | When an apps/ or tuner_testkit.apps tool is created or changed, it must ship a handover doc (requirement background, tr… | `.cursor/rules/apps-handover.mdc` |
 | `assets-knowledge` | glob | assets/** | 1.1.0 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
@@ -36,7 +37,7 @@
 | `derive-design-knowledge` | on-demand | - | 0.2.0 | Compile assets/design/<app>/<route-slug>.md from open evidence channels (MCP network, DDL, SUT source, optional logs) | `.cursor/skills/derive-design-knowledge/SKILL.md` |
 | `derive-feature-sets` | on-demand | - | 1.0.0 | Turn assets/explore capability notes (plus usecases/domain-notes) into behave Feature Sets under tests/features/ | `.cursor/skills/derive-feature-sets/SKILL.md` |
 | `dump-ddl` | on-demand | - | 1.2.0 | Dumps live table DDL into assets/ddl/<datasource>/ via tuner_testkit/apps/dump_ddl.py, then updates the knowledge index… | `.cursor/skills/dump-ddl/SKILL.md` |
-| `explore-sut` | on-demand | - | 1.1.0 | Explore-first Playwright MCP session against a live SUT | `.cursor/skills/explore-sut/SKILL.md` |
+| `explore-sut` | on-demand | - | 1.2.0 | Explore-first Playwright MCP session against a live SUT | `.cursor/skills/explore-sut/SKILL.md` |
 | `feature-authoring` | on-demand | - | 1.0.0 | Creates or rewrites behave Gherkin .feature files following behave-gerkin-syntax.md | `.cursor/skills/feature-authoring/SKILL.md` |
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
@@ -51,8 +52,9 @@
 
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
-| `bdd-asset-pipeline` | orchestration | - | 2.0.0 | Lower-half of SUT self-learning — Feature Sets + design knowledge → Reuse Analysis → Freeze API Objects → Maintain Page… | `.cursor/agents/bdd-asset-pipeline.md` |
-| `sut-source-to-design` | orchestration | - | 1.0.0 | Walk SUT backend source (Django models/views/serializers, or equivalent) plus assets/ddl to draft assets/design/<app>/<… | `.cursor/agents/sut-source-to-design.md` |
+| `bdd-asset-pipeline` | orchestration | - | 2.0.1 | Lower-half of SUT self-learning — Feature Sets + design knowledge → Reuse Analysis → Freeze API Objects → Maintain Page… | `.cursor/agents/bdd-asset-pipeline.md` |
+| `sut-self-learning` | orchestration | - | 1.0.0 | Orchestrate explore-first SUT self-learning — accounts → Playwright MCP explore → evidence → freeze API/page objects → … | `.cursor/agents/sut-self-learning.md` |
+| `sut-source-to-design` | orchestration | - | 1.0.1 | Walk SUT backend source (Django models/views/serializers, or equivalent) plus assets/ddl to draft assets/design/<app>/<… | `.cursor/agents/sut-source-to-design.md` |
 
 ## Hooks（事件驱动脚本）
 

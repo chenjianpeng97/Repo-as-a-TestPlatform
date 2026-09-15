@@ -20,9 +20,15 @@ wheels/
 # report files (legacy path; new runs use artifacts/)
 report/
 
-# run-scope evidence / catalogs (sanitized, still local)
+# run-scope evidence / catalogs / agent inbox (sanitized, still local)
 artifacts/evidence/
 artifacts/catalogs/
+artifacts/inbox/
+
+# Local SUT login for LLM explore — never commit
+data/**/*.local.yaml
+data/**/*.local.json
+data/**/*.local.md
 
 # run-scope logs produced by supports/logging
 logs/

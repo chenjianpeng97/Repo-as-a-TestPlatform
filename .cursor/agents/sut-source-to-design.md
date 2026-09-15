@@ -1,6 +1,6 @@
 ---
 name: sut-source-to-design
-version: 1.0.0
+version: 1.0.1
 description: Walk SUT backend source (Django models/views/serializers, or equivalent) plus assets/ddl to draft assets/design/<app>/<route-slug>.md. Use when the engineer points at a source tree. Do not invent tables. Complements derive-design-knowledge; this agent is the source-channel playbook.
 ---
 
@@ -31,3 +31,5 @@ Highest-quality `writes` / `noise` / `reads` often come from **models.save / vie
 - `confidence: inferred` for source-only; `observed` only with DB/log evidence.
 - No secrets.
 - Do not generate action words here.
+- Write `artifacts/inbox/<utc>-sut-source-to-design-<slice>.md` per
+  `docs/spec/agent-task-log.md` (outputs = design files; no secrets).

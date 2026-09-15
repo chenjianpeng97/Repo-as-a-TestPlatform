@@ -32,6 +32,7 @@ SKELETON_DIRS: tuple[str, ...] = (
     "artifacts",
     "artifacts/evidence",
     "artifacts/catalogs",
+    "artifacts/inbox",
 )
 
 # Thin SUT files copied from this template (not the full kit runtime).
@@ -52,6 +53,7 @@ _STUB_FILES: tuple[str, ...] = (
     "packages/action_words/_internal/params.py",
     "apps/__init__.py",
     "behave.ini",
+    "data/sut-accounts.example.yaml",
 )
 
 

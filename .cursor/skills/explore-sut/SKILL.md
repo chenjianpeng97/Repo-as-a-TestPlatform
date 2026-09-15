@@ -1,6 +1,6 @@
 ---
 name: explore-sut
-version: 1.1.0
+version: 1.2.0
 description: Explore-first Playwright MCP session against a live SUT. Produces sanitized artifacts/evidence/<run_id>/ plus assets/explore capability notes. Use when learning a web SUT, mapping pages/buttons, or gathering evidence before any .feature exists. Do NOT use when the user already has a feature to implement — use run-feature-playwright-mcp instead.
 ---
 
@@ -23,6 +23,10 @@ description: Explore-first Playwright MCP session against a live SUT. Produces s
 ## Steps
 
 1. Read `INDEX.md` and `INDEX.project.md` if present. Note base URLs from `config`.
+   Load login from **`data/sut-accounts.local.yaml`** if it exists; else
+   `config/env_local.py` `TEST_ACCOUNT`. Copy `data/sut-accounts.example.yaml`
+   when neither exists and **stop**. Never write the password into evidence,
+   explore notes, inbox, or git.
 2. Pick a **vertical slice** (e.g. workspace → project → issue), not a full-site crawl.
 3. Navigate with Playwright MCP. After each meaningful action, dump network + snapshot.
 4. Persist with **`tuner-evidence persist`** (do not leave captures only in chat):

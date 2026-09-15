@@ -1,4 +1,4 @@
-<!-- version: 1.4.0 -->
+<!-- version: 1.4.1 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -13,7 +13,10 @@
 ## 1. 知识层（assets/）
 
 规范：`docs/spec/assets-knowledge-syntax.md`。字段：domain / source / date / version / confidence。
-SUT 自学习：`docs/spec/sut-self-learning.md`。design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
+SUT 自学习：`docs/spec/sut-self-learning.md`（编排 `.cursor/agents/sut-self-learning.md`）。
+design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
+agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
+探索账号模板：scaffold 写入 `data/sut-accounts.example.yaml`；本机副本 `data/sut-accounts.local.yaml`（gitignore）。
 
 ### 1.1 DDL（自动区，dump_ddl 产出）
 
@@ -100,7 +103,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 
 | 类型 | 路径 | 说明 |
 | --- | --- | --- |
-| behave BDD | `tests/features/**` | UI/API 双 stage；下半程见 `.cursor/agents/bdd-asset-pipeline.md`；探索入口见 `docs/spec/sut-self-learning.md` |
+| behave BDD | `tests/features/**` | UI/API 双 stage；探索编排 `.cursor/agents/sut-self-learning.md`；下半程 `.cursor/agents/bdd-asset-pipeline.md` |
 | pytest | `tests/pytest/**` | 性能/DB 核对等显式 pytest 套件 |
 
 ## 5. AI 组件（.cursor/）

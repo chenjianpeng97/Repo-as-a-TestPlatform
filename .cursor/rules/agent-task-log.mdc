@@ -1,0 +1,22 @@
+---
+description: Every agent run must leave a task log under artifacts/inbox/ (no secrets).
+alwaysApply: true
+version: 1.0.0
+---
+
+# Agent task log — `artifacts/inbox/`
+
+每次按 `.cursor/agents/*.md` 编排执行（含 SUT 自学习），结束前必须写一份任务记录。
+细则见 `docs/spec/agent-task-log.md`。
+
+## Must
+
+- 路径：`artifacts/inbox/<UTC>-<agent>-<slice>.md`（例 `20260914T031200Z-sut-self-learning-cycles.md`）。
+- 必填：`agent`、意图、输入、产出文件列表、下一步。
+- **SUT 自学习**额外必填：本次探索的页面（url pattern + 标题）、本次新增/更新的测试资产路径。
+- 只写 `account_id` / workspace slug，**禁止**密码、token、Cookie。
+
+## Must not
+
+- 用聊天摘要代替 inbox 落盘。
+- 把 inbox 当 evidence（网络 dump 仍走 `artifacts/evidence/<run_id>/`）。

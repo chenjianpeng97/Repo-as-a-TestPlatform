@@ -27,6 +27,9 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
     assert (dest / "config" / "env.py").is_file()
     assert (dest / "packages" / "action_words" / "__init__.py").is_file()
     assert (dest / ".cursor" / "rules").is_dir()
+    assert (dest / "artifacts" / "inbox").is_dir()
+    assert (dest / "data" / "sut-accounts.example.yaml").is_file()
+    assert "replace-me" in (dest / "data" / "sut-accounts.example.yaml").read_text(encoding="utf-8")
     assert any(line.startswith("copy config/env.py") for line in actions)
     assert any("dna sync (exit 0)" in line for line in actions)
 
@@ -43,5 +46,7 @@ def test_scaffold_uses_packaged_stubs_when_not_editable(tmp_path: Path, monkeypa
     assert (dest / "config" / "env.py").read_text(encoding="utf-8") == _STUB_ENV.read_text(
         encoding="utf-8"
     )
+    assert (dest / "artifacts" / "inbox").is_dir()
+    assert (dest / "data" / "sut-accounts.example.yaml").is_file()
     assert any(line.startswith("copy config/env.py") for line in actions)
     assert any("dna sync (exit 0)" in line for line in actions)

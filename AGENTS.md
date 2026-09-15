@@ -1,4 +1,4 @@
-<!-- version: 1.3.0 -->
+<!-- version: 1.4.0 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -21,7 +21,7 @@
 | 测试层 | `tests/` | 自动化测试代码（behave `features/` + `pytest/`）。 | behave / pytest |
 | 文档层 | `docs/` | 仓库使用说明与规范（`docs/spec/**`）。 | 只读 |
 
-配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`artifacts/`·`logs/`（运行产出；MCP evidence 落 `artifacts/evidence/<run_id>/`）。
+配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`artifacts/`·`logs/`（运行产出；MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
 
 ## 2. 三角色
 
@@ -43,7 +43,7 @@
 ```mermaid
 flowchart TD
   Start[任务到达] --> Q{任务类型?}
-  Q -->|"学习被测系统 / 探索式测试"| Learn["SUT 自学习\ndocs/spec/sut-self-learning.md"]
+  Q -->|"学习被测系统 / 探索式测试"| Learn["SUT 自学习编排\n.cursor/agents/sut-self-learning.md"]
   Q -->|"业务 UI/API 流自动化"| BDD["BDD 资产流水线（下半程）\n.cursor/agents/bdd-asset-pipeline.md"]
   Q -->|"明确要求 pytest / 性能 / DB 核对"| Pytest["pytest 路径\n复用 tuner_testkit + packages，不产出 .feature"]
   Q -->|"需要一个新的独立工具"| App["create-app skill\napps-authoring / apps-handover 规则"]
@@ -52,7 +52,7 @@ flowchart TD
   Q -->|"读/策展/索引知识"| Idx["查 INDEX.md + maintain-index skill"]
 ```
 
-- **学习被测系统** → `docs/spec/sut-self-learning.md`（explore-first：能力清单 + design 知识；证据来源开放、design 产物收敛）。
+- **学习被测系统** → `.cursor/agents/sut-self-learning.md`（编排 explore → freeze → design；规格 `docs/spec/sut-self-learning.md`；任务 log 见 `docs/spec/agent-task-log.md`）。
 - **业务 UI/API 流** → `.cursor/agents/bdd-asset-pipeline.md`（自学习的**下半程**；内部含三门禁，仅在此分支生效）。
 - **明确 pytest** → 直接写 pytest，复用 `tuner_testkit` 与本仓 `packages/**` 业务资产，不要为满足分层而硬造 Gherkin。
 - **造工具** → `create-app` skill；工具做好按 `apps-handover.mdc` 补交接文档。证据通道（日志/DB 日志取数）也落 `apps/`，遵守 CLI + JSON 输出约定。
@@ -65,7 +65,7 @@ flowchart TD
 - 不得将 token / cookie / Authorization / 密码 / session 等敏感信息写入仓库（含 capture 与 api_objects）。
 - 提交遵循 Conventional Commits + 六层 scope，见 `docs/spec/commit-convention.md`（`commit-msg` hook 会校验）。
 - DB 只走 `tuner_testkit.db`，日志只走 `tuner_testkit.logging`（见对应 rule）。
-- 密钥只放本机 `config/env_local.py` 或环境变量，**任何分支都不得提交**。多套 prd/uat/dev 写在 `env_local.ENVIRONMENTS` 里，用 `python -m tuner_testkit.config use <name>` 切换（或 `TUNER_ENV`）。
+- 密钥只放本机 `config/env_local.py`、`data/**/*.local.yaml` 或环境变量，**任何分支都不得提交**。多套 prd/uat/dev 写在 `env_local.ENVIRONMENTS` 里，用 `python -m tuner_testkit.config use <name>` 切换（或 `TUNER_ENV`）。探索账号优先 `data/sut-accounts.local.yaml`（模板 `data/sut-accounts.example.yaml`）。
 
 ## 6. 分支与下游仓
 

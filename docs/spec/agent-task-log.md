@@ -1,0 +1,70 @@
+# Agent 任务日志（`artifacts/inbox/`）
+
+> 给 `.cursor/agents/**` 编排任务用的**运行记录**约定。
+> 硬约束见 `.cursor/rules/agent-task-log.mdc`。
+> Evidence（网络/DOM dump）仍落 `artifacts/evidence/<run_id>/`，本目录不替代它。
+
+## 1. 路径
+
+```text
+artifacts/inbox/<YYYYMMDDTHHMMSSZ>-<agent>-<slice>.md
+```
+
+- `<agent>`：与 agent front-matter `name` 一致（如 `sut-self-learning`）。
+- `<slice>`：短横线 slug（如 `cycles`、`issue-create`）。
+- 本目录默认 gitignore；本机下次会话靠读磁盘复用，不入库。
+
+## 2. 通用模板（所有 agent）
+
+```markdown
+---
+agent: sut-self-learning
+slice: cycles
+started: 2026-09-14T03:12:00Z
+ended: 2026-09-14T03:40:00Z
+status: done
+account_id: dogfood-admin
+evidence:
+  - artifacts/evidence/20260914T031200Z-cycles/
+---
+
+# <slice> — <一句话意图>
+
+## Intent
+（用户要什么）
+
+## Inputs
+- INDEX / INDEX.project / accounts 文件 / 源码路径
+
+## Outputs
+| kind | path | action |
+| --- | --- | --- |
+| explore | assets/explore/web/….md | add |
+| api_object | packages/api_objects/… | add |
+
+## Next
+- …
+```
+
+`kind` 建议：`explore` / `design` / `ddl` / `api_object` / `page_object` / `action_word` / `feature` / `index` / `inbox`。
+
+## 3. SUT 自学习额外章节（强制）
+
+编排 agent `.cursor/agents/sut-self-learning.md` 的 inbox **必须**再写：
+
+```markdown
+## Pages explored
+| url pattern | title | primary actions |
+| --- | --- | --- |
+| `/{workspace}/projects/{id}/cycles/` | Cycles | New cycle, Save |
+
+## Assets added this run
+（只列本任务新增或更新的路径，不要把仓库里已有资产再抄一遍）
+```
+
+对照两轮 dogfood 时，另写 `## Loop delta`：相对上一份 inbox，少了哪些手工步骤、多了哪些平台能力。
+
+## 4. 密钥
+
+- 可用 `account_id` 指向 `data/sut-accounts.local.yaml` 的条目。
+- 禁止密码、token、Cookie、Authorization 原文。

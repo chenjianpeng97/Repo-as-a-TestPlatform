@@ -19,3 +19,6 @@ def test_dna_sync_and_check(tmp_path: Path):
     assert (tmp_path / "tools" / "git-hooks" / "commit-msg").is_file()
     assert (tmp_path / ".tuner-dna-version").is_file()
     assert main(["check", "--target", str(tmp_path)]) == 0
+    assert (tmp_path / ".cursor" / "agents" / "sut-self-learning.md").is_file()
+    assert (tmp_path / ".cursor" / "rules" / "agent-task-log.mdc").is_file()
+    assert (tmp_path / "docs" / "spec" / "agent-task-log.md").is_file()

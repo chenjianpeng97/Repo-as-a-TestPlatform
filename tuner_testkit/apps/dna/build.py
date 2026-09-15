@@ -31,8 +31,19 @@ def _payload_ready(root: Path | None = None) -> bool:
 
 
 def _bundle() -> None:
+    """Refresh ``dna_payload`` from the template tree when building a wheel.
+
+    A leftover ``dna_payload/`` from an older build must not short-circuit:
+    that shipped stale DNA (4.3.0 payload inside a 4.4.0 wheel).
+    """
     _ensure_src_on_path()
-    if _payload_ready():
+    from tuner_testkit.project import template_source_root
+
+    if template_source_root() is None:
+        if not _payload_ready():
+            raise RuntimeError(
+                "no DNA payload in this install and no template checkout to bundle from"
+            )
         return
 
     from tuner_testkit.apps.dna.cli import cmd_bundle

@@ -5,6 +5,7 @@
 #   1. 本文件 DATABASES / TEST_* 占位
 #   2. config/env_overlay.py（可选，项目/试验田提交：额外别名与类型，仍无密钥）
 #   3. config/env_local.py（gitignore，本机真实 host/密码/账号）
+#   探索登录优先读 data/sut-accounts.local.yaml（gitignore；模板 data/sut-accounts.example.yaml）
 #      - 若定义了非空 ENVIRONMENTS：由 tuner_testkit.config 按激活名只套用那一套
 #        （TUNER_ENV > config/.active_env > ACTIVE_ENV > 唯一 key）
 #      - 否则按扁平 DATABASES / TEST_* 合并（旧写法）

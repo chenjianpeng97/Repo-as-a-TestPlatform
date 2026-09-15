@@ -44,6 +44,22 @@
 
 ---
 
+## 2026-09-14 — tuner-testkit 4.4.0（自学习编排 agent + inbox 任务 log）
+
+- **commit**: `TBD`
+- **来源**: Plane 下游第二轮探索前补齐「可复用账号 + 可编排 workflow + 任务记录」
+- **目的**: LLM 下次能自主登录探索；agent 必须把本轮页面与新增资产写入 `artifacts/inbox/`。
+- **路径**:
+  - `.cursor/agents/sut-self-learning.md`
+  - `.cursor/rules/agent-task-log.mdc`
+  - `.cursor/agents/bdd-asset-pipeline.md`、`sut-source-to-design.md`
+  - `.cursor/skills/explore-sut/SKILL.md`
+  - `docs/spec/agent-task-log.md`、`docs/spec/sut-self-learning.md`、`AGENTS.md`
+  - `tuner_testkit/apps/init_repo/scaffold.py`（`artifacts/inbox/`、`data/sut-accounts.example.yaml`）
+  - `tuner_testkit/apps/dna/build.py`（wheel 构建始终从源树重打 DNA payload，避免旧 payload 短路）
+- **不在同步范围**: 下游 `data/sut-accounts.local.yaml` 与业务资产
+- **验证**: `tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`；scaffold 单测
+
 ## 2026-09-13 — tuner-testkit 4.3.0（dogfood 回流：evidence CLI + path 插值）
 
 - **commit**: `3697f41`

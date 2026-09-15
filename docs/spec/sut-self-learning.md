@@ -48,6 +48,10 @@ artifacts/evidence/<run_id>/     ← 统一落盘（强制）
               steps imple → Auto UAT（behave）
 ```
 
+**上半程编排**：[`.cursor/agents/sut-self-learning.md`](../../.cursor/agents/sut-self-learning.md)
+（本机账号 → explore → evidence → freeze → design → `artifacts/inbox/`）。
+任务记录约定：[`agent-task-log.md`](agent-task-log.md)。
+
 下半程（已有 feature set + design 时写 steps）由
 [`.cursor/agents/bdd-asset-pipeline.md`](../../.cursor/agents/bdd-asset-pipeline.md) 编排。
 
@@ -87,5 +91,7 @@ artifacts/evidence/<run_id>/     ← 统一落盘（强制）
 - **阶段 2 design 闭环**：`derive-design-knowledge` + `sut-source-to-design` agent；schema 仍为 v0.1（Plane 切片缺口记在 design spec §6）。
 - **阶段 3 双路汇合**：`derive-feature-sets`；bdd-asset-pipeline 下半程。
 - **阶段 4 知识自治**：knowledge-curator；确定性 `secret-scan` hook。
+- **编排与任务 log（4.4.0 DNA）**：`sut-self-learning` agent + `artifacts/inbox/`；
+  探索账号本机文件 `data/sut-accounts.local.yaml`。
 
 内循环用 `uv tool install --from <platform-repo>`；阶段收口才打 tag 发 PyPI。

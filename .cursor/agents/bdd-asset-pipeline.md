@@ -1,6 +1,6 @@
 ---
 name: bdd-asset-pipeline
-version: 2.0.0
+version: 2.0.1
 description: Lower-half of SUT self-learning — Feature Sets + design knowledge → Reuse Analysis → Freeze API Objects → Maintain Page Objects → Maintain Steps → behave regression. Use only for behave/BDD automation assets. Do NOT use when the user explicitly requests pytest. Do NOT use this agent as the explore-first entry; start from docs/spec/sut-self-learning.md instead.
 ---
 
@@ -104,3 +104,5 @@ Before writing Then-assertions, **read `assets/design/**`**:
 - `behave --stage ui` succeeds for UI features that exist.
 - `behave --stage api` succeeds for API features that exist (or `--dry-run`
   with documented TODO).
+- Task log written to `artifacts/inbox/` per `docs/spec/agent-task-log.md`
+  (no secrets).
