@@ -46,7 +46,7 @@
 
 ## 2026-09-14 — tuner-testkit 4.4.0（自学习编排 agent + inbox 任务 log）
 
-- **commit**: `TBD`
+- **commit**: `27bd59c`
 - **来源**: Plane 下游第二轮探索前补齐「可复用账号 + 可编排 workflow + 任务记录」
 - **目的**: LLM 下次能自主登录探索；agent 必须把本轮页面与新增资产写入 `artifacts/inbox/`。
 - **路径**:
