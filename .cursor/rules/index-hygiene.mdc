@@ -2,7 +2,7 @@
 description: Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail; index is the discovery entry for humans and the LLM
 globs: assets/**,packages/api_objects/**,packages/page_objects/**,apps/**,tuner_testkit/apps/**,dogfood/assets/**,dogfood/packages/**,dogfood/apps/**,dogfood/INDEX.project.md
 alwaysApply: false
-version: 1.2.0
+version: 1.3.0
 ---
 
 # index-hygiene — 索引与留痕纪律
@@ -22,7 +22,9 @@ version: 1.2.0
 
 ## 增量维护（省 token）
 
-- 更新 `INDEX.md` 时**优先读各区 `CHANGELOG` 的 delta**，据此补条目；
+- 索引里 `<!-- auto:begin:<zone> -->` 围栏内的区块由 `tuner-workspace index render` 从
+  `artifacts/catalogs/workspace.json` 确定性渲染，**禁止手写**；CI 跑 `tuner-workspace index check`。
+- 围栏外的人工区更新 `INDEX.md` 时**优先读各区 `CHANGELOG` 的 delta**，据此补条目；
   **不要为维护索引而全量读取 `assets/ddl/*.sql` 正文**。
 - AI 组件区（`.cursor/**`）不手写进 `INDEX.md`：由 `python -m tuner_testkit.apps.index_ai`
   确定性生成 `.cursor/REGISTRY.md`，`INDEX.md` 只链接过去。

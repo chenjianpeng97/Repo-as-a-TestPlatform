@@ -1,7 +1,7 @@
 ---
 name: maintain-index
 description: Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bodies. Use after new assets/tools/objects are added, or when INDEX.md drifts from reality.
-version: 1.1.2
+version: 1.2.0
 ---
 
 # Maintain INDEX.md（增量、省 token）
@@ -12,6 +12,19 @@ version: 1.1.2
 - **规范**：`.cursor/rules/index-hygiene.mdc`、`docs/spec/assets-knowledge-syntax.md`。
 - **写范围**：`INDEX.md`；若 `INDEX.project.md` 存在则也可改它。AI 组件区不手写（见下）。
 - **分流**：平台工具 / 公共 `packages` / AI 组件链接 → `INDEX.md`。业务 DDL / SQL / 用例 / explore / design / api_objects / page_objects / features → 有 `INDEX.project.md` 就写那里，不要把 SUT 明细填进 `INDEX.md`。
+
+## 先跑确定性渲染，再做人工区
+
+索引文件里被 `<!-- auto:begin:<zone> -->` … `<!-- auto:end:<zone> -->` 围起来的区块**不要手写**：
+
+```bash
+uv run tuner-workspace catalog          # 刷新 artifacts/catalogs/workspace.json
+uv run tuner-workspace index render     # 渲染 INDEX.project.md（无则 INDEX.md）的 auto 围栏
+uv run tuner-workspace index check      # CI：自动区过期则 exit 1
+```
+
+zone：`ddl` / `sql` / `assets` / `api_objects` / `page_objects` / `action_words` / `apps` / `features`。
+本 skill 只负责围栏**之外**的人工区（用途一句话、confidence 采信说明、平台工具的交接文档链接等）。
 
 ## 核心原则：读 delta，不全量读
 

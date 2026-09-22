@@ -21,7 +21,7 @@
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
 | `commit-convention` | always | all files | 1.1.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
 | `explore-safety` | glob | artifacts/evidence/**,assets/explore/**,assets/design/** | 1.0.0 | Safety rails for live-SUT explore sessions (Playwright MCP) | `.cursor/rules/explore-safety.mdc` |
-| `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/**,tuner_testkit/apps/**,dogfood/assets/**,dogfood/packages/**,dogfood/apps/**,dogfood/INDEX.project.md | 1.2.0 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
+| `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/**,tuner_testkit/apps/**,dogfood/assets/**,dogfood/packages/**,dogfood/apps/**,dogfood/INDEX.project.md | 1.3.0 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
 | `packages-db` | glob | **/*.py | 1.3.1 | Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL c… | `.cursor/rules/packages-db.mdc` |
 | `packages-fake` | glob | **/*.py | 1.0.0 | Require business random/fake values to go through tuner_testkit.fake | `.cursor/rules/packages-fake.mdc` |
 | `packages-logging` | glob | **/*.py | 1.0.0 | Require all run-time logging to go through tuner_testkit.logging | `.cursor/rules/packages-logging.mdc` |
@@ -42,7 +42,7 @@
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
-| `maintain-index` | on-demand | - | 1.1.2 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
+| `maintain-index` | on-demand | - | 1.2.0 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
 | `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
 | `release-template` | on-demand | - | 1.0.1 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
 | `reuse-analysis` | on-demand | - | 1.0.0 | Analyzes whether to reuse/add/update Feature steps, Page Objects, and API Objects by searching for existing assets, mat… | `.cursor/skills/reuse-analysis/SKILL.md` |

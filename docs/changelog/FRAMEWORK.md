@@ -46,7 +46,7 @@
 
 ## 2026-09-22 — tuner-testkit 5.0.0（Plane Job 协议退场；tool manifest + workspace catalog 中立化）
 
-- **commit**: `TBD`
+- **commit**: `968ba3c`
 - **来源**: 路线图重排 A→B→C→D（`dogfood/assets/domain-notes/platform/roadmap.md`）；企业 Runner 协议属 D 阶段，步子跨大
 - **目的**: 删除 `@plane_app` / `@plane_*` / `index_platform`，把「argparse → JSON Schema + argv_plan」与「workspace 静态扫描」抽成中立模块，供 A（catalog / INDEX 自动区）与 B（本地工作台）复用。
 - **路径**:

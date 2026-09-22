@@ -1,6 +1,6 @@
 {
   "template_version": "5.0.0",
-  "generated_at": "2026-09-22T15:52:10+0800",
+  "generated_at": "2026-09-22T15:53:18+0800",
   "tracked_paths": [
     ".cursor/rules",
     ".cursor/skills",
@@ -26,7 +26,7 @@
     ".cursor/rules/bdd-stage-layout.mdc": "0eb223f191eeb89360ef5c454c29447818de897fd3c9f495409dd400887485b6",
     ".cursor/rules/commit-convention.mdc": "ecd8eff4b37b3fbe5d1cec9f70a3ae4defb8f3ff562b4662b3b02aec1b8abe51",
     ".cursor/rules/explore-safety.mdc": "d105a7b8de1fe64ed61a4b122f0b587d7217a2baa9cbdba3fb925ffbb213cac0",
-    ".cursor/rules/index-hygiene.mdc": "478565aa61f395e1f2e50a4b84c0fd3985f1790a2fd8b1b872d53a269f6744a2",
+    ".cursor/rules/index-hygiene.mdc": "36c1a2c360a3dead68c7de6bfd4a0e3a2e30ebbca7c8d30422823ddbee69ea8c",
     ".cursor/rules/packages-db.mdc": "57bf01443fdcb5ce96987aab7538e4fae9f99147a262e0cf059ea88f0f684d96",
     ".cursor/rules/packages-fake.mdc": "8f87dc11aabced976a5f3d93627046ecc6aafd7fd06ec9637aa370b51a8512bc",
     ".cursor/rules/packages-logging.mdc": "5d0b5ca8e943667f61d3d491198dec3ecec780af46860e3912e99acaee483b84",
@@ -42,7 +42,7 @@
     ".cursor/skills/feature-review-lint/SKILL.md": "1c902c06222e078bc1cd083c5678967896dc9af3cd906e61ab0552a47c43f0c6",
     ".cursor/skills/freeze-api-objects/SKILL.md": "d742f73f5e6460762027b585ee3fefd87d736531eb8daa44313f3b9c87db2522",
     ".cursor/skills/maintain-behave-steps/SKILL.md": "24879aef1186bb87da7551dd7747c8b241a07e68af0582e424bbee79382d01a6",
-    ".cursor/skills/maintain-index/SKILL.md": "fc13f66480ea2d6f161eb92f8ec67633290b8d1e296f398716147572cc69e342",
+    ".cursor/skills/maintain-index/SKILL.md": "c5a4f5b76f106628eed1774254f1405582b186708d84e6c7bed0a63a8fde12fe",
     ".cursor/skills/maintain-page-objects/SKILL.md": "9f91b08e8f1d130467cf9f1df42a7e4d2034a5ae2b273aac0a1256c4d83e4ba6",
     ".cursor/skills/release-template/SKILL.md": "ddc608888db3eff003ce601212c2eeda4c1506b3ee05387b6dbcefa072f16ba0",
     ".cursor/skills/reuse-analysis/SKILL.md": "669115a8012562e28f32d0a476f1cb61e19da1c31494d92cf0ebecdaeed48825",
