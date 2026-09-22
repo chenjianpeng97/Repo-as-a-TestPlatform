@@ -31,8 +31,17 @@ _DEFAULT_RELATIVE = {
     "api_objects": "packages/api_objects",
     "mocks": "data/mocks",
     "ddl": "assets/ddl",
-    "artifacts_page_test": "artifacts/page_test",
     "config": "config",
+    # artifacts layout — see docs/spec/artifacts-layout.md
+    "artifacts": "artifacts",
+    "artifacts_evidence": "artifacts/evidence",
+    "artifacts_inbox": "artifacts/inbox",
+    "artifacts_runs": "artifacts/runs",
+    "artifacts_reports": "artifacts/reports",
+    "artifacts_catalogs": "artifacts/catalogs",
+    "artifacts_exports": "artifacts/exports",
+    "artifacts_playwright": "artifacts/playwright",
+    "artifacts_page_test": "artifacts/page_test",
 }
 
 _ENV_OVERRIDES = {
@@ -40,6 +49,7 @@ _ENV_OVERRIDES = {
     "api_objects": "TUNER_API_OBJECTS_DIR",
     "mocks": "TUNER_MOCKS_DIR",
     "ddl": "TUNER_DDL_DIR",
+    "artifacts": "TUNER_ARTIFACTS_DIR",
     "artifacts_page_test": "PAGE_TEST_ARTIFACTS_DIR",
 }
 
@@ -178,3 +188,9 @@ def config_dir() -> Path:
 
 def artifacts_page_test_dir() -> Path:
     return asset_path("artifacts_page_test")
+
+
+def artifacts_dir(kind: str | None = None) -> Path:
+    """``artifacts/`` (``kind=None``) or one of its conventional sub-areas
+    (``evidence`` / ``inbox`` / ``runs`` / ``reports`` / ``catalogs`` / ``exports`` / ``playwright``)."""
+    return asset_path("artifacts" if not kind else f"artifacts_{kind}")

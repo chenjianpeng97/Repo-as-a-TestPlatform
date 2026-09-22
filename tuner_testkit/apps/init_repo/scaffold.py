@@ -52,7 +52,22 @@ _STUB_FILES: tuple[str, ...] = (
     "apps/__init__.py",
     "behave.ini",
     "data/sut-accounts.example.yaml",
+    "INDEX.project.md",
+    "tests/features/api_environment.py",
+    "tests/features/ui_environment.py",
+    "tests/features/api_steps/given.py",
+    "tests/features/api_steps/when.py",
+    "tests/features/api_steps/then.py",
+    "tests/features/ui_steps/given.py",
+    "tests/features/ui_steps/when.py",
+    "tests/features/ui_steps/then.py",
+    "tests/pytest/conftest.py",
 )
+
+# Stub files whose on-disk name differs from the bundled name (dotfiles are dropped by sdist).
+_RENAMED_STUBS: dict[str, str] = {
+    "gitignore": ".gitignore",
+}
 
 
 def _stub_root() -> pathlib.Path | None:
@@ -158,6 +173,14 @@ def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = Fa
                 actions.append(f"copy {rel}")
             else:
                 actions.append(f"skip {rel} (exists)")
+        for bundled_name, dest_rel in _RENAMED_STUBS.items():
+            src = src_root / bundled_name
+            if not src.exists():
+                continue
+            if _copy_file(src, target / dest_rel, overwrite=overwrite):
+                actions.append(f"copy {dest_rel}")
+            else:
+                actions.append(f"skip {dest_rel} (exists)")
 
     if with_ai:
         from types import SimpleNamespace

@@ -214,6 +214,29 @@ def _summary_markdown(
     return "\n".join(lines)
 
 
+def _write_manifest(
+    dest: Path,
+    *,
+    run_id: str,
+    scenario_id: str,
+    intent: str,
+    count: int,
+    routes: list[dict[str, Any]],
+    root: Path | None,
+) -> None:
+    """Run-level manifest (docs/spec/artifacts-layout.md §2) so catalogs and the workbench can list evidence runs."""
+    from tuner_testkit.artifacts import RunManifest, default_producer
+
+    manifest = RunManifest(
+        kind="evidence",
+        run_id=run_id,
+        producer=default_producer(root, suite="tuner-evidence persist"),
+        params={"scenario_id": scenario_id, "intent": intent},
+        dir=dest,
+    )
+    manifest.finish("succeeded", exit_code=0, summary={"captures": count, "routes": len(routes)})
+
+
 def persist(
     *,
     run_id: str,
@@ -247,6 +270,8 @@ def persist(
     )
     (dest / "run_summary.md").write_text(summary, encoding="utf-8", newline="\n")
     files.append("run_summary.md")
+    _write_manifest(dest, run_id=run_id, scenario_id=scenario_id, intent=intent, count=len(rows), routes=routes, root=root)
+    files.append("manifest.json")
     payload = {
         "run_id": run_id,
         "dir": dest.as_posix(),

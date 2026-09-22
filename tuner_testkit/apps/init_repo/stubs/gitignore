@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+*.egg-info
+.venv
+.pytest_cache/
+.ruff_cache/
+
+# run-scope artifacts (docs/spec/artifacts-layout.md) — sanitized, still local
+artifacts/evidence/
+artifacts/catalogs/
+artifacts/inbox/
+artifacts/runs/
+artifacts/reports/
+artifacts/exports/
+artifacts/playwright/
+artifacts/page_test/
+logs/
+
+# local secrets / machine overlay — never commit
+.env
+.env.*
+!.env.example
+config/env_local.py
+config/.active_env
+data/**/*.local.yaml
+data/**/*.local.json
+data/**/*.local.md
+
+# DNA overlay pointer written by tuner-dna sync
+.tuner-dna-version
+
+# Playwright MCP session dumps
+.playwright-mcp/

@@ -16,6 +16,7 @@
 SUT 自学习：`docs/spec/sut-self-learning.md`（编排 `.cursor/agents/sut-self-learning.md`）。
 design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
 agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
+交付物目录与 run manifest：`docs/spec/artifacts-layout.md`（`artifacts/{evidence,inbox,runs,reports,catalogs,exports,playwright}`；`tuner_testkit.artifacts`）。
 探索账号模板：scaffold 写入 `data/sut-accounts.example.yaml`；本机副本 `data/sut-accounts.local.yaml`（gitignore）。
 
 ### 1.1 DDL（自动区，dump_ddl 产出）

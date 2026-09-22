@@ -21,7 +21,7 @@
 | 测试层 | `tests/` | 自动化测试代码（behave `features/` + `pytest/`）。 | behave / pytest |
 | 文档层 | `docs/` | 仓库使用说明与规范（`docs/spec/**`）。 | 只读 |
 
-配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`artifacts/`·`logs/`（运行产出；MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
+配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`artifacts/`·`logs/`（运行产出，规范 `docs/spec/artifacts-layout.md`：MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`；工具运行落 `artifacts/runs/<run_id>/`；回归报告落 `artifacts/reports/<run_id>/`，每个 run 目录带 `manifest.json`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
 
 ## 2. 三角色
 

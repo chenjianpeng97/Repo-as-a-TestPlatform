@@ -1,6 +1,6 @@
 {
   "template_version": "5.0.0",
-  "generated_at": "2026-09-22T15:53:18+0800",
+  "generated_at": "2026-09-22T15:59:33+0800",
   "tracked_paths": [
     ".cursor/rules",
     ".cursor/skills",
@@ -47,11 +47,12 @@
     ".cursor/skills/release-template/SKILL.md": "ddc608888db3eff003ce601212c2eeda4c1506b3ee05387b6dbcefa072f16ba0",
     ".cursor/skills/reuse-analysis/SKILL.md": "669115a8012562e28f32d0a476f1cb61e19da1c31494d92cf0ebecdaeed48825",
     ".cursor/skills/run-feature-playwright-mcp/SKILL.md": "f71f46aad264a32d7693ba6bd41a0616f2cfb0a6d159d3ae9000026171d1e9ef",
-    "AGENTS.md": "f464cdf8b56bba291a9cdf3311beae16776f3ba18a975b58e963b14e7afb3b6d",
+    "AGENTS.md": "b11d36c3155f1e8beb2b236c4f5ee7f7affb1e66e0a2bdd2c02e22e11efc3c3c",
     "docs/spec/action-words-syntax.md": "8247597548842159da747fdef10a2b6d3f20080c229184fd5eff86eff101b9eb",
     "docs/spec/agent-task-log.md": "6ae037740a45e34e2f5c5e88a1872510c7643bceeb60995b78cf3892cdee4e12",
     "docs/spec/api-objects-syntax.md": "ffe220b071d0d3f137acd8cbfceab7c6c8f0fce68324fbbc457bb64ed7e6c405",
     "docs/spec/apps-authoring-syntax.md": "7ae45c9d501a4a24803240e39689776e1851a47187275937408be28d4b9e4a89",
+    "docs/spec/artifacts-layout.md": "7a0b907b6a2178c4fe4d7fe1b3d2aa6f1769a7e13ab7896b2562817b52b92adc",
     "docs/spec/assets-knowledge-syntax.md": "d5f3df5c08dbc5e75f3f32fe4ea255a6b33b02b6d6d292eee1850b7c17b37caf",
     "docs/spec/bdd-run-gherkin-in-playwrightMCP.md": "1ec45dbd6feb36d0332067da7ff1d2bea0e84d689c3fe4c5d9ab7e3fdc3d7e04",
     "docs/spec/behave-gerkin-syntax.md": "96d4ed5f3d0a041f8c8d6ca91504c8bab27caeb539df2830f9ba795649663572",

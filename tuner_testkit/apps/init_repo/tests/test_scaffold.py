@@ -32,6 +32,15 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
     assert "replace-me" in (dest / "data" / "sut-accounts.example.yaml").read_text(encoding="utf-8")
     assert any(line.startswith("copy config/env.py") for line in actions)
     assert any("dna sync (exit 0)" in line for line in actions)
+    # 5.x stubs: gitignore, project index with auto fences, behave environments + G/W/T steps, pytest conftest
+    assert "artifacts/runs/" in (dest / ".gitignore").read_text(encoding="utf-8")
+    assert "<!-- auto:begin:apps -->" in (dest / "INDEX.project.md").read_text(encoding="utf-8")
+    for stage in ("api", "ui"):
+        assert "report_run_begin" in (dest / "tests" / "features" / f"{stage}_environment.py").read_text(encoding="utf-8")
+        for kind in ("given", "when", "then"):
+            assert (dest / "tests" / "features" / f"{stage}_steps" / f"{kind}.py").is_file()
+    assert (dest / "tests" / "pytest" / "conftest.py").is_file()
+    assert not (dest / "packages" / "api_objects" / "plane.py").exists()
 
 
 def test_scaffold_uses_packaged_stubs_when_not_editable(tmp_path: Path, monkeypatch):
