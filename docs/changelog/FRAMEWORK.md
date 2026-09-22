@@ -61,7 +61,7 @@
 
 ## 2026-09-22 — tuner-testkit 5.1.0（A 收口 + 本地工作台 + C0 元数据）
 
-- **commit**: `TBD`
+- **commit**: `ae0a72a`
 - **目的**: 收口 workspace 内核（run manifest、CI、多 IDE DNA），并补上本机工作台与元数据铺垫：`tuner-workspace run` / `meta stamp`、`tuner-workbench`、apps `--json`、`metadata-conventions`、`generate-test-report`；dogfood 解除离线子集 `@wip`。
 - **路径**:
   - `docs/spec/artifacts-layout.md`、`tuner_testkit/artifacts.py`、`docs/spec/metadata-conventions.md`、`docs/spec/apps-authoring-syntax.md` §7
