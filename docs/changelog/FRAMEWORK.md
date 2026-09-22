@@ -46,7 +46,7 @@
 
 ## 2026-09-22 — action word 嵌套子包发现
 
-- **commit**: `TBD`
+- **commit**: `213eb39`
 - **目的**: 下游仓把 `db_seed` 按业务域分子目录（`db_seed/audit/*.py`）时，kit `discover` 与工作台 `entry_mtimes` 原先只扫一层，词条进不了 `/words/db_seed`。改为递归导入 + `rglob`。
 - **路径**:
   - `tuner_testkit/action_words/registry.py`（`_import_word_package`）
