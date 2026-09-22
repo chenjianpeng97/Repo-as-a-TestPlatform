@@ -97,3 +97,14 @@ apps/                            # 仅 SUT 私有工具
 - 破坏性工具默认 dry-run；真正执行必须有显式开关。
 - `create-app` 脚手架默认带 `--json` 与 `tool.py`。
 
+## 8. 工作台入口（扫描约定）
+
+没有入口文件 = 工作台当它不存在。不另做 `WORKBENCH.toml` 手写清单（会和 `@tool` 双源漂移）。入口就是装饰器 + 固定路径。
+
+可见工具必须同时满足：
+
+1. 路径是 `apps/<name>/tool.py`（平台工具是 `tuner_testkit/apps/<name>/tool.py`）；
+2. `@tool(..., visibility="workbench")`（默认值）。`visibility="local"` 只走 CLI。
+
+发现器**只**枚举上述两个 glob，不扫 `cli.py` / 其它模块。`tool.py` 及其 import **禁止**顶层 DB / Playwright / 驱动——这既是安全约束，也是扫描性能约束。工作台热路径只读目录切片（`build_directory`），不读 `assets/`、不跑 `git log`。
+

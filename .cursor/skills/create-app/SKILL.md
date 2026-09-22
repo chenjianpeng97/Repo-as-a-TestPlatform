@@ -1,7 +1,7 @@
 ---
 name: create-app
 description: Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business assets, following apps-authoring-syntax.md. Use when the engineer needs an on-demand test tool (data generator, checker, exporter, capture/enrichment). Do not scaffold into tuner_testkit/apps/.
-version: 1.2.0
+version: 1.2.1
 ---
 
 # Create App — 按需开发一个独立工具
@@ -46,6 +46,7 @@ apps/<name>/
   `tuner_testkit.apps._shared.changelog.append_entry(...)` 追加对应区 `CHANGELOG.md`。
 - 不得被 `tests/` import；不得写入 token/cookie/密码等敏感值；破坏性操作默认 dry-run/只读，`@tool(..., destructive=True)`。
 - `tool.py` 及其 import **禁止**顶层 import DB / Playwright / mitmproxy。
+  没有 `apps/<name>/tool.py` + `@tool` = 工作台当它不存在。
 - `--json` 时 stdout 打印 envelope：`status / outputs[] / artifacts[] / log_path`（见 apps-authoring-syntax §7）。
 - README 写完后立刻 `uv run tuner-workspace meta stamp apps/<name>/README.md --kind app`（不要手填邮箱）。
 

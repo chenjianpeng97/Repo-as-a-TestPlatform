@@ -14,6 +14,12 @@ Feature: 在工作台中发现可用工具
     And 目录应包含动作词 "db_seed.sample_seed"
     And 每个条目应带有名称、分组与参数结构
 
+  @api @offline
+  Scenario: 按类别列出造数动作词
+    When 我查看造数动作词目录
+    Then 目录应包含动作词 "db_seed.sample_seed"
+    And 每个条目应带有名称、分组与参数结构
+
   @ui @wip
   Scenario: 按关键字搜索工具
     When 我在工具目录搜索 "sample"

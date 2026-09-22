@@ -2,7 +2,7 @@
 description: SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's packages business assets; no reinventing wheels, no secrets, not imported by tests
 globs: apps/**,tuner_testkit/apps/**
 alwaysApply: false
-version: 2.0.0
+version: 2.0.1
 ---
 
 # apps — 创建期约束
@@ -43,6 +43,7 @@ version: 2.0.0
   不写 `tool.py`，或写了但 `visibility="local"`。
 - 发现器只 import `apps/*/tool.py` 与 kit 的 `tuner_testkit/apps/*/tool.py`；`cli.py` 可以较重，
   但 `tool.py` 及其 import 的模块禁止顶层 import DB 驱动 / Playwright / mitmproxy。
+  没有 `apps/<name>/tool.py` = 工作台当它不存在。
 - 需要机器可读输出时用 `--json` envelope（`status / outputs[] / artifacts[] / log_path`），见规范 §7。
 
 ## 相关

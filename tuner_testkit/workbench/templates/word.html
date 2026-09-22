@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }} · tuner workbench{% endblock %}
+{% block body %}
+<h1>{{ item.name }}</h1>
+<p class="muted"><code>{{ item.id }}</code> · {{ item.category }}{% if item.datasource %} · {{ item.datasource }}{% endif %}</p>
+{% if item.tags %}
+<div class="chips">{% for tag in item.tags %}<span class="chip">{{ tag }}</span>{% endfor %}</div>
+{% endif %}
+{% if item.doc %}<pre class="doc">{{ item.doc }}</pre>{% endif %}
+{% if item.destructive %}<p class="warn">破坏性操作：运行前必须勾选确认。</p>{% endif %}
+
+<h2>参数</h2>
+{% set prefer_dry_run = false %}
+{% include "_params_form.html" %}
+{% endblock %}

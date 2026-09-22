@@ -1,0 +1,64 @@
+<form method="post" action="{{ form_action }}" id="run-form">
+  <div id="fields"></div>
+  {% if item.destructive %}
+  <label><input type="checkbox" name="confirm" value="1"> 我确认要执行这个破坏性动作</label>
+  {% endif %}
+  <input type="hidden" name="params_json" id="params_json" value="{}">
+  <button type="submit" class="btn">运行</button>
+</form>
+<script>
+const schema = {{ item.params_schema | tojson }};
+const example = {{ (item.example_params or {}) | tojson }};
+const preferDryRun = {{ 'true' if prefer_dry_run|default(false) else 'false' }};
+const fields = document.getElementById("fields");
+const props = (schema && schema.properties) || {};
+const required = new Set((schema && schema.required) || []);
+function defaultValue(key, prop) {
+  if (example && Object.prototype.hasOwnProperty.call(example, key)) return example[key];
+  if (preferDryRun && key === "dry_run") return true;
+  return prop.default;
+}
+for (const [key, prop] of Object.entries(props)) {
+  const wrap = document.createElement("label");
+  wrap.className = "field";
+  const title = document.createElement("span");
+  title.textContent = (prop.description || key) + (required.has(key) ? " *" : "");
+  wrap.appendChild(title);
+  const initial = defaultValue(key, prop);
+  let input;
+  if (prop.type === "boolean") {
+    input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = !!initial;
+  } else if (prop.enum) {
+    input = document.createElement("select");
+    for (const opt of prop.enum) {
+      const o = document.createElement("option");
+      o.value = opt; o.textContent = opt;
+      if (initial === opt) o.selected = true;
+      input.appendChild(o);
+    }
+  } else {
+    input = document.createElement("input");
+    input.type = prop.type === "integer" || prop.type === "number" ? "number" : "text";
+    if (initial !== undefined && initial !== null) input.value = initial;
+  }
+  input.dataset.key = key;
+  input.dataset.type = prop.type || "string";
+  wrap.appendChild(input);
+  fields.appendChild(wrap);
+}
+document.getElementById("run-form").addEventListener("submit", () => {
+  const params = {};
+  for (const el of fields.querySelectorAll("[data-key]")) {
+    const key = el.dataset.key;
+    if (el.type === "checkbox") { params[key] = el.checked; continue; }
+    let value = el.value;
+    if (value === "" && !required.has(key)) continue;
+    if (el.dataset.type === "integer") value = parseInt(value, 10);
+    if (el.dataset.type === "number") value = Number(value);
+    params[key] = value;
+  }
+  document.getElementById("params_json").value = JSON.stringify(params);
+});
+</script>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }} · 造数{% endblock %}
+{% block body %}
+<h1>{{ item.name }}</h1>
+<p class="muted">
+  <code>{{ item.id }}</code>
+  · {{ item.category }}
+  · datasource <code>{{ item.datasource or "main" }}</code>
+</p>
+{% if item.tags %}
+<div class="chips">{% for tag in item.tags %}<span class="chip">{{ tag }}</span>{% endfor %}</div>
+{% endif %}
+{% if item.doc %}<pre class="doc">{{ item.doc }}</pre>{% endif %}
+<p class="warn">造数默认按 destructive 处理：运行前必须勾选确认。表单预填 <code>example_params</code>；<code>dry_run</code> 缺省为 True。</p>
+{% if not item.has_dry_run %}
+<p class="warn">此造数词未声明 <code>dry_run</code> 字段。运行即可能落库，请先核对交接说明。</p>
+{% endif %}
+
+<h2>参数</h2>
+{% set prefer_dry_run = true %}
+{% include "_params_form.html" %}
+<p class="muted">运行结果页会单独列出 <code>cleanup[]</code>（造数契约：按表登记行 id）。</p>
+{% endblock %}

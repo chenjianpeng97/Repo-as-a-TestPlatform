@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -11,8 +12,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from tuner_testkit.catalog.build import build_catalog
+from tuner_testkit.catalog.directory import build_directory
+from tuner_testkit.catalog.scan import read_git_meta
 from tuner_testkit.project import project_root
 from tuner_testkit.tools.runner import DestructiveNotConfirmed, RunRequest, run_tool
+from tuner_testkit.workbench.kinds import home_cards, known_word_kind
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 
@@ -25,57 +29,80 @@ def create_app(*, root: Path | None = None) -> FastAPI:
     if static.is_dir():
         app.mount("/static", StaticFiles(directory=str(static)), name="static")
     app.state.root = repo
+    os.environ["TUNER_ROOT"] = str(repo)
+
+    def directory(*, refresh: bool = False) -> dict[str, Any]:
+        return build_directory(repo, include_kit_tools=True, refresh=refresh)
 
     def catalog() -> dict[str, Any]:
         return build_catalog(repo, include_kit_tools=True)
 
     def _render(request: Request, name: str, **ctx: Any) -> HTMLResponse:
-        payload = catalog()
-        return templates.TemplateResponse(
-            request,
-            name,
-            {"root": str(repo), "catalog": payload, **ctx},
-        )
+        return templates.TemplateResponse(request, name, {"root": str(repo), **ctx})
 
     @app.get("/", response_class=HTMLResponse)
-    def home(request: Request) -> HTMLResponse:
-        return _render(request, "home.html")
-
-    @app.get("/tools", response_class=HTMLResponse)
-    def tools_page(request: Request, q: str = "") -> HTMLResponse:
-        payload = catalog()
-        items = _directory(payload, q)
-        return templates.TemplateResponse(
+    def home(request: Request, refresh: bool = False) -> HTMLResponse:
+        payload = directory(refresh=refresh)
+        return _render(
             request,
-            "tools.html",
-            {"root": str(repo), "catalog": payload, "items": items, "q": q},
+            "home.html",
+            cards=home_cards(payload.get("counts_by_kind") or {}),
+            git=read_git_meta(repo),
         )
 
+    @app.get("/tools", response_class=HTMLResponse)
+    def tools_page(request: Request, q: str = "", refresh: bool = False) -> HTMLResponse:
+        items = [it for it in _directory(directory(refresh=refresh), q) if it["kind"] == "tool"]
+        return _render(request, "tools.html", items=items, q=q)
+
     @app.get("/tools/{item_id}", response_class=HTMLResponse)
-    def tool_detail(request: Request, item_id: str) -> HTMLResponse:
-        item = _find_item(catalog(), item_id)
+    def tool_detail(request: Request, item_id: str, refresh: bool = False) -> HTMLResponse:
+        item = _find_item(directory(refresh=refresh), item_id)
         if item is None:
             raise HTTPException(404, f"unknown tool {item_id}")
+        if item["kind"] == "action_word":
+            return RedirectResponse(url=item["href"], status_code=302)
         readme = _readme_text(repo, item)
-        return _render(request, "tool.html", item=item, readme=readme, error=None)
+        return _render(request, "tool.html", item=item, readme=readme, form_action=f"/tools/{item['id']}/run")
 
     @app.post("/tools/{item_id}/run")
     async def tool_run(request: Request, item_id: str) -> RedirectResponse:
-        form = await _parse_urlencoded(request)
-        try:
-            params = json.loads(form.get("params_json") or "{}")
-        except json.JSONDecodeError as exc:
-            raise HTTPException(400, f"invalid params JSON: {exc}") from exc
-        if not isinstance(params, dict):
-            raise HTTPException(400, "params must be a JSON object")
-        confirm = bool(form.get("confirm"))
-        try:
-            result = run_tool(RunRequest(tool_id=item_id, params=params, confirm=confirm), root=repo)
-        except DestructiveNotConfirmed as exc:
-            raise HTTPException(400, str(exc)) from exc
-        except (KeyError, ValueError) as exc:
-            raise HTTPException(400, str(exc)) from exc
-        return RedirectResponse(url=f"/runs/{result.run_id}", status_code=303)
+        return await _run_from_form(request, repo, item_id)
+
+    @app.get("/words/{kind}", response_class=HTMLResponse)
+    def words_page(request: Request, kind: str, q: str = "", refresh: bool = False) -> HTMLResponse:
+        spec = known_word_kind(kind)
+        if spec is None:
+            raise HTTPException(404, f"unknown kind {kind}")
+        items = [
+            it
+            for it in _directory(directory(refresh=refresh), q)
+            if it["kind"] == "action_word" and it.get("category") == kind
+        ]
+        return _render(request, spec.list_template, items=items, q=q, kind=spec)
+
+    @app.get("/words/{kind}/{word_id}", response_class=HTMLResponse)
+    def word_detail(request: Request, kind: str, word_id: str, refresh: bool = False) -> HTMLResponse:
+        spec = known_word_kind(kind)
+        if spec is None:
+            raise HTTPException(404, f"unknown kind {kind}")
+        item = _find_item(directory(refresh=refresh), word_id)
+        if item is None or item.get("kind") != "action_word" or item.get("category") != kind:
+            raise HTTPException(404, f"unknown word {word_id}")
+        return _render(
+            request,
+            spec.detail_template,
+            item=item,
+            kind=spec,
+            form_action=f"/tools/{item['id']}/run",
+        )
+
+    @app.post("/words/{kind}/{word_id}/run")
+    async def word_run(request: Request, kind: str, word_id: str) -> RedirectResponse:
+        spec = known_word_kind(kind)
+        if spec is None:
+            raise HTTPException(404, f"unknown kind {kind}")
+        return await _run_from_form(request, repo, word_id)
 
     @app.get("/runs", response_class=HTMLResponse)
     def runs_page(request: Request) -> HTMLResponse:
@@ -120,9 +147,25 @@ def create_app(*, root: Path | None = None) -> FastAPI:
     def api_catalog() -> JSONResponse:
         return JSONResponse(catalog())
 
+    @app.get("/api/directory")
+    def api_directory(refresh: bool = Query(False)) -> JSONResponse:
+        return JSONResponse(directory(refresh=refresh))
+
     @app.get("/api/tools")
-    def api_tools(q: str = Query("")) -> JSONResponse:
-        return JSONResponse({"items": _directory(catalog(), q)})
+    def api_tools(q: str = Query(""), kind: str = Query(""), refresh: bool = Query(False)) -> JSONResponse:
+        items = _directory(directory(refresh=refresh), q)
+        if kind == "tool":
+            items = [it for it in items if it["kind"] == "tool"]
+        elif kind:
+            items = [it for it in items if it.get("category") == kind or it.get("group") == kind]
+        return JSONResponse({"items": items})
+
+    @app.get("/api/words")
+    def api_words(category: str = Query(""), q: str = Query(""), refresh: bool = Query(False)) -> JSONResponse:
+        items = [it for it in _directory(directory(refresh=refresh), q) if it["kind"] == "action_word"]
+        if category:
+            items = [it for it in items if it.get("category") == category]
+        return JSONResponse({"items": items})
 
     @app.post("/api/tools/{item_id}/run")
     def api_run(item_id: str, body: dict[str, Any] | None = None) -> JSONResponse:
@@ -159,6 +202,24 @@ def create_app(*, root: Path | None = None) -> FastAPI:
     return app
 
 
+async def _run_from_form(request: Request, repo: Path, item_id: str) -> RedirectResponse:
+    form = await _parse_urlencoded(request)
+    try:
+        params = json.loads(form.get("params_json") or "{}")
+    except json.JSONDecodeError as exc:
+        raise HTTPException(400, f"invalid params JSON: {exc}") from exc
+    if not isinstance(params, dict):
+        raise HTTPException(400, "params must be a JSON object")
+    confirm = bool(form.get("confirm"))
+    try:
+        result = run_tool(RunRequest(tool_id=item_id, params=params, confirm=confirm), root=repo)
+    except DestructiveNotConfirmed as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except (KeyError, ValueError) as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return RedirectResponse(url=f"/runs/{result.run_id}", status_code=303)
+
+
 def _directory(payload: dict[str, Any], q: str) -> list[dict[str, Any]]:
     needle = (q or "").strip().lower()
     items: list[dict[str, Any]] = []
@@ -167,7 +228,7 @@ def _directory(payload: dict[str, Any], q: str) -> list[dict[str, Any]]:
             continue
         items.append(_tool_item(row))
     for row in payload.get("action_words", []):
-        if "word_id" not in row:
+        if "word_id" not in row or row.get("visibility") == "local":
             continue
         items.append(_word_item(row))
     if needle:
@@ -176,30 +237,53 @@ def _directory(payload: dict[str, Any], q: str) -> list[dict[str, Any]]:
 
 
 def _tool_item(row: dict[str, Any]) -> dict[str, Any]:
+    schema = row.get("params_schema") or {}
+    props = schema.get("properties") or {}
     return {
         "id": row["tool_id"],
         "kind": "tool",
         "name": row.get("name") or row["tool_id"],
         "group": row.get("group") or "general",
+        "category": None,
         "summary": row.get("summary") or "",
+        "doc": row.get("summary") or "",
+        "datasource": "",
+        "tags": [],
+        "example_params": {},
         "destructive": bool(row.get("destructive")),
-        "params_schema": row.get("params_schema") or {},
+        "params_schema": schema,
+        "has_dry_run": "dry_run" in props,
+        "visibility": row.get("visibility") or "workbench",
         "readme_path": row.get("readme_path"),
         "origin": row.get("origin"),
+        "href": f"/tools/{row['tool_id']}",
     }
 
 
 def _word_item(row: dict[str, Any]) -> dict[str, Any]:
+    doc = (row.get("doc") or row.get("description") or "").strip()
+    schema = row.get("params_schema") or {}
+    props = schema.get("properties") or {}
+    category = str(row.get("category") or "action")
+    word_id = row["word_id"]
     return {
-        "id": row["word_id"],
+        "id": word_id,
         "kind": "action_word",
-        "name": row.get("name") or row["word_id"],
-        "group": str(row.get("category") or "action"),
-        "summary": (row.get("description") or "")[:200],
+        "name": row.get("name") or word_id,
+        "group": category,
+        "category": category,
+        "summary": doc.splitlines()[0][:200] if doc else "",
+        "doc": doc,
+        "datasource": row.get("datasource") or "",
+        "tags": list(row.get("tags") or []),
+        "example_params": dict(row.get("example_params") or {}),
         "destructive": bool(row.get("destructive")),
-        "params_schema": row.get("params_schema") or {},
+        "params_schema": schema,
+        "has_dry_run": "dry_run" in props,
+        "visibility": row.get("visibility") or "workbench",
         "readme_path": None,
         "origin": "workspace",
+        "href": f"/words/{category}/{word_id}",
     }
 
 
@@ -212,8 +296,6 @@ def _find_item(payload: dict[str, Any], item_id: str) -> dict[str, Any] | None:
 
 def _env_view(root: Path) -> dict[str, Any]:
     """Named environments only — never include credentials or URLs."""
-    import os
-
     from tuner_testkit.config import (
         EnvProfileError,
         environments_of,
@@ -242,8 +324,6 @@ def _env_view(root: Path) -> dict[str, Any]:
 
 
 def _switch_env(root: Path, name: str) -> str | None:
-    import os
-
     from tuner_testkit.config import environments_of, load_env_local, write_active_env
 
     os.environ["TUNER_ROOT"] = str(root)
@@ -314,6 +394,23 @@ def _load_run(root: Path, run_id: str) -> dict[str, Any] | None:
                     row["envelope"] = json.loads(envelope.read_text(encoding="utf-8"))
                 except json.JSONDecodeError:
                     row["envelope"] = None
+            row["result"] = _action_result(row)
             return row
     return None
 
+
+def _action_result(run: dict[str, Any]) -> dict[str, Any] | None:
+    """Best-effort Result dict (cleanup / detail) from envelope or pretty-printed stdout."""
+    envelope = run.get("envelope")
+    if isinstance(envelope, dict) and ("cleanup" in envelope or "ok" in envelope or "detail" in envelope):
+        return envelope
+    text = (run.get("stdout") or "").strip()
+    if not text:
+        return None
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    if isinstance(data, dict) and ("cleanup" in data or "ok" in data or "detail" in data):
+        return data
+    return None

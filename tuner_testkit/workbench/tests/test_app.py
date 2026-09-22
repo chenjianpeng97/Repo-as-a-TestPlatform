@@ -14,11 +14,13 @@ def client(monkeypatch: pytest.MonkeyPatch):
     from fastapi.testclient import TestClient
 
     from tuner_testkit.action_words.registry import reset_registry_for_tests
+    from tuner_testkit.catalog.directory import clear_directory_cache
     from tuner_testkit.tools.manifest import reset_registry_for_tests as reset_tools
     from tuner_testkit.workbench.app import create_app
 
     reset_tools()
     reset_registry_for_tests()
+    clear_directory_cache(DOGFOOD)
     monkeypatch.setenv("TUNER_ROOT", str(DOGFOOD))
     return TestClient(create_app(root=DOGFOOD))
 
@@ -52,6 +54,32 @@ def test_api_env_lists_names_only(client) -> None:
     for secret in ("password", "token", "secret", "authorization", "cookie"):
         assert secret not in blob
     assert client.get("/env").status_code == 200
+
+
+def test_home_uses_kind_cards(client) -> None:
+    html = client.get("/").text
+    assert "造数" in html
+    assert "工具" in html
+    assert "ddl_tables" not in html
+
+
+def test_db_seed_specialized_page_has_example(client) -> None:
+    resp = client.get("/words/db_seed/db_seed.sample_seed")
+    assert resp.status_code == 200
+    text = resp.text
+    assert "db_seed.sample_seed" in text
+    assert "DEMO" in text
+    assert "dry_run" in text
+    assert "cleanup" in text
+
+
+def test_api_words_lists_db_seed(client) -> None:
+    items = client.get("/api/words", params={"category": "db_seed"}).json()["items"]
+    ids = {row["id"] for row in items}
+    assert "db_seed.sample_seed" in ids
+    sample = next(row for row in items if row["id"] == "db_seed.sample_seed")
+    assert sample["example_params"]["prefix"] == "DEMO"
+    assert sample["has_dry_run"] is True
 
 
 def test_api_run_sample_tool(client) -> None:

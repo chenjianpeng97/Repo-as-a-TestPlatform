@@ -1,7 +1,9 @@
 # tuner-workbench
 
-本机工作台：把 `tuner-workspace catalog` 的工具 / 动作词渲染成表单，按 `argv_plan` 或
-`tuner-action-words run` 执行，产物落 `artifacts/runs/<run_id>/`。
+本机工作台：把目录切片（`apps/*/tool.py` 的 `@tool` + 类别目录上的 `@register`）
+渲染成表单，按 `argv_plan` 或 `tuner-action-words run` 执行，产物落
+`artifacts/runs/<run_id>/`。列表/搜索不扫 `assets/`、不跑 `git log`。
+`db_seed` 有特化页（example / dry_run / cleanup）。
 
 ## 需求背景
 
@@ -29,4 +31,5 @@ uv run tuner-workbench --no-browser --port 8765
 uv run --directory dogfood tuner-workbench --no-browser
 ```
 
-打开 `http://127.0.0.1:8765/tools` 应能看到 `sample_tool` 与 `db_seed.sample_seed`。
+打开 `http://127.0.0.1:8765/tools` 应能看到 `sample_tool`；
+`http://127.0.0.1:8765/words/db_seed` 应能看到 `db_seed.sample_seed`。

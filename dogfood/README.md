@@ -29,7 +29,7 @@ uv run --directory dogfood pytest -q
 2. 在仓库根 `uv sync`（与平台共用 `.venv`）
 3. 双击 `dogfood/workbench.cmd`（Windows）或执行 `dogfood/workbench.sh`，等价于 `uv run --directory dogfood tuner-workbench`
 
-浏览器打开 `http://127.0.0.1:8765/`，在「工具」里找 `sample_tool` / `db_seed.sample_seed`，填参运行。工作台只绑本机，密钥不会出现在页面上。
+浏览器打开 `http://127.0.0.1:8765/`，在「工具」里找 `sample_tool`，在「造数」里找 `db_seed.sample_seed`，填参运行。工作台只绑本机，密钥不会出现在页面上。
 
 ## 为什么这里没有 `.cursor/`
 

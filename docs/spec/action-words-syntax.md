@@ -45,6 +45,9 @@ packages/action_words/
   （如 `create_invoice_relation` 与 `link_invoice_to_uninvoiced`）可同模块。
 - 新增类别子包后无需注册：`registry.discover()` 会自动扫描
   `_WORD_SUBPACKAGES` 中列出的子包。
+- **工作台入口**：发现器只扫
+  `packages/action_words/{db_seed,db_assert,api_request,api_assert,ui_action,ui_assert}/*.py`。
+  其它路径（`_internal/`、`models.py`、随意 `rglob`）不会出现在工作台。没有入口文件 = 工作台当它不存在。
 
 ## 类模板（强制）
 
@@ -65,7 +68,8 @@ class CreateInOut(ActionWord):
     tags = ("发票审计", "出入库")             # 业务域标签，便于目录过滤
     requires = frozenset({"db"})            # 依赖资源："db" / "api"
     datasource = "main"                     # 目标数据源别名（config/env.py DATABASES 键）
-    example_params = {...}                  # 必须能通过 Params 校验
+    example_params = {...}                  # 必须能通过 Params 校验；特化表单预填
+    visibility = "workbench"                # 可选；"local" 不进工作台目录
 
     Params = InOutParams                    # pydantic BaseModel，见下
 
@@ -130,7 +134,8 @@ uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录
 - `run` 输出 `Result` 的 JSON（含 cleanup 登记），退出码 0/1 对应成功/失败；
 - 手工造数后需要清理时，按输出的 cleanup 逐表 `DELETE ... WHERE id IN (...)`。
 - `catalog` 供本机调用 `export_catalog()`；`tuner-workspace catalog` 把**全部** `@register` 的词条（含 `params_schema`、
-  `destructive` 推断）写入 `artifacts/catalogs/workspace.json` 的 `action_words[]`，工作台据此渲染表单。
+  `destructive` 推断、`visibility`）写入 `artifacts/catalogs/workspace.json` 的 `action_words[]`。
+  工作台列表/搜索**不**读这份全量 JSON，只扫本节登记的入口（见下）。
 
 ## 与 BDD / pytest 的集成
 
@@ -144,12 +149,15 @@ uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录
 
 ## 与本地工作台（workbench）
 
-- `@register` 即可见：工作台从 `tuner-workspace catalog` 的 `action_words[]` 读取词条，不需要额外装饰器。
+- `@register` 即工作台登记，不需要第二套装饰器。类属性 `visibility` 默认 `"workbench"`；`"local"` 的词不进目录切片，仍可 CLI 运行。
+- 扫描只认类别目录下的模块：`packages/action_words/<category>/*.py`。模块必须 **import-safe**：顶层不得连库、不得读 `env_local`、不得启动浏览器。
+- `Params` 每字段 `Field(description=...)`、`example_params` 非空——特化表单依赖这两项。
 - 运行：工作台经 `tuner-workspace run <word_id> --params JSON` 调用
   `python -m tuner_testkit.action_words run <word_id> --params JSON`；只暴露 `word_id` 与 `--params`，
   不暴露 `--username` / `--password` / `--params-file`（凭据来自本机 `config/env_local.py`）。
 - `db_seed` / `api_request` / `ui_action` 三类按类别推断为 **destructive**：工作台要求勾选确认，未确认拒绝运行。
-- 每个 `Params` 字段的 `Field(description=...)` 就是表单 label；缺 description 会被模板测试拦截。
+- `db_seed` 有特化页（`/words/db_seed/<word_id>`）：预填 `example_params`、`dry_run` 缺省 True、结果强调 `cleanup[]`。
+  其它类别先走通用词页，kit 加类别时在 `tuner_testkit/workbench/kinds/` 加模块即可。
 
 
 ## 敏感信息
@@ -169,4 +177,5 @@ uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录
 5. `uv run pytest packages/tests/test_action_word_template.py` 通过；
 6. `python -m tuner_testkit.action_words run <word_id> --example` 冒烟（需要环境时）；
 7. 若供 behave 使用，在步骤层接线并跑 `behave --stage api --dry-run`。
-8. `tuner-workspace catalog` 后确认词条出现在 `action_words[]`（工作台随即可见）。
+8. `tuner-workspace catalog` 后确认词条出现在 `action_words[]`；工作台热路径读目录切片，
+   没有类别目录下的入口文件 = 工作台当它不存在。

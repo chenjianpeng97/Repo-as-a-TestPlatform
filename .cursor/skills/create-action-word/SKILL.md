@@ -1,6 +1,6 @@
 ---
 name: create-action-word
-version: 1.1.2
+version: 1.1.3
 description: Creates or updates action words under packages/action_words/ following action-words-syntax.md. Use when adding DB seed/assert, API request/assert, or UI action/assert business actions, or when migrating ad-hoc test logic (SQL scripts, step bodies) into reusable action words.
 ---
 
@@ -48,6 +48,9 @@ description: Creates or updates action words under packages/action_words/ follow
 - 资源一律经 `self.ctx`（DB 用 `self.db`，即
   `ctx.get_db(cls.datasource)`；API 用 `ctx.api_token`），不自建连接；
 - 源码 / example / 日志中不得出现真实 token、密码、Cookie。
+- 工作台只扫 `packages/action_words/{db_seed,db_assert,api_request,api_assert,ui_action,ui_assert}/*.py`
+  上的 `@register`；没有入口文件 = 工作台当它不存在。默认 `visibility = "workbench"`，
+  `local` 不进目录。模块顶层不得连库 / 读 `env_local`。
 
 ## Recommended structure (db_seed)
 

@@ -1,4 +1,4 @@
-"""Local workbench: a 127.0.0.1 page over ``tuner-workspace catalog`` + ``run``.
+"""Local workbench: a 127.0.0.1 page over the directory slice + ``run``.
 
 Lightweight users ``git pull`` then ``uv run tuner-workbench`` to fill in tool
 parameters visually. No database; repo is read-only; only ``artifacts/`` is written.

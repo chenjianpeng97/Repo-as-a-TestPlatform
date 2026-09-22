@@ -98,7 +98,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `index_ai` | `tuner-index-ai` | 生成 `.cursor/REGISTRY.md` | `tuner_testkit/apps/index_ai/README.md` |
 | `init_repo` | `tuner-init scaffold <dir>` | 任意目录铺新仓骨架 + 一次 `dna sync`（wheel 带 `stubs/`；**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
 | `workspace` | `tuner-workspace catalog` / `index render\|check` / `run` / `meta stamp` | 确定性 workspace catalog（`artifacts/catalogs/workspace.json`）、INDEX 自动区渲染、按清单运行工具、front-matter 署名 | `tuner_testkit/workspace/README.md` |
-| `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：工具目录 / 表单运行 / 运行历史 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
+| `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：目录切片（`@tool` / `@register`）/ `db_seed` 特化页 / 表单运行 / 运行历史 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
 | `tools`（库） | `from tuner_testkit.tools import tool` | `apps/<name>/tool.py` 的 `@tool` 清单：argparse → `params_schema` + `argv_plan`，供 catalog / 工作台 / 运行器 | `docs/spec/apps-authoring-syntax.md` §5 |
 | `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
 | `evidence` | `tuner-evidence persist` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，stdout JSON | `tuner_testkit/apps/evidence/README.md` |

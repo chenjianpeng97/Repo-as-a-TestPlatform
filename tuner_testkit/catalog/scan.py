@@ -165,12 +165,16 @@ def scan_page_objects(root: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def scan_action_words(root: Path) -> list[dict[str, Any]]:
+def scan_action_words(root: Path, *, isolate: bool = True) -> list[dict[str, Any]]:
     """Registered action words with their pydantic params schema.
 
     Imports ``packages.action_words`` from *root* (the registry needs the real
     classes for ``Params.model_json_schema()``). Failures degrade to ``[]``
     so a broken word module never breaks the whole catalog.
+
+    ``isolate=True`` (default, full catalog / tests) resets the registry and
+    evicts ``packages.*``. ``isolate=False`` (workbench directory hot path)
+    reuses an already-loaded registry from this root.
     """
     if not (root / "packages" / "action_words").is_dir():
         return []
@@ -179,6 +183,7 @@ def scan_action_words(root: Path) -> list[dict[str, Any]]:
 
     from tuner_testkit.action_words import registry
 
+    root = root.resolve()
     root_str = str(root)
     inserted = root_str not in sys.path
     if inserted:
@@ -186,9 +191,10 @@ def scan_action_words(root: Path) -> list[dict[str, Any]]:
     old_root = os.environ.get("TUNER_ROOT")
     os.environ["TUNER_ROOT"] = root_str
     try:
-        registry.reset_registry_for_tests()
-        for name in [m for m in sys.modules if m == "packages" or m.startswith("packages.")]:
-            sys.modules.pop(name, None)
+        if isolate or not _words_ready_for(root):
+            registry.reset_registry_for_tests()
+            for name in [m for m in sys.modules if m == "packages" or m.startswith("packages.")]:
+                sys.modules.pop(name, None)
         rows = []
         for cls in registry.list_all():
             row = cls.describe()
@@ -205,7 +211,26 @@ def scan_action_words(root: Path) -> list[dict[str, Any]]:
             os.environ.pop("TUNER_ROOT", None)
         else:
             os.environ["TUNER_ROOT"] = old_root
-        registry.reset_registry_for_tests()
+        if isolate:
+            registry.reset_registry_for_tests()
+        if inserted:
+            try:
+                sys.path.remove(root_str)
+            except ValueError:
+                pass
+
+
+def _words_ready_for(root: Path) -> bool:
+    """True when ``packages.action_words`` is already imported from *root* and registered."""
+    import sys
+
+    from tuner_testkit.action_words import registry
+
+    if not registry._REGISTRY:  # noqa: SLF001 — cheap emptiness check
+        return False
+    mod = sys.modules.get("packages.action_words")
+    file = getattr(mod, "__file__", None) or ""
+    return bool(file and Path(file).resolve().is_relative_to(root))
 
 
 # ---------------------------------------------------------------------------

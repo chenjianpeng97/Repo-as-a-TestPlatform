@@ -3,6 +3,22 @@
 {% block body %}
 <h1>运行 {{ run.run_id }}</h1>
 <p>状态 <strong>{{ run.status }}</strong> · 退出码 {{ run.exit_code }} · 工具 {{ run.producer.tool_id or "—" }}</p>
+{% if run.result is defined and run.result and run.result.cleanup is defined %}
+<h2>cleanup（造数登记）</h2>
+{% if run.result.cleanup %}
+<table class="cleanup">
+  <thead><tr><th>表</th><th>行 id</th></tr></thead>
+  <tbody>
+  {% for row in run.result.cleanup %}
+    <tr><td><code>{{ row.table }}</code></td><td>{{ row.ids | join(", ") }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">本次无 cleanup 行（dry-run 或未落库）。</p>
+{% endif %}
+{% if run.result.detail %}<p class="muted">detail：<code>{{ run.result.detail | tojson }}</code></p>{% endif %}
+{% endif %}
 <h2>stdout</h2>
 <pre>{{ run.stdout }}</pre>
 {% if run.stderr %}<h2>stderr</h2><pre>{{ run.stderr }}</pre>{% endif %}

@@ -74,3 +74,10 @@ def step_list_tools(context):
     resp = context.workbench.get("/api/tools")
     assert resp.status_code == 200
     context.tool_items = resp.json()["items"]
+
+
+@when("我查看造数动作词目录")
+def step_list_db_seed_words(context):
+    resp = context.workbench.get("/api/words", params={"category": "db_seed"})
+    assert resp.status_code == 200
+    context.tool_items = resp.json()["items"]

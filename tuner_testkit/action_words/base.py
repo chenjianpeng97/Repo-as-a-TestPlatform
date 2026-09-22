@@ -79,6 +79,8 @@ class ActionWord(ABC):
     datasource: ClassVar[str] = DEFAULT_ALIAS
     #: 可直接运行的入参样例（必须能通过 Params 校验）
     example_params: ClassVar[dict[str, Any]] = {}
+    #: 工作台 / catalog 目录可见性。``local`` 不进工作台列表。
+    visibility: ClassVar[str] = "workbench"
 
     class Params(BaseModel):
         """入参契约；子类内嵌覆盖。未知键一律拒绝，避免拼写错误静默生效。"""
@@ -127,5 +129,6 @@ class ActionWord(ABC):
             "datasource": cls.datasource,
             "doc": (cls.__doc__ or "").strip(),
             "params_schema": cls.params_schema(),
-            "example_params": cls.example_params,
+            "example_params": dict(cls.example_params or {}),
+            "visibility": getattr(cls, "visibility", "workbench") or "workbench",
         }

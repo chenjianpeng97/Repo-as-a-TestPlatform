@@ -44,6 +44,21 @@
 
 ---
 
+## 2026-09-22 — 工作台目录切片 + db_seed 特化页
+
+- **commit**: `TBD`
+- **目的**: 工作台热路径不再每次 `build_catalog`（全仓 + 每文件 `git log`）。只扫规范登记的 `@tool` / `@register` 入口，并按 kit 类别做可演进的特化 UI（先做 `db_seed`）。
+- **路径**:
+  - `tuner_testkit/catalog/directory.py`（`build_directory`、入口 mtime 缓存）
+  - `tuner_testkit/catalog/scan.py`（`scan_action_words(..., isolate=)`）
+  - `tuner_testkit/action_words/{base,registry}.py`（`visibility`）
+  - `tuner_testkit/workbench/app.py`、`templates/**`、`kinds/`（kind 插件、`/words/db_seed`）
+  - `docs/spec/apps-authoring-syntax.md` §8、`docs/spec/action-words-syntax.md`
+  - `.cursor/skills/create-app`、`create-action-word`、`.cursor/rules/apps-authoring.mdc`
+  - `dogfood/tests/features/workbench/tool_catalog.feature`
+- **不在同步范围**: 下游未 re-export kit `@register` 的旧词条（如仍走 `packages.action_words.registry` 的仓）
+- **验证**: `uv run pytest tuner_testkit/catalog/tests/test_directory.py tuner_testkit/workbench/tests/test_app.py`；`uv run --directory dogfood behave --stage api --tags "@offline" --tags "~@wip"`
+
 ## 2026-09-22 — tuner-testkit 5.1.0（A 收口 + 本地工作台 + C0 元数据）
 
 - **commit**: `TBD`

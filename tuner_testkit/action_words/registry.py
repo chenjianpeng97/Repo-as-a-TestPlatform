@@ -36,6 +36,9 @@ def register(cls: type[ActionWord]) -> type[ActionWord]:
         raise ValueError(f"{word_id}: 必须有业务 docstring")
     if not word_id.startswith(f"{cls.category}."):
         raise ValueError(f"{word_id}: word_id 须以类别前缀开头，如 '{cls.category}.xxx'")
+    visibility = getattr(cls, "visibility", "workbench") or "workbench"
+    if visibility not in {"workbench", "local"}:
+        raise ValueError(f"{word_id}: visibility 须是 'workbench' 或 'local'")
     existing = _REGISTRY.get(word_id)
     if existing is not None and existing is not cls:
         raise ValueError(f"word_id 重复注册: {word_id} ({existing.__name__} vs {cls.__name__})")

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ kind.label }} · tuner workbench{% endblock %}
+{% block body %}
+<h1>{{ kind.label }}</h1>
+<p class="muted">类别 <code>{{ kind.kind_id }}</code>，来自 <code>packages/action_words/{{ kind.kind_id }}/*.py</code> 的 <code>@register</code>。</p>
+<form method="get" action="/words/{{ kind.kind_id }}" class="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="按名称或 id 搜索">
+  <button type="submit">搜索</button>
+</form>
+<table>
+  <thead><tr><th>id</th><th>名称</th><th>数据源</th><th></th></tr></thead>
+  <tbody>
+  {% for it in items %}
+    <tr>
+      <td><code>{{ it.id }}</code></td>
+      <td>{{ it.name }}{% if it.destructive %} <span class="warn">destructive</span>{% endif %}</td>
+      <td>{{ it.datasource or "—" }}</td>
+      <td><a href="{{ it.href }}">打开</a></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4" class="muted">没有匹配的动作词</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
