@@ -20,15 +20,19 @@ wheels/
 # report files (legacy path; new runs use artifacts/)
 report/
 
-# run-scope evidence / catalogs / agent inbox (sanitized, still local)
-artifacts/evidence/
-artifacts/catalogs/
-artifacts/inbox/
+# run-scope artifacts (sanitized, still local) — `**/` so dogfood/ and nested workspaces are covered
+**/artifacts/evidence/
+**/artifacts/catalogs/
+**/artifacts/inbox/
+**/artifacts/runs/
+**/artifacts/reports/
+**/artifacts/exports/
+**/artifacts/playwright/
 
 # Local SUT login for LLM explore — never commit
-data/**/*.local.yaml
-data/**/*.local.json
-data/**/*.local.md
+**/data/**/*.local.yaml
+**/data/**/*.local.json
+**/data/**/*.local.md
 
 # run-scope logs produced by supports/logging
 logs/
@@ -46,8 +50,11 @@ logs/
 .env
 .env.*
 !.env.example
-config/env_local.py
-config/.active_env
+**/config/env_local.py
+**/config/.active_env
+
+# personal notes kept beside the repo, never committed
+docs/*.local.md
 
 # DNA overlay pointer written by tuner-dna sync (project-local)
 .tuner-dna-version

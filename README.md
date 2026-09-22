@@ -165,4 +165,8 @@ uv sync --extra all
 
 `uv sync --extra dev` 与 `--extra all` 等价（`dev` 只是引用 `[all]`）。
 
+本仓是**平台仓**，不是 workspace。`dogfood/` 是用 `tuner-init scaffold dogfood --no-ai` 生成的 workspace 示范
+（被测系统 = 平台本身，uv workspace 成员，共用 `.venv`）：路线图在 `dogfood/assets/domain-notes/platform/roadmap.md`，
+验收活文档在 `dogfood/tests/features/`。见 [`dogfood/README.md`](dogfood/README.md)。
+
 4.3.0 发行说明见 [`docs/changelog/TEMPLATE-4.3.0.md`](docs/changelog/TEMPLATE-4.3.0.md)；4.2.0 见 [`TEMPLATE-4.2.0.md`](docs/changelog/TEMPLATE-4.2.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。

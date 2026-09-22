@@ -1,4 +1,4 @@
-<!-- version: 1.4.0 -->
+<!-- version: 1.5.0 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -70,6 +70,9 @@ flowchart TD
 ## 6. 分支与下游仓
 
 本公开仓只维护**平台**：`tuner_testkit/`、`.cursor/**`、`docs/spec/**`、`INDEX.md`。
+**本仓不是 workspace**：真正的个人 workspace 是 `tuner-init scaffold` 生成的下游仓。仓内 `dogfood/`
+是用同一 scaffold 生成的 workspace 示范（被测系统 = 平台本身），存放路线图、验收剧本与活文档；
+它是 uv workspace 成员，不带自己的 `.cursor/`（根 DNA 覆盖全树），提交 scope 用 `dogfood`。
 
 | 分支 | 职责 | 谁改 |
 | --- | --- | --- |

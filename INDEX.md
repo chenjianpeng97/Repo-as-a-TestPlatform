@@ -1,4 +1,4 @@
-<!-- version: 1.4.1 -->
+<!-- version: 1.5.0 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -82,9 +82,9 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | --- | --- | --- | --- |
 | _(暂无)_ | | | `python -m tuner_testkit.page_test list` 列出实际发现的资产 |
 
-## 3. 工具层（kit CLI + 本仓 `apps/`）
+## 3. 工具层（kit CLI + workspace `apps/`）
 
-公共工具在 **`tuner_testkit.apps`**（`tuner-*` scripts）。本仓 `apps/` 只放 **SUT 私有**工具。规范：`docs/spec/apps-authoring-syntax.md`。
+公共工具在 **`tuner_testkit.apps`**（`tuner-*` scripts）。workspace 的 `apps/` 只放 **SUT 私有**工具（本仓示范见 `dogfood/apps/`）。规范：`docs/spec/apps-authoring-syntax.md`。
 
 | 工具 | 运行 | 用途 | 交接文档 |
 | --- | --- | --- | --- |
@@ -103,9 +103,24 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 
 | 类型 | 路径 | 说明 |
 | --- | --- | --- |
-| behave BDD | `tests/features/**` | UI/API 双 stage；探索编排 `.cursor/agents/sut-self-learning.md`；下半程 `.cursor/agents/bdd-asset-pipeline.md` |
-| pytest | `tests/pytest/**` | 性能/DB 核对等显式 pytest 套件 |
+| behave BDD | workspace `tests/features/**`（本仓示范 `dogfood/tests/features/`） | UI/API 双 stage；探索编排 `.cursor/agents/sut-self-learning.md`；下半程 `.cursor/agents/bdd-asset-pipeline.md` |
+| pytest | workspace `tests/pytest/**` | 性能/DB 核对等显式 pytest 套件 |
+| kit 回归 | `packages/tests/**`、`tuner_testkit/**/tests/**` | 平台运行库单测（`uv run pytest`） |
 
 ## 5. AI 组件（.cursor/）
 
 完整注册表（含类型/触发/版本）：[`.cursor/REGISTRY.md`](.cursor/REGISTRY.md)（`python -m tuner_testkit.apps.index_ai` 生成）。
+
+## 6. dogfood（`dogfood/`）
+
+用本仓 `tuner-init scaffold dogfood --no-ai` 生成的 workspace，被测系统是平台本身；uv workspace 成员，与平台共用 `.venv`。
+
+| 内容 | 路径 |
+| --- | --- |
+| 业务资产地图 | [`dogfood/INDEX.project.md`](dogfood/INDEX.project.md) |
+| 平台路线图（A→B→C→D） | `dogfood/assets/domain-notes/platform/roadmap.md` |
+| 「QA 一天」验收剧本 / 轻量用户场景 | `dogfood/assets/usecases/platform/qa-daily-journeys.md`、`dogfood/assets/usecases/workbench/lightweight-user.md` |
+| 活文档（behave） | `dogfood/tests/features/platform/*.feature`、`dogfood/tests/features/workbench/*.feature`（未落地场景 `@wip`） |
+| fixture | `dogfood/apps/sample_tool/`、`dogfood/packages/action_words/db_seed/sample_seed.py` |
+
+运行：`uv run --directory dogfood behave --stage api --tags @offline --tags ~@wip`。提交 scope 用 `dogfood`。

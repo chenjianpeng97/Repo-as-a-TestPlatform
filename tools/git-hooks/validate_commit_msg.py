@@ -17,6 +17,7 @@ Exit code 0 = ok, 1 = rejected.
 """
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -30,9 +31,14 @@ ALLOWED_TYPES = {
 ALLOWED_SCOPES = {
     "assets", "apps", "packages", "api_objects", "page_objects", "action_words",
     "tests", "docs", "rules", "skills", "agents", "hooks", "init_repo", "index",
+    # in-repo dogfood workspace (scaffolded from this platform repo)
+    "dogfood",
     # fine-grained package aliases also accepted
     "db", "logging", "recorder", "config", "api_test", "excel",
 }
+
+# Tests can inject the staged file list instead of calling git.
+STAGED_ENV = "TUNER_COMMIT_STAGED"
 
 # packages umbrella covers these sub-layers
 PACKAGES_UMBRELLA = {"api_objects", "page_objects", "action_words", "packages",
@@ -44,6 +50,9 @@ HEADER_RE = re.compile(
 
 
 def _staged_files() -> list[str]:
+    injected = os.environ.get(STAGED_ENV)
+    if injected is not None:
+        return [line.strip() for line in injected.splitlines() if line.strip()]
     try:
         out = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],
@@ -57,6 +66,8 @@ def _staged_files() -> list[str]:
 def _path_to_layer(path: str) -> str | None:
     """Map a repo path to a canonical scope layer, or None if unrecognized."""
     p = path.replace("\\", "/")
+    if p.startswith("dogfood/"):
+        return "dogfood"
     if p.startswith("packages/api_objects/"):
         return "api_objects"
     if p.startswith("packages/page_objects/"):
@@ -108,7 +119,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     try:
-        with open(argv[1], encoding="utf-8") as fh:
+        with open(argv[1], encoding="utf-8-sig") as fh:  # tolerate a Windows editor BOM
             raw = fh.read()
     except OSError as exc:
         print(f"commit-msg: cannot read message file: {exc}", file=sys.stderr)

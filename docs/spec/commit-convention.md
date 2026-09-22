@@ -51,6 +51,7 @@
 | `hooks` | `.cursor/hooks*`、`tools/git-hooks/**` | 钩子 |
 | `init_repo` | `tuner_testkit/apps/init_repo/**` | 初始化工具与 release |
 | `index` | `INDEX.md`、`INDEX.project.md`、`.cursor/REGISTRY.md` | 索引/注册表 |
+| `dogfood` | `dogfood/**` | 平台仓内用 scaffold 生成的 dogfood workspace（知识、feature、fixture） |
 
 > `packages` 视为 `api_objects` / `page_objects` / `action_words` 的**上位 scope**：
 > 声明 `packages` 可覆盖这三者的改动。
@@ -80,4 +81,5 @@ feat(apps,packages): add init_repo and release manifest surface
 git config core.hooksPath tools/git-hooks
 ```
 
-CI 可复用同一校验脚本（对齐 `docs/note.md` 里 Ruff+CI 规划）。合并/回滚提交（`Merge`/`Revert` 开头）跳过校验。
+CI 可复用同一校验脚本。合并/回滚提交（`Merge`/`Revert` 开头）跳过校验。
+测试或活文档可用环境变量 `TUNER_COMMIT_STAGED`（换行分隔的路径列表）注入"已暂存文件"，替代 `git diff --cached`。
