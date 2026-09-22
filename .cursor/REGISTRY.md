@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**35**（rules 14 · skills 16 · agents 3 · hooks 2）
+> 组件总数：**37**（rules 14 · skills 16 · agents 3 · hooks 4）
 
 ## Rules（约束/边界）
 
@@ -61,4 +61,6 @@
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
 | `afterFileEdit` | afterFileEdit | Write | 1 | command: python .cursor/hooks/sync_registry.py | `.cursor/hooks.json` |
+| `pre-commit` | git commit (before message) | tools/git-hooks | - | Deterministic secret scan over staged files (secret_scan.py) | `tools/git-hooks/pre-commit` |
 | `commit-msg` | git commit | tools/git-hooks | - | Conventional Commits + layer-scope consistency check | `tools/git-hooks/commit-msg` |
+| `pre-push` | git push | tools/git-hooks | - | Warn when DNA drifted from release_manifest.json (non-blocking) | `tools/git-hooks/pre-push` |

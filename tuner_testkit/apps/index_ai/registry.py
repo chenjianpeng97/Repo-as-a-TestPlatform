@@ -178,17 +178,25 @@ def collect_hooks() -> list[Component]:
                 ))
     # git hooks (not agent hooks) — listed for completeness
     git_hooks = _repo_root() / "tools" / "git-hooks"
-    if (git_hooks / "commit-msg").exists():
-        out.append(Component(
-            kind="hook",
-            name="commit-msg",
-            trigger="git commit",
-            scope="tools/git-hooks",
-            description="Conventional Commits + layer-scope consistency check",
-            version="-",
-            path="tools/git-hooks/commit-msg",
-        ))
+    for name, trigger, description in _GIT_HOOKS:
+        if (git_hooks / name).exists():
+            out.append(Component(
+                kind="hook",
+                name=name,
+                trigger=trigger,
+                scope="tools/git-hooks",
+                description=description,
+                version="-",
+                path=f"tools/git-hooks/{name}",
+            ))
     return out
+
+
+_GIT_HOOKS: tuple[tuple[str, str, str], ...] = (
+    ("pre-commit", "git commit (before message)", "Deterministic secret scan over staged files (secret_scan.py)"),
+    ("commit-msg", "git commit", "Conventional Commits + layer-scope consistency check"),
+    ("pre-push", "git push", "Warn when DNA drifted from release_manifest.json (non-blocking)"),
+)
 
 
 def _render_table(title: str, comps: list[Component]) -> str:
