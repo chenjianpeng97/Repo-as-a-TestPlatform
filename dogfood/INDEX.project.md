@@ -12,7 +12,7 @@
 <!-- auto:begin:ddl -->
 | datasource | 表 | 路径 |
 | --- | --- | --- |
-| _(暂无)_ | | |
+| _(暂无)_ |  |  |
 <!-- auto:end:ddl -->
 
 ### 1.2 业务 SQL 副本（自动区）
@@ -20,7 +20,7 @@
 <!-- auto:begin:sql -->
 | 文件 | 路径 |
 | --- | --- |
-| _(暂无)_ | |
+| _(暂无)_ |  |
 <!-- auto:end:sql -->
 
 ### 1.3 用例 / 业务讲解 / 探索 / design / 报告（人工区）
@@ -38,7 +38,7 @@
 <!-- auto:begin:api_objects -->
 | method + path | 文件 |
 | --- | --- |
-| _(暂无)_ | |
+| _(暂无)_ |  |
 <!-- auto:end:api_objects -->
 
 ### 2.2 Page Objects（自动区）
@@ -46,7 +46,7 @@
 <!-- auto:begin:page_objects -->
 | page | 文件 |
 | --- | --- |
-| _(暂无)_ | |
+| _(暂无)_ |  |
 <!-- auto:end:page_objects -->
 
 ### 2.3 Action Words（自动区）
@@ -62,7 +62,7 @@
 <!-- auto:begin:apps -->
 | 工具 | 运行 | 用途 | 交接文档 |
 | --- | --- | --- | --- |
-| `sample_tool` | `python -m apps.sample_tool` | 离线示例工具（工作台表单 fixture） | `apps/sample_tool/README.md` |
+| `sample_tool` | `python -m apps.sample_tool` | 离线生成带标签的样例行；工作台表单与 QA 一天验收的 fixture。 | `apps/sample_tool/README.md` |
 <!-- auto:end:apps -->
 
 ## 4. 测试层（tests/，自动区）
@@ -71,10 +71,10 @@
 | feature | 场景数 | 标签 |
 | --- | --- | --- |
 | `tests/features/platform/qa_daily_journeys.feature` | 5 | platform, dogfood |
-| `tests/features/workbench/tool_catalog.feature` | 3 | workbench, dogfood |
-| `tests/features/workbench/run_tool.feature` | 4 | workbench, dogfood |
-| `tests/features/workbench/run_history.feature` | 2 | workbench, dogfood |
 | `tests/features/workbench/knowledge_browse.feature` | 3 | workbench, dogfood |
+| `tests/features/workbench/run_history.feature` | 2 | workbench, dogfood |
+| `tests/features/workbench/run_tool.feature` | 4 | workbench, dogfood |
+| `tests/features/workbench/tool_catalog.feature` | 3 | workbench, dogfood |
 <!-- auto:end:features -->
 
 ## 5. 交付物（artifacts/）

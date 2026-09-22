@@ -85,4 +85,4 @@ uv run python -m tuner_testkit.page_test run plane.sign_in@v1 --flow login --exa
 - **脱敏当场做**：`type=password` 与敏感键名 → `{{password}}` / `{{username}}`。
 - 只生成声明式 `PageModel`，不生成 `BasePage` 子类。若目标文件已是手写 class，工具 **skip** 以免覆盖。
 
-本工具是**本地维护 CLI**（产物进 git），不加 `@plane_app`。
+本工具是**本地维护 CLI**（产物进 git），不提供 `tool.py` 清单，不进工作台。

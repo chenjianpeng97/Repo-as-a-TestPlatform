@@ -81,3 +81,7 @@ flowchart TD
 - **下游 SUT 测试仓**用 `tuner-init scaffold` 从空白目录新建，用 `uv add tuner-testkit==x.y.z` + `tuner-dna sync` 取平台能力。业务资产（`assets/`、objects、features、`INDEX.project.md`）只活在下游仓。
 - 试用中发现框架要改：在 `public-main` 改并提交（内循环可用 `uv tool install --from <this-repo>`）；阶段收口打 tag 发 PyPI，下游再升级。
 - 历史分支 `plane-dogfood` **退役**：分支式 dogfood 验不了 `tuner-init` + PyPI 全链。Plane 的业务测试仓是外部仓（如 `tuner-test-platform-testrepo`）。
+- **「Plane」在本仓只指 dogfood 的被测系统**（plane.so 类项目管理产品）。曾经的 Plane Job / Sync 协议
+  （`@plane_app`、`@plane_*`、`index_platform`）已在 5.0.0 退场，对应能力中立化为 `tuner_testkit.tools`
+  （tool manifest）与 `tuner_testkit.catalog`（`tuner-workspace catalog`）；云端拉取 workspace 属于 D 阶段，
+  见 `dogfood/assets/domain-notes/platform/roadmap.md`。

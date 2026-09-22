@@ -27,7 +27,7 @@ data/mocks/          prod-api/inout/report/his/queryInoutHis/POST.v1.json # 响�
 
 - 后端未就绪 / 环境不稳，但要先把 UI、API 用例跑通。
 - 构造真实环境难复现的分支：500、业务码非 200、空列表、慢响应。
-- 测试平台（Plane）拉起本仓后，由页面定义某接口这次返回什么。
+- 工作台 / 测试平台拉起本服务后，由页面定义某接口这次返回什么（`tool.py` 以 `runtime="long_lived"` 登记）。
 - 给 `tuner_testkit/api_test` 自身做回归时，需要一个确定性的对端。
 
 **不适用**
@@ -134,8 +134,8 @@ curl -X POST http://127.0.0.1:8931/__mock__/persist -H "Content-Type: applicatio
 | `GET {prefix}/requests?limit=` | 最近收到的请求留痕（已脱敏），可断言调用次数与入参 |
 | `DELETE {prefix}/requests` | 清空留痕 |
 
-**改动默认只在内存**，必须显式 `persist` 才写盘。这样 Plane Runner 在容器里改返回值
-不会污染 checkout（与 `tuner_testkit/apps/index_platform` 的「不写 git」一致）。
+**改动默认只在内存**，必须显式 `persist` 才写盘。这样运行器在容器里改返回值
+不会污染 checkout（与 `tuner-workspace catalog` 的「不写 git」一致）。
 
 ## mock 定义格式
 

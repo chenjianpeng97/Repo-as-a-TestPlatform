@@ -1,6 +1,6 @@
 ---
 name: maintain-page-objects
-version: 2.0.2
+version: 2.1.0
 description: Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element table + declarative flows, or BasePage escape hatch) following page-objects-syntax.md. Use when UI steps fail due to locators, new UI flows are needed, selector leakage must be removed from steps, or doctor reports locator rot.
 ---
 
@@ -50,7 +50,7 @@ description: Creates or updates page assets under packages/page_objects/ on the 
 - 每个 flow 带 `description` 与 `example_params`（让 `run --example` 可一键跑）。
 - 页面级 `asserts` / `extracts` 只放**页面自身的稳定契约**（`open()` 时执行）；
   flow 级断言写在该 flow 的 steps 里。
-- 需要上 Plane Formulation 时加 `@plane_pageobject`。
+- 不需要任何装饰器就会出现在 `tuner-workspace catalog` 与工作台的只读页面清单里（静态扫描 `page_id`）。
 
 ## Quick validation（必须跑）
 

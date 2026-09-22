@@ -169,4 +169,4 @@ uv sync --extra all
 （被测系统 = 平台本身，uv workspace 成员，共用 `.venv`）：路线图在 `dogfood/assets/domain-notes/platform/roadmap.md`，
 验收活文档在 `dogfood/tests/features/`。见 [`dogfood/README.md`](dogfood/README.md)。
 
-4.3.0 发行说明见 [`docs/changelog/TEMPLATE-4.3.0.md`](docs/changelog/TEMPLATE-4.3.0.md)；4.2.0 见 [`TEMPLATE-4.2.0.md`](docs/changelog/TEMPLATE-4.2.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。
+5.0.0 发行说明（Plane Job 协议退场、`tuner-workspace`）见 [`docs/changelog/TEMPLATE-5.0.0.md`](docs/changelog/TEMPLATE-5.0.0.md)；4.3.0 见 [`TEMPLATE-4.3.0.md`](docs/changelog/TEMPLATE-4.3.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。

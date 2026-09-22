@@ -119,7 +119,7 @@ def test_broken_module_is_skipped_without_breaking_the_scan(asset_root):
 
 def test_helper_modules_are_not_treated_as_assets(asset_root):
     (asset_root / "session.py").write_text(BROKEN_ASSET, encoding="utf-8")
-    (asset_root / "plane.py").write_text(BROKEN_ASSET, encoding="utf-8")
+    (asset_root / "pages.py").write_text(BROKEN_ASSET, encoding="utf-8")
     (asset_root / "__init__.py").write_text(BROKEN_ASSET, encoding="utf-8")
 
     assert registry.discover() == []

@@ -1,9 +1,8 @@
 """Enumerate every frozen :class:`APIModel` under ``packages/api_objects``.
 
-Existing discovery paths are not usable for a route table: ``scan_api_objects``
-(``apps.index_platform``) only regex-greps ``method=`` / ``path=`` and never
-materialises the object, and ``collect_plane_api_objects`` only returns assets
-carrying an opt-in ``@plane_apiobject`` mark.
+The static catalog scan (``tuner_testkit.catalog.scan.scan_api_objects``) is not
+usable for a route table: it only regex-greps ``method=`` / ``path=`` and never
+materialises the object.
 
 Assets live in a route-shaped tree whose directory names mirror URL segments
 (``packages/api_objects/prod-api/inout/...``). Those segments are frequently

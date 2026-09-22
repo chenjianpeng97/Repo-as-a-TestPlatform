@@ -2,7 +2,7 @@
 description: SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's packages business assets; no reinventing wheels, no secrets, not imported by tests
 globs: apps/**,tuner_testkit/apps/**
 alwaysApply: false
-version: 1.4.0
+version: 2.0.0
 ---
 
 # apps — 创建期约束
@@ -30,18 +30,20 @@ version: 1.4.0
 - 不得被 `tests/` import（复用逻辑下沉到 `packages/` 业务资产或 `tuner_testkit`）。
 - 不得写入 token / cookie / 密码 / Authorization / session 等敏感值。
 - 破坏性操作无开关、默认非 dry-run/只读 → 禁止。
-- 不得为了「被 Plane 看见」而给本地维护工具加 `@plane_app`（dump_ddl / recorder /
-  api_recorder / page_recorder / init_repo / index_ai 保持本机 CLI，产物进 git）。
+- 造数 / API / UI 动作不得做成伪 app：写成 action word（`@register` 后自动进目录与工作台）。
 
-## Plane 可运行 vs 本地维护
+## 工作台可见 vs 本地维护
 
-- **本地维护**（工程师跑完再 commit）：不必 `plane.py`，Plane Runner 不会执行。
-- **Plane Job**：必须提供 import-safe 的 `apps/<name>/plane.py`，用
-  `tuner_testkit.apps._shared.plane_app.@plane_app` / `register_plane_app` 登记；SUT CLI 为
-  `python -m apps.<name>`。领域逻辑在 `packages/`，apps 只做协议适配。
-  造数 / API / UI 动作不要再做成伪 app；给 word 加 `@plane_db_seed` 等即可。
-- 发现器只 import 存在 `plane.py` 的包；`cli.py` 可以较重，但 `plane.py` 禁止
-  顶层 import DB / mitmproxy。
+- **工作台可见**（团队成员要在 `tuner-workbench` 里填参运行）：提供 import-safe 的
+  `apps/<name>/tool.py`，用 `tuner_testkit.tools.tool(tool_id=..., name=..., module="apps.<name>", group=...,
+  destructive=..., timeout=...)` 装饰 `build_parser`；`tuner-workspace catalog` 据此导出
+  `params_schema` / `argv_plan`。每个参数必须有 `help`（即表单 label）；破坏性工具声明 `destructive=True`
+  且 CLI 默认 dry-run。
+- **本地维护**（工程师跑完再 commit，产物进 git；如 dump_ddl / recorder / init_repo / index_ai）：
+  不写 `tool.py`，或写了但 `visibility="local"`。
+- 发现器只 import `apps/*/tool.py` 与 kit 的 `tuner_testkit/apps/*/tool.py`；`cli.py` 可以较重，
+  但 `tool.py` 及其 import 的模块禁止顶层 import DB 驱动 / Playwright / mitmproxy。
+- 需要机器可读输出时用 `--json` envelope（`status / outputs[] / artifacts[] / log_path`），见规范 §7。
 
 ## 相关
 

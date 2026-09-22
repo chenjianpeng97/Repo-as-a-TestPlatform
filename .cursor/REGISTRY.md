@@ -13,10 +13,10 @@
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
 | `agent-task-log` | always | all files | 1.0.0 | Every agent run must leave a task log under artifacts/inbox/ (no secrets). | `.cursor/rules/agent-task-log.mdc` |
-| `apps-authoring` | glob | apps/**,tuner_testkit/apps/** | 1.4.0 | SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's package… | `.cursor/rules/apps-authoring.mdc` |
+| `apps-authoring` | glob | apps/**,tuner_testkit/apps/** | 2.0.0 | SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's package… | `.cursor/rules/apps-authoring.mdc` |
 | `apps-handover` | glob | apps/**,tuner_testkit/apps/** | 1.1.0 | When an apps/ or tuner_testkit.apps tool is created or changed, it must ship a handover doc (requirement background, tr… | `.cursor/rules/apps-handover.mdc` |
 | `assets-knowledge` | glob | assets/** | 1.1.0 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
-| `bdd-asset-layering` | glob | **/*.py | 1.3.1 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime | `.cursor/rules/bdd-asset-layering.mdc` |
+| `bdd-asset-layering` | glob | **/*.py | 1.4.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime | `.cursor/rules/bdd-asset-layering.mdc` |
 | `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/**,assets/design/** | 3.0.0 | Three gates for the BDD/self-learning asset pipeline (evidence capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
 | `commit-convention` | always | all files | 1.1.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
@@ -43,7 +43,7 @@
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.1.2 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
-| `maintain-page-objects` | on-demand | - | 2.0.2 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
+| `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
 | `release-template` | on-demand | - | 1.0.1 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
 | `reuse-analysis` | on-demand | - | 1.0.0 | Analyzes whether to reuse/add/update Feature steps, Page Objects, and API Objects by searching for existing assets, mat… | `.cursor/skills/reuse-analysis/SKILL.md` |
 | `run-feature-playwright-mcp` | on-demand | - | 1.2.0 | Runs behave Gherkin scenarios (or records an explore session) via Playwright MCP with Run→Capture→Freeze workflow and s… | `.cursor/skills/run-feature-playwright-mcp/SKILL.md` |

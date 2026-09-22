@@ -20,7 +20,7 @@
   - `tuner_testkit/apps/page_recorder/**`
   - `tuner_testkit/apps/dump_ddl.py`
   - `tuner_testkit/apps/_shared/**`
-  - `tuner_testkit/apps/index_platform/**`
+  - `tuner_testkit/tools/**`、`tuner_testkit/catalog/**`、`tuner_testkit/workspace/**`
   - `docs/spec/**`（框架规范）
   - `.cursor/skills/**` / `.cursor/rules/**`
   - 本文件 `docs/changelog/FRAMEWORK.md`
@@ -43,6 +43,24 @@
 ```
 
 ---
+
+## 2026-09-22 — tuner-testkit 5.0.0（Plane Job 协议退场；tool manifest + workspace catalog 中立化）
+
+- **commit**: `TBD`
+- **来源**: 路线图重排 A→B→C→D（`dogfood/assets/domain-notes/platform/roadmap.md`）；企业 Runner 协议属 D 阶段，步子跨大
+- **目的**: 删除 `@plane_app` / `@plane_*` / `index_platform`，把「argparse → JSON Schema + argv_plan」与「workspace 静态扫描」抽成中立模块，供 A（catalog / INDEX 自动区）与 B（本地工作台）复用。
+- **路径**:
+  - `tuner_testkit/tools/**`（`@tool` 清单、`build_argv` / `validate_params`）
+  - `tuner_testkit/catalog/**`（catalog v3、front-matter 读写器）
+  - `tuner_testkit/workspace/**`（`tuner-workspace catalog` / `index render|check`）
+  - `tuner_testkit/apps/mock_server/tool.py`（原 `plane.py`）
+  - 删除：`tuner_testkit/apps/_shared/plane*.py`、`tuner_testkit/action_words/plane.py`、`tuner_testkit/apps/index_platform/**`、`packages/*/plane.py`、`init_repo/stubs/packages/*/plane.py`
+  - `.cursor/rules/apps-authoring.mdc`（2.0.0）、`bdd-asset-layering.mdc`、`.cursor/skills/maintain-page-objects`
+  - `docs/spec/apps-authoring-syntax.md`、`action-words-syntax.md`、`api-objects-syntax.md`、`page-objects-syntax.md`
+  - `pyproject.toml`（5.0.0；`tuner-workspace` 替代 `tuner-index-platform`；uv workspace 成员 `dogfood`）
+  - `dogfood/**`（A0 dogfood workspace）、`INDEX.md`、`AGENTS.md`
+- **不在同步范围**: 下游业务资产；下游需按 `TEMPLATE-5.0.0.md` 删 `plane.py` 桩
+- **验证**: `uv run pytest`；`uv run --directory dogfood tuner-workspace catalog --out -`；`uv run --directory dogfood tuner-workspace index check`；`tuner-index-ai --check`；`manifest --check`
 
 ## 2026-09-14 — tuner-testkit 4.4.0（自学习编排 agent + inbox 任务 log）
 

@@ -2,7 +2,7 @@
 description: Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime; no selector or request leakage across layers
 globs: **/*.py
 alwaysApply: false
-version: 1.3.1
+version: 1.4.0
 ---
 
 # Asset Layering — boundary rules per layer
@@ -43,8 +43,8 @@ Each layer owns one responsibility. Leakage across layers (e.g. selectors in ste
 - **No secrets in repo**, ever: `Authorization`, `Cookie`, `Set-Cookie`, `*token*`, `*secret*`, `*password*`, `*session*`. Also applies to captures under `artifacts/evidence/`.
 - **Evidence-driven edits**: Page/API object changes must be backed by Playwright MCP snapshots, `tuner-recorder` / `tuner-api-recorder` captures (`python -m tuner_testkit.apps.recorder` / `api_recorder`), or run_summary findings; avoid locator/path guesses.
 - **`tests/**` must not import `apps.*`**. Action words for BDD/pytest stay in
-  `tuner_testkit.action_words`. Opt into Plane with `@plane_db_seed` (etc.) from
-  `tuner_testkit.action_words.plane`; do not wrap them as `apps.*`.
+  `tuner_testkit.action_words`; every `@register`ed word is already listed by
+  `tuner-workspace catalog` and runnable from the workbench — do not wrap them as `apps.*`.
 
 ## Examples
 

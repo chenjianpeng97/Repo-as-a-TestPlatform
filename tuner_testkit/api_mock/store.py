@@ -6,9 +6,8 @@ Two layers:
 * **overrides** — whatever the admin API changed since startup.
 
 Overrides win on read and stay in memory until :meth:`MockStore.persist` writes
-them out. That split is deliberate: the Plane runner must be able to redefine a
-response without the server writing into the checked-out repo (see
-``tuner_testkit/apps/index_platform/README.md`` — catalog jobs do not write git).
+them out. That split is deliberate: a test platform or the workbench must be able
+to redefine a response without the server writing into the checked-out repo.
 """
 from __future__ import annotations
 

@@ -11,8 +11,8 @@ description: Action Words spec for unified test-asset management. Covers the bas
 - **目标**：把测试资产收敛为**最小可复用业务动作单元**（action word），统一管理
   DB 造数 / DB 断言 / 接口请求 / 接口断言 / 页面操作 / 页面断言六类工作，做到：
   - 每个 word **独立可运行**（CLI 一键执行），也可被 behave 步骤或 pytest 直接调用；
-  - 入参/出参有**统一数据契约**（pydantic v2），可导出 JSON Schema 供 Plane
-    Formulation 做可视化表单与一键执行；
+  - 入参/出参有**统一数据契约**（pydantic v2），可导出 JSON Schema 供本地工作台
+    （`tuner-workbench`）做可视化表单与一键执行；
   - 造数产生的行**按表登记 cleanup**，测试夹具场景后精确删除。
 - **边界**：
   - action word 是**业务动作**，不是技术封装——`tuner_testkit/db`、`tuner_testkit/api_test`、
@@ -26,7 +26,7 @@ description: Action Words spec for unified test-asset management. Covers the bas
 框架（基类 / registry / CLI）在 **`tuner_testkit.action_words`**。SUT 仓的 `packages/action_words/` 只做 re-export 并放本仓 word：
 
 ```
-tuner_testkit/action_words/   # kit：base / context / registry / plane / CLI
+tuner_testkit/action_words/   # kit：base / context / registry / CLI
 packages/action_words/
 ├── __init__.py          # re-export ActionWord / ActionResult / register 等
 ├── __main__.py          # 转到 tuner_testkit.action_words CLI
@@ -129,7 +129,8 @@ uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录
 
 - `run` 输出 `Result` 的 JSON（含 cleanup 登记），退出码 0/1 对应成功/失败；
 - 手工造数后需要清理时，按输出的 cleanup 逐表 `DELETE ... WHERE id IN (...)`。
-- `catalog` 供本机调用 `export_catalog()`；**Plane 列表只收带 `@plane_*` 的词条**，由 `apps.index_platform` 写入 `components.action_words`。
+- `catalog` 供本机调用 `export_catalog()`；`tuner-workspace catalog` 把**全部** `@register` 的词条（含 `params_schema`、
+  `destructive` 推断）写入 `artifacts/catalogs/workspace.json` 的 `action_words[]`，工作台据此渲染表单。
 
 ## 与 BDD / pytest 的集成
 
@@ -141,15 +142,14 @@ uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录
   纯构建函数（`build_*_rows` / `build_links`）可离线断言列集与关联键。
 - **禁止**：`tests/**` import `apps.*`。组合层永远是本包。
 
-## 与 Plane（TestCopilot）
+## 与本地工作台（workbench）
 
-- 仅 `@register` 的 word 供 BDD / 本机 CLI；**不上 Plane**。
-- 要上 Formulation / Job：再加 `@plane_db_seed` / `@plane_db_assert` /
-  `@plane_api_request` / `@plane_api_assert` / `@plane_ui_action` /
-  `@plane_ui_assert`（`from tuner_testkit.action_words.plane import ...`，内部仍调用 `@register`）。
-- 运行：`python -m tuner_testkit.action_words run <word_id>`。Plane 不暴露 CLI 的
-  `--username` / `--password` / `--params-file`；Job 只有 `word_id`、`--params` JSON、`--example`。
-- 词条 `params_schema` 仍给 Formulation 业务表单；Job 校验用 `job_params_schema`。
+- `@register` 即可见：工作台从 `tuner-workspace catalog` 的 `action_words[]` 读取词条，不需要额外装饰器。
+- 运行：工作台经 `tuner-workspace run <word_id> --params JSON` 调用
+  `python -m tuner_testkit.action_words run <word_id> --params JSON`；只暴露 `word_id` 与 `--params`，
+  不暴露 `--username` / `--password` / `--params-file`（凭据来自本机 `config/env_local.py`）。
+- `db_seed` / `api_request` / `ui_action` 三类按类别推断为 **destructive**：工作台要求勾选确认，未确认拒绝运行。
+- 每个 `Params` 字段的 `Field(description=...)` 就是表单 label；缺 description 会被模板测试拦截。
 
 
 ## 敏感信息
@@ -169,4 +169,4 @@ uv run python -m tuner_testkit.action_words catalog [-o out.json] # 全量目录
 5. `uv run pytest packages/tests/test_action_word_template.py` 通过；
 6. `python -m tuner_testkit.action_words run <word_id> --example` 冒烟（需要环境时）；
 7. 若供 behave 使用，在步骤层接线并跑 `behave --stage api --dry-run`。
-8. 若要出现在 TestCopilot Formulation：再加对应 `@plane_*` 装饰器。
+8. `tuner-workspace catalog` 后确认词条出现在 `action_words[]`（工作台随即可见）。

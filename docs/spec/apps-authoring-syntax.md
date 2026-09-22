@@ -2,7 +2,7 @@
 
 > `apps/` 存放 **SUT 私有**、可独立运行的测试工具（`python -m apps.<name>`）。
 > **平台**工具在 `tuner_testkit.apps`（`tuner-recorder`、`tuner-dump-ddl` 等），不要再拷进下游 `apps/`。
-> 领域动作（造数 / API / UI）留在 `packages/`，用 `@plane_db_seed` 等 opt-in 上架，不经 apps 冒充。
+> 领域动作（造数 / API / UI）留在 `packages/`（action words 经 `@register` 自动进入目录与工作台），不经 apps 冒充。
 > 供 `apps-authoring.mdc`（创建期）与 `apps-handover.mdc`（完成期）引用。
 
 ## 1. 目录与入口
@@ -14,8 +14,9 @@ apps/                            # 仅 SUT 私有工具
 ├── __init__.py
 └── <your_tool>/
     ├── __init__.py __main__.py
-    ├── cli.py
-    ├── README.md
+    ├── cli.py                   # argparse build_parser() + main()
+    ├── tool.py                  # import-safe @tool 清单（工作台 / catalog 读取）
+    ├── README.md                # 交接文档（front-matter 见 metadata-conventions）
     └── tests/
 
 # 平台工具（已安装的 tuner-testkit，不要写进本仓 apps/）
@@ -63,10 +64,11 @@ apps/                            # 仅 SUT 私有工具
 - 不得写入 token / cookie / 密码 / Authorization / session 等敏感值（含产出文件与日志）。
 - apps 是**独立运行**的工具，**不得被 `tests/` import**（测试复用逻辑应下沉到 `packages/`）。
 - 破坏性操作（写生产库、删除文件）必须显式开关 + 默认 dry-run/只读。
-- **Plane vs 本地**：只有要在 Plane 跑的 **CLI 工具** 才加 `plane.py` + `@plane_app`。
-  回填 git 的工具（DDL/api_objects/REGISTRY/脚手架）不要注册。领域动作留在
-  `packages/`，用 `@plane_db_seed` 等标记上架；发现器只加载 `apps/*/plane.py`
-  作为 `tools[]`。Plane 装饰器从 `tuner_testkit.apps._shared.plane_app` 导入。
+- **工作台可见 vs 本地维护**：要出现在 `tuner-workspace catalog` / 工作台的工具，提供 import-safe 的
+  `apps/<name>/tool.py`，用 `tuner_testkit.tools.tool` 装饰 `build_parser`（argparse → `params_schema` + `argv_plan`）。
+  纯本地维护、产物直接进 git 的工具可以不写 `tool.py`，或写了但声明 `visibility="local"`。
+  `tool.py` 及其 import 的模块**不得**在顶层 import DB 驱动 / 浏览器 / 代理。领域动作留在 `packages/`
+  （action words 经 `@register` 自动进目录）。
 
 ## 6. 测试
 

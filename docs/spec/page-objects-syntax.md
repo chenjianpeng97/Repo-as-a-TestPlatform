@@ -40,7 +40,8 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 - **无 host**：`url_path` 与 `Goto(path=...)` 只写路径；host 由
   `tuner_testkit.config.get_ui_base_url()` 运行时注入。
 - **无凭据**：敏感值写 `{{password}}` 占位符，运行时从入参或环境变量代入，**永不落盘**。
-- **Plane**：要出现在 Formulation Page，用 `@plane_pageobject`（`packages.page_objects.plane`）。
+- **目录可见**：`tuner-workspace catalog` 静态扫描 `packages/page_objects/**` 中带 `page_id` 的 `PageModel` /
+  `BasePage` 文件，不需要装饰器；`session.py` / `pages.py` 等辅助模块会被跳过。
 - **可审计**：脆弱 locator 必须声明 `confidence="fragile"` 并在 `note` 写清风险与替代建议。
 
 ## Locator 策略

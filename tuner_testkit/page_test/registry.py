@@ -5,7 +5,7 @@
 两者用 :class:`PageAsset` 统一封装，因此 CLI、平台与 doctor 只需处理一种接口。
 
 扫描**容错**：单个模块 import 失败只记录问题、不中断整体发现，与
-``apps._shared.plane_asset`` 跳过坏模块的行为一致。
+``tuner_testkit.catalog`` 跳过坏模块的行为一致。
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from .errors import PageTestError
 from .model import PageModel
 
 #: page_objects 下的辅助模块，不含页面资产
-_SKIP_STEMS = frozenset({"__init__", "plane", "session", "pages"})
+_SKIP_STEMS = frozenset({"__init__", "session", "pages"})
 
 _REGISTRY: dict[str, "PageAsset"] = {}
 _IMPORT_PROBLEMS: list[str] = []
