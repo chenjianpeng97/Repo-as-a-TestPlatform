@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**37**（rules 14 · skills 16 · agents 3 · hooks 4）
+> 组件总数：**38**（rules 14 · skills 17 · agents 3 · hooks 4）
 
 ## Rules（约束/边界）
 
@@ -33,7 +33,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `analyze-mcp-network` | on-demand | - | 1.0.0 | Turn a persisted artifacts/evidence/<run_id>/network.jsonl into a unique method+path route table (JSON) for freeze-api-… | `.cursor/skills/analyze-mcp-network/SKILL.md` |
 | `create-action-word` | on-demand | - | 1.1.2 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
-| `create-app` | on-demand | - | 1.1.0 | Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business as… | `.cursor/skills/create-app/SKILL.md` |
+| `create-app` | on-demand | - | 1.2.0 | Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business as… | `.cursor/skills/create-app/SKILL.md` |
 | `derive-design-knowledge` | on-demand | - | 0.2.0 | Compile assets/design/<app>/<route-slug>.md from open evidence channels (MCP network, DDL, SUT source, optional logs) | `.cursor/skills/derive-design-knowledge/SKILL.md` |
 | `derive-feature-sets` | on-demand | - | 1.0.0 | Turn assets/explore capability notes (plus usecases/domain-notes) into behave Feature Sets under tests/features/ | `.cursor/skills/derive-feature-sets/SKILL.md` |
 | `dump-ddl` | on-demand | - | 1.2.0 | Dumps live table DDL into assets/ddl/<datasource>/ via tuner_testkit/apps/dump_ddl.py, then updates the knowledge index… | `.cursor/skills/dump-ddl/SKILL.md` |
@@ -41,6 +41,7 @@
 | `feature-authoring` | on-demand | - | 1.0.0 | Creates or rewrites behave Gherkin .feature files following behave-gerkin-syntax.md | `.cursor/skills/feature-authoring/SKILL.md` |
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
+| `generate-test-report` | on-demand | - | 1.0.0 | Turn a regression run under artifacts/reports/<run_id>/ (plus inbox and optional design notes) into a curated Markdown … | `.cursor/skills/generate-test-report/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.2.0 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
 | `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |

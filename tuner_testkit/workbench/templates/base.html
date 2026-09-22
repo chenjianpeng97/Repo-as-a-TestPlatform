@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}tuner workbench{% endblock %}</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" href="/">tuner workbench</a>
+    <nav>
+      <a href="/tools">工具</a>
+      <a href="/runs">运行历史</a>
+      <a href="/knowledge">知识</a>
+      <a href="/env">环境</a>
+    </nav>
+    <span class="muted">{{ root }}</span>
+  </header>
+  <main>
+    {% block body %}{% endblock %}
+  </main>
+</body>
+</html>

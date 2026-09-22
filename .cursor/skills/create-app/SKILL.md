@@ -1,7 +1,7 @@
 ---
 name: create-app
 description: Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business assets, following apps-authoring-syntax.md. Use when the engineer needs an on-demand test tool (data generator, checker, exporter, capture/enrichment). Do not scaffold into tuner_testkit/apps/.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Create App — 按需开发一个独立工具
@@ -28,9 +28,10 @@ version: 1.1.0
 apps/<name>/
 ├── __init__.py
 ├── __main__.py        # from .cli import main; raise SystemExit(main())
-├── cli.py             # argparse 入口，调用核心逻辑
+├── cli.py             # argparse：build_parser() + main()；每个参数有 help；带 --json
+├── tool.py            # import-safe：用 @tool 装饰 build_parser（工作台 / catalog）
 ├── <core>.py          # 纯逻辑，尽量可离线单测
-├── README.md          # 交接文档(见下)
+├── README.md          # 交接文档 + metadata-conventions front-matter
 └── tests/             # 离线单测
 ```
 
@@ -43,7 +44,10 @@ apps/<name>/
   + 环境变量取；**禁止** `print`、直连驱动、硬编码 DSN、SQL 拼接、自建日志文件。
 - 覆盖式生成 `assets/**` / `packages/api_objects/**` / `packages/page_objects/**` 的工具，运行结束必须
   `tuner_testkit.apps._shared.changelog.append_entry(...)` 追加对应区 `CHANGELOG.md`。
-- 不得被 `tests/` import；不得写入 token/cookie/密码等敏感值；破坏性操作默认 dry-run/只读。
+- 不得被 `tests/` import；不得写入 token/cookie/密码等敏感值；破坏性操作默认 dry-run/只读，`@tool(..., destructive=True)`。
+- `tool.py` 及其 import **禁止**顶层 import DB / Playwright / mitmproxy。
+- `--json` 时 stdout 打印 envelope：`status / outputs[] / artifacts[] / log_path`（见 apps-authoring-syntax §7）。
+- README 写完后立刻 `uv run tuner-workspace meta stamp apps/<name>/README.md --kind app`（不要手填邮箱）。
 
 ## 交接文档（完成期必产出）
 
@@ -53,8 +57,9 @@ apps/<name>/
 ## Verify
 
 1. `python -m apps.<name> --help` 正常输出用法。
-2. 离线单测 `uv run pytest apps/<name>/tests -q`（若有）。
-3. 有环境时跑一条示例命令，确认产出位置与 `CHANGELOG` 追加正确。
+2. `tuner-workspace catalog` 的 `tools[]` 出现该 `tool_id`，且 `params_schema.properties` 每项有 `description`。
+3. 离线单测 `uv run pytest apps/<name>/tests -q`（若有）。
+4. 有环境时跑一条示例命令，确认产出位置与 `CHANGELOG` 追加正确。
 
 ## Output checklist
 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}运行历史 · tuner workbench{% endblock %}
+{% block body %}
+<h1>运行历史</h1>
+<table>
+  <thead><tr><th>run_id</th><th>工具</th><th>状态</th><th>开始</th></tr></thead>
+  <tbody>
+  {% for run in runs %}
+    <tr>
+      <td><a href="/runs/{{ run.run_id }}"><code>{{ run.run_id }}</code></a></td>
+      <td>{{ run.producer.tool_id or run.producer.suite or "—" }}</td>
+      <td>{{ run.status }}</td>
+      <td>{{ run.started }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4" class="muted">还没有运行记录</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

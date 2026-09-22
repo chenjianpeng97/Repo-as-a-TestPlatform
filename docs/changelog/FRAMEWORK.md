@@ -44,22 +44,19 @@
 
 ---
 
-## 2026-09-22 — tuner-testkit 5.1.0（A 阶段收口：artifacts 规范、CI、secret-scan、多 IDE DNA、QA 一天验收）
+## 2026-09-22 — tuner-testkit 5.1.0（A 收口 + 本地工作台 + C0 元数据）
 
-- **commit**: `TBD`（分多次提交落地，见 git log `feat(...)`/`ci(...)` 条目）
-- **目的**: 让 workspace 内核确定性化并可验收——run 级 manifest、行为一致的 behave/pytest 报告落点、CI 守住 index/manifest/secret 三条线、DNA 可渲染到其他 IDE、dogfood 跑通「QA 一天」离线子集。
+- **commit**: `TBD`
+- **目的**: 收口 workspace 内核（run manifest、CI、多 IDE DNA），并补上本机工作台与元数据铺垫：`tuner-workspace run` / `meta stamp`、`tuner-workbench`、apps `--json`、`metadata-conventions`、`generate-test-report`；dogfood 解除离线子集 `@wip`。
 - **路径**:
-  - `docs/spec/artifacts-layout.md`、`tuner_testkit/artifacts.py`、`tuner_testkit/project.py`（`artifacts_*` 路径键）
-  - `tuner_testkit/apps/evidence/persist.py`（写 `manifest.json`）
-  - `tuner_testkit/apps/init_repo/stubs/**`（`.gitignore`、`INDEX.project.md` 围栏、stage environments、G/W/T steps、pytest conftest）、`scaffold.py`（生成 REGISTRY）
-  - `tuner_testkit/apps/index_ai/registry.py`（`set_root`）
-  - `tools/git-hooks/pre-commit` + `secret_scan.py`、`validate_commit_msg.py`（`dogfood` scope、`TUNER_COMMIT_STAGED`）
-  - `.github/workflows/ci.yml`（platform / dogfood / scaffold-smoke 三个 job）
-  - `tuner_testkit/apps/dna/targets.py`、`cli.py`（`--ide cursor|claude|agents|codex|all`、`targets` 子命令）
-  - `.cursor/skills/maintain-index`、`.cursor/rules/index-hygiene.mdc`
-  - 删除 `main.py`；`docs/note.md` 移出仓库（`docs/*.local.md` gitignore）
-- **不在同步范围**: 下游业务资产；下游 `.gitignore` 由 scaffold 首次生成，已有仓自行合并
-- **验证**: `uv run pytest`；`uv run --directory dogfood tuner-workspace index check`；`git ls-files | xargs python tools/git-hooks/secret_scan.py`；CI 三个 job 绿
+  - `docs/spec/artifacts-layout.md`、`tuner_testkit/artifacts.py`、`docs/spec/metadata-conventions.md`、`docs/spec/apps-authoring-syntax.md` §7
+  - `tuner_testkit/tools/runner.py`、`tuner_testkit/workspace/meta.py`、`tuner_testkit/workbench/**`
+  - `.cursor/skills/create-app`、`create-action-word`、`generate-test-report`
+  - `tuner_testkit/apps/init_repo/stubs/**`（含 `workbench.cmd` / `workbench.sh`）、`.github/workflows/ci.yml`
+  - `tuner_testkit/apps/dna/targets.py`、`tools/git-hooks/secret_scan.py`
+  - `dogfood/**`（离线 behave 步骤、工作台入口）
+- **不在同步范围**: 下游业务资产；下游 `.gitignore` 由 scaffold 首次生成
+- **验证**: `uv run pytest`；`uv run --directory dogfood behave --stage api --tags "@offline" --tags "~@wip"`；`tuner-index-ai --check`；`manifest --check`
 
 ## 2026-09-22 — tuner-testkit 5.0.0（Plane Job 协议退场；tool manifest + workspace catalog 中立化）
 

@@ -53,6 +53,8 @@ _STUB_FILES: tuple[str, ...] = (
     "behave.ini",
     "data/sut-accounts.example.yaml",
     "INDEX.project.md",
+    "workbench.cmd",
+    "workbench.sh",
     "tests/features/api_environment.py",
     "tests/features/ui_environment.py",
     "tests/features/api_steps/given.py",

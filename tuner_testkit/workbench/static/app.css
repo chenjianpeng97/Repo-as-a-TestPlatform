@@ -1,0 +1,19 @@
+:root { font-family: "Segoe UI", system-ui, sans-serif; color: #1b1b1b; background: #f6f4ef; }
+body { margin: 0; }
+.bar { display: flex; gap: 1.5rem; align-items: center; padding: .75rem 1.25rem; background: #1f3d2b; color: #fff; }
+.bar a { color: #e8f2ea; text-decoration: none; }
+.brand { font-weight: 700; }
+.muted { color: #666; font-size: .9rem; }
+main { padding: 1.25rem 1.5rem 3rem; max-width: 960px; }
+.cards { display: flex; flex-wrap: wrap; gap: .75rem; }
+.card { background: #fff; border: 1px solid #ddd; padding: .75rem 1rem; min-width: 6rem; }
+.card strong { display: block; font-size: 1.4rem; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { border-bottom: 1px solid #eee; padding: .45rem .5rem; text-align: left; vertical-align: top; }
+.btn { display: inline-block; background: #1f3d2b; color: #fff; padding: .4rem .8rem; text-decoration: none; border: 0; cursor: pointer; }
+.warn { color: #8a1f1f; font-weight: 600; }
+.search { display: flex; gap: .5rem; margin: 1rem 0; }
+.search input { flex: 1; padding: .4rem; }
+.field { display: flex; flex-direction: column; gap: .25rem; margin: .6rem 0; }
+pre { background: #fff; padding: .75rem; overflow: auto; border: 1px solid #ddd; white-space: pre-wrap; }
+.readme { max-height: 28rem; }

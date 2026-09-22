@@ -41,6 +41,8 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
             assert (dest / "tests" / "features" / f"{stage}_steps" / f"{kind}.py").is_file()
     assert (dest / "tests" / "pytest" / "conftest.py").is_file()
     assert not (dest / "packages" / "api_objects" / "plane.py").exists()
+    assert (dest / "workbench.cmd").is_file()
+    assert (dest / "workbench.sh").is_file()
     assert (dest / ".cursor" / "REGISTRY.md").is_file()
     assert any(line.startswith("write .cursor/REGISTRY.md") for line in actions)
 

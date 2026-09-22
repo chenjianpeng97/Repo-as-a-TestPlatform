@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}工具目录 · tuner workbench{% endblock %}
+{% block body %}
+<h1>工具目录</h1>
+<form method="get" action="/tools" class="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="按名称或 id 搜索">
+  <button type="submit">搜索</button>
+</form>
+<table>
+  <thead><tr><th>id</th><th>名称</th><th>分组</th><th>类型</th><th></th></tr></thead>
+  <tbody>
+  {% for it in items %}
+    <tr>
+      <td><code>{{ it.id }}</code></td>
+      <td>{{ it.name }}{% if it.destructive %} <span class="warn">destructive</span>{% endif %}</td>
+      <td>{{ it.group }}</td>
+      <td>{{ it.kind }}</td>
+      <td><a href="/tools/{{ it.id }}">打开</a></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted">没有匹配的工具</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

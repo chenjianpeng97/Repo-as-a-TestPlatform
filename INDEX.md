@@ -51,8 +51,9 @@ agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
 | `[web-ui]` | `tuner_testkit.page_test` | Web UI（Playwright）；Python 模块名仍为 `page_test` |
 | `[phone-ui]` | — | **预留**，4.0 未实现 |
 | `[excel]` / `[fake]` / `[mock]` | 对应模块 | 表格 / 假数据 / api_mock |
+| `[workbench]` | `tuner_testkit.workbench` | 本机工作台（复用 `[mock]` 的 fastapi/uvicorn + jinja2） |
 | `[recorder]` | `tuner_testkit.apps.{recorder,page_recorder,api_recorder}` | 合录 / 仅 UI / 代理 |
-| `[all]` | 元 extra | `db,api,web-ui,phone-ui,excel,fake,mock,recorder,test,bdd` 并集 |
+| `[all]` | 元 extra | 能力 extra 并集（含 `workbench`） |
 | `[dev]` | 引用 `[all]` | 本仓 editable 开发别名 |
 | （默认 wheel） | `tuner_testkit.apps.dna` / dump_ddl / init_repo | `tuner-init` / `tuner-dna` 可在 tool 域裸装使用；`tuner-dump-ddl` 等需业务仓 `[db]` 后 `uv run` |
 
@@ -97,6 +98,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `index_ai` | `tuner-index-ai` | 生成 `.cursor/REGISTRY.md` | `tuner_testkit/apps/index_ai/README.md` |
 | `init_repo` | `tuner-init scaffold <dir>` | 任意目录铺新仓骨架 + 一次 `dna sync`（wheel 带 `stubs/`；**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
 | `workspace` | `tuner-workspace catalog` / `index render\|check` / `run` / `meta stamp` | 确定性 workspace catalog（`artifacts/catalogs/workspace.json`）、INDEX 自动区渲染、按清单运行工具、front-matter 署名 | `tuner_testkit/workspace/README.md` |
+| `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：工具目录 / 表单运行 / 运行历史 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
 | `tools`（库） | `from tuner_testkit.tools import tool` | `apps/<name>/tool.py` 的 `@tool` 清单：argparse → `params_schema` + `argv_plan`，供 catalog / 工作台 / 运行器 | `docs/spec/apps-authoring-syntax.md` §5 |
 | `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
 | `evidence` | `tuner-evidence persist` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，stdout JSON | `tuner_testkit/apps/evidence/README.md` |

@@ -26,7 +26,7 @@ from tuner_testkit.page_test.steps import (
 from .capture import Capture, page_slug_from_path
 from .codegen import asset_variable, render_page_model_source
 
-_SKIP_OVERWRITE = frozenset({"session.py", "plane.py", "pages.py", "__init__.py"})
+_SKIP_OVERWRITE = frozenset({"session.py", "pages.py", "__init__.py"})
 
 
 @dataclass(frozen=True)

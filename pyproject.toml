@@ -1,6 +1,6 @@
 [project]
 name = "tuner-testkit"
-version = "5.0.0"
+version = "5.1.0"
 description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
 license = "MIT"
@@ -37,6 +37,10 @@ mock = [
     "uvicorn[standard]>=0.32.0",
     "httpx>=0.28.0",
 ]
+workbench = [
+    "tuner-testkit[mock]",
+    "jinja2>=3.1.0",
+]
 recorder = [
     "playwright>=1.54.0",
     "mitmproxy>=11.1.3",
@@ -53,7 +57,7 @@ bdd = [
 ]
 # Union of capability extras (excludes `dev` to avoid a cycle).
 all = [
-    "tuner-testkit[db,api,web-ui,phone-ui,excel,fake,mock,recorder,test,bdd]",
+    "tuner-testkit[db,api,web-ui,phone-ui,excel,fake,mock,recorder,test,bdd,workbench]",
 ]
 dev = [
     "tuner-testkit[all]",
@@ -74,6 +78,7 @@ tuner-fake = "tuner_testkit.fake.cli:main"
 tuner-page-test = "tuner_testkit.page_test.__main__:main"
 tuner-action-words = "tuner_testkit.action_words.__main__:main"
 tuner-evidence = "tuner_testkit.apps.evidence.cli:main"
+tuner-workbench = "tuner_testkit.workbench.cli:main"
 
 [build-system]
 requires = ["setuptools>=77", "wheel"]
@@ -85,6 +90,7 @@ include = ["tuner_testkit*"]
 [tool.setuptools.package-data]
 "tuner_testkit.apps.dna" = ["dna_payload/**/*"]
 "tuner_testkit.apps.init_repo" = ["stubs/**/*"]
+"tuner_testkit.workbench" = ["templates/**/*", "static/**/*"]
 
 [tool.setuptools.cmdclass]
 build_py = "tuner_testkit.apps.dna.build.BuildPyWithDna"

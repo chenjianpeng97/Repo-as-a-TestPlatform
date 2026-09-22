@@ -31,7 +31,7 @@ Feature: 测试工程师在 workspace 里的一天
     Then 回归报告应落在交付物目录
     And 报告清单应记录本次运行的状态与文件
 
-  @cli @offline @wip
+  @cli @offline
   Scenario: 开发一个私有工具并在工作区目录中可见
     Given 工作区已有私有工具 "sample_tool"
     When 我查看该工具的用法说明
@@ -39,7 +39,7 @@ Feature: 测试工程师在 workspace 里的一天
     Then 用法说明应列出参数 "--count" 与 "--label"
     And 工作区目录应包含工具 "sample_tool" 及其参数结构
 
-  @cli @offline @wip
+  @cli @offline
   Scenario Outline: 按六层 scope 提交并得到确定性的校验结果
     Given 暂存了 "<path>" 的改动
     When 我用首行 "<header>" 提交

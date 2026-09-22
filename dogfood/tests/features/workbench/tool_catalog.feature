@@ -7,7 +7,7 @@ Feature: 在工作台中发现可用工具
   Background:
     Given 工作台已在本机启动
 
-  @api @wip
+  @api @offline
   Scenario: 工具目录同时列出私有工具与造数动作词
     When 我查看工具目录
     Then 目录应包含工具 "sample_tool"

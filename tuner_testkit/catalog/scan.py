@@ -188,10 +188,7 @@ def scan_action_words(root: Path) -> list[dict[str, Any]]:
     try:
         registry.reset_registry_for_tests()
         for name in [m for m in sys.modules if m == "packages" or m.startswith("packages.")]:
-            mod = sys.modules.get(name)
-            file = getattr(mod, "__file__", None) or ""
-            if file and not Path(file).resolve().is_relative_to(root.resolve()):
-                sys.modules.pop(name, None)
+            sys.modules.pop(name, None)
         rows = []
         for cls in registry.list_all():
             row = cls.describe()

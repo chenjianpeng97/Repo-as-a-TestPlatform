@@ -5,8 +5,8 @@
     python -m tuner_testkit.apps.mock_server routes
 
 Import-safe on purpose: ``build_parser`` must be reachable from
-``tuner_testkit/apps/mock_server/plane.py`` without importing fastapi/uvicorn, so the Plane
-catalog scan works whether or not the ``mock`` extra is installed. Heavy
+``tuner_testkit/apps/mock_server/tool.py`` without importing fastapi/uvicorn, so the
+catalog / workbench scan works whether or not the ``mock`` extra is installed. Heavy
 imports live inside the command handlers.
 """
 from __future__ import annotations

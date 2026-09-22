@@ -75,3 +75,25 @@ apps/                            # 仅 SUT 私有工具
 - 纯逻辑（归一化、解析、代码生成）应可离线单测：可放 `packages/**/tests` 或 `apps/<name>/tests/`
   （参考 `packages/tests/test_api_objects_recording_*.py`、`tuner_testkit/apps/api_recorder/tests`）。
 - 依赖真实环境的部分用参数/开关隔离，便于 CI 只跑离线单测。
+
+## 7. `--json` 输出契约（工作台 / runner）
+
+工作台与 `tuner-workspace run` 会把 stdout 里**最后一行 JSON 对象**当作 envelope 写入
+`artifacts/runs/<run_id>/envelope.json`。约定：
+
+```json
+{
+  "status": "succeeded",
+  "outputs": [{"kind": "lines", "count": 2}],
+  "artifacts": ["artifacts/runs/<run_id>/out.txt"],
+  "log_path": null
+}
+```
+
+- `status`：`succeeded` / `failed`（须与进程退出码一致：0 ↔ succeeded）。
+- `outputs[]`：给人看的摘要，自由结构。
+- `artifacts[]`：本次写出的文件路径（相对 workspace 根或绝对路径）。
+- `log_path`：若工具自己另写了日志文件则填，否则 `null`（kit 仍会写 `stdout.log`）。
+- 破坏性工具默认 dry-run；真正执行必须有显式开关。
+- `create-app` 脚手架默认带 `--json` 与 `tool.py`。
+

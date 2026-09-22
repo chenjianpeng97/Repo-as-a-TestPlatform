@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from tuner_testkit.catalog.scan import (
+    git_first_author,
     read_git_meta,
     scan_action_words,
     scan_ai_components,
@@ -41,12 +42,15 @@ def build_catalog(root: Path | None = None, *, include_kit_tools: bool = True) -
         row["created"] = meta.get("created")
         if not row.get("readme_path") and meta.get("readme_path"):
             row["readme_path"] = meta["readme_path"]
+        _attach_author_check(repo, row, row.get("readme_path"))
     action_words = scan_action_words(repo)
     api_objects = scan_api_objects(repo)
     page_objects = scan_page_objects(repo)
     ddl = scan_ddl(repo)
     sql_files = scan_sql_files(repo)
     assets = scan_assets(repo)
+    for row in assets:
+        _attach_author_check(repo, row, row.get("path"))
     features = scan_features(repo)
     pytest_nodes = scan_pytest_nodes(repo)
     data_files = scan_data_files(repo)
@@ -95,6 +99,14 @@ def build_catalog(root: Path | None = None, *, include_kit_tools: bool = True) -
         "artifacts": {"inbox": inbox, "runs": runs, "reports": reports, "evidence_runs": evidence},
         "ai_components": ai,
     }
+
+
+def _attach_author_check(root: Path, row: dict[str, Any], rel_path: str | None) -> None:
+    """Stamp git first-author + mismatch flag (C1). Never blocks the catalog."""
+    first = git_first_author(root, rel_path) if rel_path else None
+    author = row.get("author")
+    row["git_first_author"] = first
+    row["author_mismatch"] = bool(author and first and str(author).lower() != first.lower())
 
 
 def write_catalog(payload: dict[str, Any], out: Path) -> Path:

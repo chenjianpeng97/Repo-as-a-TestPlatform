@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}概览 · tuner workbench{% endblock %}
+{% block body %}
+<h1>工作区概览</h1>
+<p class="muted">只读仓库，运行产物写到 <code>artifacts/</code>。绑定 127.0.0.1。</p>
+<section class="cards">
+  {% for key, value in catalog.counts.items() %}
+  <article class="card"><strong>{{ value }}</strong><span>{{ key }}</span></article>
+  {% endfor %}
+</section>
+<p>git：{{ catalog.git.branch or "—" }} @ {{ (catalog.git.sha or "—")[:8] }}</p>
+<p><a class="btn" href="/tools">打开工具目录</a></p>
+{% endblock %}

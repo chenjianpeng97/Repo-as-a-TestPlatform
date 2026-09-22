@@ -39,7 +39,7 @@ description: Creates or updates action words under packages/action_words/ follow
 
 - 类与模块 docstring 描述业务/前置条件/副作用（非一行占位）；
 - `word_id` / `name`（中文业务名）/ `category` 必填，word_id 前缀与 category 一致；
-- `Params`：pydantic v2，`extra="forbid"`，**每个字段**带类型 + `Field(description=中文)`；
+- `Params`：pydantic v2，`extra="forbid"`，**每个字段**带类型 + `Field(description=中文)`（工作台表单 label）；
 - `Result` 继承 `ActionResult`，业务字段同样带 description；
 - `example_params` 非空且能通过 `Params.model_validate`；
 - `run(params)` 带完整类型标注；

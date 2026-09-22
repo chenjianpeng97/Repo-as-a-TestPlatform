@@ -66,6 +66,7 @@ def test_build_catalog_synthetic_workspace(tmp_path: Path) -> None:
     assert counts["tools"] == 0 and counts["action_words"] == 0
     usecase = next(a for a in payload["knowledge"]["assets"] if a["category"] == "usecases")
     assert usecase["confidence"] == "high" and usecase["title"] == "Checkout"
+    assert "author_mismatch" in usecase
 
     out = write_catalog(payload, tmp_path / "artifacts" / "catalogs" / "workspace.json")
     assert json.loads(out.read_text(encoding="utf-8"))["counts"]["features"] == 1
@@ -78,6 +79,7 @@ def test_build_catalog_dogfood_sees_fixtures() -> None:
     assert tools["sample_tool"]["origin"] == "workspace"
     assert "count" in tools["sample_tool"]["params_schema"]["properties"]
     assert tools["sample_tool"]["params_schema"]["required"] == ["count"]
+    assert "author_mismatch" in tools["sample_tool"]
     assert "out" not in tools["sample_tool"]["params_schema"]["properties"]  # hide_params
     assert tools["sample_tool"]["readme_path"] == "apps/sample_tool/README.md"
     assert tools["mock_server"]["origin"] == "kit"
