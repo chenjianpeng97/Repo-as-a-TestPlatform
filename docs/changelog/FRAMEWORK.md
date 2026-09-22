@@ -55,6 +55,7 @@
   - `tuner_testkit/apps/index_ai/registry.py`（`set_root`）
   - `tools/git-hooks/pre-commit` + `secret_scan.py`、`validate_commit_msg.py`（`dogfood` scope、`TUNER_COMMIT_STAGED`）
   - `.github/workflows/ci.yml`（platform / dogfood / scaffold-smoke 三个 job）
+  - `tuner_testkit/apps/dna/targets.py`、`cli.py`（`--ide cursor|claude|agents|codex|all`、`targets` 子命令）
   - `.cursor/skills/maintain-index`、`.cursor/rules/index-hygiene.mdc`
   - 删除 `main.py`；`docs/note.md` 移出仓库（`docs/*.local.md` gitignore）
 - **不在同步范围**: 下游业务资产；下游 `.gitignore` 由 scaffold 首次生成，已有仓自行合并

@@ -1,0 +1,182 @@
+"""Render the (Cursor-shaped) DNA source into other AI-IDE layouts.
+
+The canonical DNA lives in ``.cursor/**`` + ``AGENTS.md`` + ``docs/spec`` +
+``tools/git-hooks``. Other tools read different paths, so ``tuner-dna sync
+--target <name>`` renders a *file map* (relative path → bytes) per target:
+
+* ``cursor``  — verbatim DNA (the historical behaviour).
+* ``claude``  — ``.claude/skills/<name>/**`` (SKILL.md is the open Agent Skills
+  format), ``.claude/agents/<name>.md``, and a generated ``CLAUDE.md`` that
+  imports ``AGENTS.md`` and inlines always-on rules / lists glob rules.
+* ``agents``  — ``.agents/skills/<name>/**`` (cross-tool Agent Skills location).
+* ``codex``   — alias of ``agents`` (Codex reads ``AGENTS.md`` natively).
+
+Directory names are data (``TARGET_LAYOUTS``) so they can be adjusted per tool
+release without touching the renderer. Cursor-specific ``hooks.json`` is never
+translated: hook schemas differ between tools.
+"""
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Callable
+
+from tuner_testkit.apps.dna.source import iter_dna_files
+
+FileMap = dict[str, bytes]
+_FM_RE = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.S)
+
+
+@dataclass(frozen=True)
+class TargetLayout:
+    name: str
+    skills_dir: str | None  # where SKILL.md folders go
+    agents_dir: str | None  # where subagent .md files go
+    instructions_file: str | None  # generated always-on instructions file (imports AGENTS.md)
+    note: str
+
+
+TARGET_LAYOUTS: dict[str, TargetLayout] = {
+    "cursor": TargetLayout("cursor", None, None, None, "verbatim DNA (.cursor/**, AGENTS.md, docs/spec, tools/git-hooks)"),
+    "claude": TargetLayout("claude", ".claude/skills", ".claude/agents", "CLAUDE.md", "Claude Code: skills + subagents + CLAUDE.md (imports AGENTS.md)"),
+    "agents": TargetLayout("agents", ".agents/skills", None, None, "cross-tool Agent Skills folder; AGENTS.md already shared"),
+    "codex": TargetLayout("codex", ".agents/skills", None, None, "alias of `agents` (Codex reads AGENTS.md natively)"),
+}
+ALL_TARGETS: tuple[str, ...] = tuple(TARGET_LAYOUTS)
+
+
+def parse_targets(raw: str | None) -> list[str]:
+    if not raw:
+        return ["cursor"]
+    names: list[str] = []
+    for part in raw.split(","):
+        part = part.strip().lower()
+        if not part:
+            continue
+        if part == "all":
+            names.extend(ALL_TARGETS)
+            continue
+        if part not in TARGET_LAYOUTS:
+            raise ValueError(f"unknown DNA target {part!r}; known: {', '.join(ALL_TARGETS)} or all")
+        names.append(part)
+    seen: list[str] = []
+    for name in names:
+        if name not in seen:
+            seen.append(name)
+    return seen or ["cursor"]
+
+
+def render_target(source: Path, target: str) -> FileMap:
+    layout = TARGET_LAYOUTS[target]
+    files = iter_dna_files(source)
+    if target == "cursor":
+        return {rel: path.read_bytes() for rel, path in files}
+    out: FileMap = {}
+    for rel, path in files:
+        parts = rel.split("/")
+        if layout.skills_dir and parts[:2] == [".cursor", "skills"] and len(parts) >= 4:
+            out["/".join([layout.skills_dir, *parts[2:]])] = path.read_bytes()
+        elif layout.agents_dir and parts[:2] == [".cursor", "agents"] and len(parts) == 3:
+            out["/".join([layout.agents_dir, parts[2]])] = _strip_cursor_only_fields(path.read_text(encoding="utf-8")).encode("utf-8")
+    if layout.instructions_file:
+        out[layout.instructions_file] = render_instructions(source, layout).encode("utf-8")
+    return out
+
+
+def _strip_cursor_only_fields(text: str) -> str:
+    """Drop front-matter keys other tools reject (keep name / description / model)."""
+    match = _FM_RE.match(text)
+    if not match:
+        return text
+    kept: list[str] = []
+    for line in match.group(1).splitlines():
+        key = line.split(":", 1)[0].strip().lower() if ":" in line else ""
+        if key in {"name", "description", "model", "tools"} or line.startswith((" ", "\t", "-")):
+            kept.append(line)
+    return "---\n" + "\n".join(kept) + "\n---\n" + text[match.end():]
+
+
+def render_instructions(source: Path, layout: TargetLayout) -> str:
+    """Generated always-on instructions: import AGENTS.md, inline always-apply rules, list glob rules."""
+    rules_dir = source / ".cursor" / "rules"
+    always: list[tuple[str, str, str]] = []
+    scoped: list[tuple[str, str, str]] = []
+    for path in sorted(rules_dir.glob("*.mdc")) if rules_dir.is_dir() else []:
+        text = path.read_text(encoding="utf-8")
+        meta = _front_matter(text)
+        body = _FM_RE.sub("", text, count=1).strip()
+        entry = (path.stem, meta.get("description", ""), body if meta.get("alwaysapply") == "true" else meta.get("globs", ""))
+        (always if meta.get("alwaysapply") == "true" else scoped).append(entry)
+    lines = [
+        f"<!-- GENERATED by `tuner-dna sync --target {layout.name}` from .cursor/rules — do not edit by hand -->",
+        "# Project instructions",
+        "",
+        "@AGENTS.md",
+        "",
+        "The repository's stable world-view is `AGENTS.md`; the capability map is `INDEX.md`",
+        "(and `INDEX.project.md` in a workspace). Skills live under "
+        f"`{layout.skills_dir or '.cursor/skills'}/<name>/SKILL.md`; read a skill before following it.",
+        "",
+        "## Always-on rules",
+        "",
+    ]
+    for name, description, body in always:
+        lines.append(f"### {name}")
+        if description:
+            lines.append(f"_{description}_")
+        lines.append("")
+        lines.append(body)
+        lines.append("")
+    lines.append("## Path-scoped rules (read the file when you touch matching paths)")
+    lines.append("")
+    lines.append("| rule | applies to | file |")
+    lines.append("| --- | --- | --- |")
+    for name, description, globs in scoped:
+        lines.append(f"| `{name}` | `{globs}` | `.cursor/rules/{name}.mdc` — {description} |")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _front_matter(text: str) -> dict[str, str]:
+    match = _FM_RE.match(text)
+    if not match:
+        return {}
+    out: dict[str, str] = {}
+    for line in match.group(1).splitlines():
+        if ":" not in line or line.startswith((" ", "\t")):
+            continue
+        key, value = line.split(":", 1)
+        out[key.strip().lower()] = value.strip().strip("\"'")
+    return out
+
+
+def write_file_map(dest: Path, files: FileMap, *, overwrite: bool, log: Callable[[str], None] = print) -> tuple[int, int]:
+    copied = skipped = 0
+    for rel, data in sorted(files.items()):
+        dst = dest / rel
+        if dst.exists():
+            if dst.is_file() and dst.read_bytes() == data:
+                skipped += 1
+                continue
+            if not overwrite:
+                skipped += 1
+                log(f"skip {rel} (differs; pass --overwrite)")
+                continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(data)
+        copied += 1
+        log(f"copy {rel}")
+    return copied, skipped
+
+
+def diff_file_map(dest: Path, files: FileMap) -> tuple[list[str], list[str]]:
+    missing: list[str] = []
+    changed: list[str] = []
+    for rel, data in sorted(files.items()):
+        dst = dest / rel
+        if not dst.is_file():
+            missing.append(rel)
+        elif dst.read_bytes() != data:
+            changed.append(rel)
+    return missing, changed

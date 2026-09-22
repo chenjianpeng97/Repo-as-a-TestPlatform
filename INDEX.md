@@ -93,7 +93,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `recorder` | `tuner-recorder --app <app>` | headed 合录 Page + API | `tuner_testkit/apps/recorder/README.md` |
 | `api_recorder` | `tuner-api-recorder` | mitmproxy 代理冻 API | `tuner_testkit/apps/api_recorder/README.md` |
 | `page_recorder` | `tuner-page-recorder --app <app>` | headed 仅冻 Page | `tuner_testkit/apps/page_recorder/README.md` |
-| `dna` | `tuner-dna sync` / `check` | 把 kit 所带 DNA merge 进项目 `.cursor/` / `docs/spec/` / git-hooks | `tuner-dna --help` |
+| `dna` | `tuner-dna sync` / `check` / `targets`（`--ide cursor,claude,agents,codex,all`） | 把 kit 所带 DNA merge 进项目 `.cursor/` / `docs/spec/` / git-hooks；`--ide` 渲染到 `.claude/`、`.agents/`、`CLAUDE.md` | `tuner-dna --help` |
 | `index_ai` | `tuner-index-ai` | 生成 `.cursor/REGISTRY.md` | `tuner_testkit/apps/index_ai/README.md` |
 | `init_repo` | `tuner-init scaffold <dir>` | 任意目录铺新仓骨架 + 一次 `dna sync`（wheel 带 `stubs/`；**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
 | `workspace` | `tuner-workspace catalog` / `index render\|check` / `run` / `meta stamp` | 确定性 workspace catalog（`artifacts/catalogs/workspace.json`）、INDEX 自动区渲染、按清单运行工具、front-matter 署名 | `tuner_testkit/workspace/README.md` |

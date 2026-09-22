@@ -122,6 +122,10 @@ git add -A && git commit
 
 `tuner-dna check` 核对项目树 DNA 是否与**当前 PATH 上那份** kit 一致。建议先 `uv tool upgrade`，再 `sync`，避免 CLI 还是旧包、`.venv` 已是新包。
 
+**其他 AI IDE**：DNA 以 Cursor 布局为源，`tuner-dna sync --ide claude,agents`（或 `all`）把 skills 渲染到
+`.claude/skills/` / `.agents/skills/`、subagents 到 `.claude/agents/`，并生成 `CLAUDE.md`（`@AGENTS.md` + always-on 规则内联 + 路径规则清单）。
+`tuner-dna targets` 列出各目标落点；hooks.json 不跨工具翻译。目录约定随各工具文档变动，用前核对。
+
 新仓第一次仍用第 2 节的 `tuner-init scaffold`（会写依赖并做一次 `tuner-dna sync`），不是每次发版都重新 scaffold。
 
 `[phone-ui]` 为预留空 extra，4.0 未实现。
