@@ -46,7 +46,7 @@
 
 ## 2026-09-22 — 工作台目录切片 + db_seed 特化页
 
-- **commit**: `TBD`
+- **commit**: `6d79804`
 - **目的**: 工作台热路径不再每次 `build_catalog`（全仓 + 每文件 `git log`）。只扫规范登记的 `@tool` / `@register` 入口，并按 kit 类别做可演进的特化 UI（先做 `db_seed`）。
 - **路径**:
   - `tuner_testkit/catalog/directory.py`（`build_directory`、入口 mtime 缓存）
