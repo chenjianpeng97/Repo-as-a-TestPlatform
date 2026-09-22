@@ -44,6 +44,22 @@
 
 ---
 
+## 2026-09-22 — tuner-testkit 5.1.0（A 阶段收口：artifacts 规范、CI、secret-scan、多 IDE DNA、QA 一天验收）
+
+- **commit**: `TBD`（分多次提交落地，见 git log `feat(...)`/`ci(...)` 条目）
+- **目的**: 让 workspace 内核确定性化并可验收——run 级 manifest、行为一致的 behave/pytest 报告落点、CI 守住 index/manifest/secret 三条线、DNA 可渲染到其他 IDE、dogfood 跑通「QA 一天」离线子集。
+- **路径**:
+  - `docs/spec/artifacts-layout.md`、`tuner_testkit/artifacts.py`、`tuner_testkit/project.py`（`artifacts_*` 路径键）
+  - `tuner_testkit/apps/evidence/persist.py`（写 `manifest.json`）
+  - `tuner_testkit/apps/init_repo/stubs/**`（`.gitignore`、`INDEX.project.md` 围栏、stage environments、G/W/T steps、pytest conftest）、`scaffold.py`（生成 REGISTRY）
+  - `tuner_testkit/apps/index_ai/registry.py`（`set_root`）
+  - `tools/git-hooks/pre-commit` + `secret_scan.py`、`validate_commit_msg.py`（`dogfood` scope、`TUNER_COMMIT_STAGED`）
+  - `.github/workflows/ci.yml`（platform / dogfood / scaffold-smoke 三个 job）
+  - `.cursor/skills/maintain-index`、`.cursor/rules/index-hygiene.mdc`
+  - 删除 `main.py`；`docs/note.md` 移出仓库（`docs/*.local.md` gitignore）
+- **不在同步范围**: 下游业务资产；下游 `.gitignore` 由 scaffold 首次生成，已有仓自行合并
+- **验证**: `uv run pytest`；`uv run --directory dogfood tuner-workspace index check`；`git ls-files | xargs python tools/git-hooks/secret_scan.py`；CI 三个 job 绿
+
 ## 2026-09-22 — tuner-testkit 5.0.0（Plane Job 协议退场；tool manifest + workspace catalog 中立化）
 
 - **commit**: `968ba3c`

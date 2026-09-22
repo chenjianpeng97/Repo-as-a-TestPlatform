@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    name: lint · pytest · index/manifest checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Sync (all extras, workspace incl. dogfood)
+        run: uv sync --extra all
+      - name: Ruff (syntax / undefined names / unused imports)
+        run: uvx ruff check .
+      - name: pytest (kit + packages/tests)
+        run: uv run pytest -q
+      - name: REGISTRY.md is current
+        run: uv run tuner-index-ai --check
+      - name: DNA release manifest has no drift
+        run: uv run python -m tuner_testkit.apps.init_repo manifest --check
+      - name: Secret scan over tracked files
+        run: git ls-files | grep -v '^uv.lock$' | xargs uv run python tools/git-hooks/secret_scan.py
+      - name: Commit message convention (last commit)
+        if: github.event_name == 'push'
+        run: |
+          git log -1 --format=%B > /tmp/msg.txt
+          TUNER_COMMIT_STAGED="$(git diff-tree --no-commit-id --name-only -r HEAD)" \
+            uv run python tools/git-hooks/validate_commit_msg.py /tmp/msg.txt
+
+  dogfood:
+    name: dogfood workspace · catalog · index · behave @offline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --extra all
+      - name: dogfood pytest (fixtures)
+        run: uv run --directory dogfood pytest -q
+      - name: workspace catalog + INDEX auto zones are current
+        run: |
+          uv run --directory dogfood tuner-workspace catalog --out -  > /dev/null
+          uv run --directory dogfood tuner-workspace index check
+      - name: behave @offline (QA-day journeys), dry-run of everything else
+        run: |
+          uv run --directory dogfood behave --stage api --dry-run --no-summary -f progress
+          uv run --directory dogfood behave --stage api --tags "@offline" --tags "~@wip" --no-summary -f progress
+
+  scaffold-smoke:
+    name: tuner-init scaffold → tuner-dna check → index_ai
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --extra all
+      - name: Scaffold a fresh workspace from the kit
+        run: uv run tuner-init scaffold "$RUNNER_TEMP/smoke"
+      - name: DNA overlay matches the kit
+        run: uv run tuner-dna check --target "$RUNNER_TEMP/smoke"
+      - name: REGISTRY.md generated in the new workspace
+        run: TUNER_ROOT="$RUNNER_TEMP/smoke" uv run tuner-index-ai --check
+      - name: Catalog of the empty workspace renders
+        run: uv run tuner-workspace catalog --root "$RUNNER_TEMP/smoke" --out - > /dev/null

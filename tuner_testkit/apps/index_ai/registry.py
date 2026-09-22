@@ -15,8 +15,20 @@ from tuner_testkit.project import project_root
 
 _KEY_RE = re.compile(r"^([A-Za-z_][\w-]*):\s*(.*)$")
 
+#: Explicit root (set by ``scaffold`` / callers that already know the workspace);
+#: ``None`` → resolve via ``tuner_testkit.project.project_root()``.
+_ROOT_OVERRIDE: pathlib.Path | None = None
+
+
+def set_root(root: pathlib.Path | None) -> None:
+    """Pin the workspace root for subsequent collect/render/write calls (``None`` resets)."""
+    global _ROOT_OVERRIDE
+    _ROOT_OVERRIDE = pathlib.Path(root).resolve() if root is not None else None
+
 
 def _repo_root() -> pathlib.Path:
+    if _ROOT_OVERRIDE is not None:
+        return _ROOT_OVERRIDE
     return project_root()
 
 

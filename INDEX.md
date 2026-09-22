@@ -125,4 +125,4 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | 活文档（behave） | `dogfood/tests/features/platform/*.feature`、`dogfood/tests/features/workbench/*.feature`（未落地场景 `@wip`） |
 | fixture | `dogfood/apps/sample_tool/`、`dogfood/packages/action_words/db_seed/sample_seed.py` |
 
-运行：`uv run --directory dogfood behave --stage api --tags @offline --tags ~@wip`。提交 scope 用 `dogfood`。
+运行：`uv run --directory dogfood behave --stage api --tags "@offline" --tags "~@wip"`。提交 scope 用 `dogfood`。

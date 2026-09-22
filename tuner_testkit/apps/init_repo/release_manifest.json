@@ -1,6 +1,6 @@
 {
   "template_version": "5.0.0",
-  "generated_at": "2026-09-22T15:59:33+0800",
+  "generated_at": "2026-09-22T16:08:31+0800",
   "tracked_paths": [
     ".cursor/rules",
     ".cursor/skills",
@@ -62,8 +62,10 @@
     "docs/spec/page-objects-syntax.md": "8263c29284f0279e7bcee9d3cf042ddaa24f6c835906bd3d187088010db1c4f1",
     "docs/spec/sut-self-learning.md": "4aca70c21b503c746a1ece900d0d82643ce0e504283c6bb12168b382b864a5a4",
     "tools/git-hooks/commit-msg": "fce81cb9f4ca3267d94e6905ca4f74e1b05e8377b17467962e55f67f48ecc7d0",
+    "tools/git-hooks/pre-commit": "722fdead25d6f3da6d698732518db984a64741b8ad3e9ab72ad5670ec31a182a",
     "tools/git-hooks/pre-push": "61c0a8f1a462ca3ca235a09b092f6372233a65a451b01dc1bab6a2d772e11c65",
-    "tools/git-hooks/README.md": "1cf554ef8364e7c24c6a90fa49352094599e24c73b92e05d78c3ab82d4b9296f",
+    "tools/git-hooks/README.md": "53101dd4f1e3c86f44630ead7cf13066cd6382e678315281ecf62e5d155dc1ae",
+    "tools/git-hooks/secret_scan.py": "3baf531068a1808c45aca89afae6ec00154e00959d5056a5317bd727b6dd1a89",
     "tools/git-hooks/validate_commit_msg.py": "7e8ffdfff26f780df6b9113edbdbe0266d2148dad1e9038914f87e44be81292e"
   }
 }

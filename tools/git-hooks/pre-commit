@@ -1,0 +1,19 @@
+#!/bin/sh
+# Deterministic secret scan over staged files (AGENTS.md §5: no tokens / cookies / passwords in the repo).
+# Enable locally with:  git config core.hooksPath tools/git-hooks
+DIR=$(dirname "$0")
+ROOT=$(cd "$DIR/../.." && pwd)
+# Prefer the repo venv (global `python` may be a Windows Store stub / missing).
+if [ -x "$ROOT/.venv/Scripts/python.exe" ]; then
+  PY="$ROOT/.venv/Scripts/python.exe"
+elif [ -x "$ROOT/.venv/bin/python" ]; then
+  PY="$ROOT/.venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+  PY=python3
+elif command -v python >/dev/null 2>&1; then
+  PY=python
+else
+  echo "pre-commit hook: python not found; skipping secret scan." >&2
+  exit 0
+fi
+( cd "$ROOT" && "$PY" "$DIR/secret_scan.py" )

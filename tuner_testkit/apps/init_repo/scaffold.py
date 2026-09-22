@@ -191,5 +191,20 @@ def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = Fa
             SimpleNamespace(target=str(target), overwrite=overwrite),
         )
         actions.append(f"dna sync (exit {code})")
+        actions.append(_write_registry(target))
 
     return actions
+
+
+def _write_registry(target: pathlib.Path) -> str:
+    """Generate ``.cursor/REGISTRY.md`` in the new workspace (deterministic, via index_ai)."""
+    from tuner_testkit.apps.index_ai import registry
+
+    registry.set_root(target)
+    try:
+        path = registry.write()
+        return f"write {path.relative_to(target).as_posix()}"
+    except Exception as exc:  # noqa: BLE001 -- scaffold must not fail on registry rendering
+        return f"skip .cursor/REGISTRY.md ({type(exc).__name__}: {exc})"
+    finally:
+        registry.set_root(None)

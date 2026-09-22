@@ -19,7 +19,7 @@
 ```bash
 uv run --directory dogfood python -m apps.sample_tool --count 2 --label demo --json
 uv run --directory dogfood tuner-action-words run db_seed.sample_seed --example
-uv run --directory dogfood behave --stage api --tags @offline --tags ~@wip
+uv run --directory dogfood behave --stage api --tags "@offline" --tags "~@wip"
 uv run --directory dogfood pytest -q
 ```
 
