@@ -60,14 +60,12 @@ _STUB_FILES: tuple[str, ...] = (
 def _stub_root() -> pathlib.Path | None:
     """Directory that contains thin SUT stub files (``config/env.py``, …).
 
-    Wheel installs have no template checkout beside site-packages, and
-    ``project_root()`` must not be used: scaffold is how a project is created.
+    ``init_repo/stubs/`` is the single source of truth for both editable and
+    wheel installs: the platform repo itself is **not** a workspace (its
+    workspace example lives in ``dogfood/``), so scaffold never copies from
+    the repo root. ``project_root()`` must not be used: scaffold is how a
+    project is created.
     """
-    from tuner_testkit.project import template_source_root
-
-    editable = template_source_root()
-    if editable is not None:
-        return editable
     bundled = pathlib.Path(__file__).resolve().parent / "stubs"
     if (bundled / "config" / "env.py").is_file():
         return bundled
