@@ -306,11 +306,9 @@ def _env_view(root: Path) -> dict[str, Any]:
 
     os.environ["TUNER_ROOT"] = str(root)
     local = load_env_local()
-    if local is None:
+    envs = environments_of(local) if local is not None else None
+    if not envs:
         return {"mode": "missing", "available": [], "active": None}
-    envs = environments_of(local)
-    if envs is None:
-        return {"mode": "flat", "available": [], "active": None}
     names = sorted(str(k) for k in envs)
     try:
         active = resolve_active_name(

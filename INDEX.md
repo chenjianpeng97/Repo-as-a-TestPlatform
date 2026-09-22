@@ -68,7 +68,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `tuner_testkit.api_mock` | 用 api_objects + `data/mocks` 起 mock server | `tuner_testkit/api_mock/README.md` |
 | `tuner_testkit.page_test` | PageModel 运行框架（`[web-ui]`） | `tuner_testkit/page_test/USAGE.md` |
 | `tuner_testkit.excel` / `fake` | 表格解析 / 假数据 | 对应 USAGE |
-| `packages/action_words` | **本仓**业务动作；基类在 kit | `docs/spec/action-words-syntax.md` |
+| `packages/action_words` | **本仓**业务动作；基类在 kit。`discover` / 工作台扫描类别子包**含子目录**（如 `db_seed/audit/*.py`） | `docs/spec/action-words-syntax.md` |
 | `packages/api_objects` | **本仓**路由资产；冻结内核在 kit `recording/` | `docs/spec/api-objects-syntax.md` |
 | `packages/page_objects` | **本仓** UI 资产 | `docs/spec/page-objects-syntax.md` |
 
@@ -98,7 +98,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `index_ai` | `tuner-index-ai` | 生成 `.cursor/REGISTRY.md` | `tuner_testkit/apps/index_ai/README.md` |
 | `init_repo` | `tuner-init scaffold <dir>` | 任意目录铺新仓骨架 + 一次 `dna sync`（wheel 带 `stubs/`；**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
 | `workspace` | `tuner-workspace catalog` / `index render\|check` / `run` / `meta stamp` | 确定性 workspace catalog（`artifacts/catalogs/workspace.json`）、INDEX 自动区渲染、按清单运行工具、front-matter 署名 | `tuner_testkit/workspace/README.md` |
-| `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：目录切片（`@tool` / `@register`）/ `db_seed` 特化页 / 表单运行 / 运行历史 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
+| `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：目录切片（`@tool` / kit `@register`，含 `db_seed/<域>/*.py`）/ `db_seed` 特化页 / 表单运行 / 运行历史 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
 | `tools`（库） | `from tuner_testkit.tools import tool` | `apps/<name>/tool.py` 的 `@tool` 清单：argparse → `params_schema` + `argv_plan`，供 catalog / 工作台 / 运行器 | `docs/spec/apps-authoring-syntax.md` §5 |
 | `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
 | `evidence` | `tuner-evidence persist` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，stdout JSON | `tuner_testkit/apps/evidence/README.md` |

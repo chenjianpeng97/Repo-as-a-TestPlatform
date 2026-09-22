@@ -1,9 +1,9 @@
 # tuner-workbench
 
-本机工作台：把目录切片（`apps/*/tool.py` 的 `@tool` + 类别目录上的 `@register`）
-渲染成表单，按 `argv_plan` 或 `tuner-action-words run` 执行，产物落
-`artifacts/runs/<run_id>/`。列表/搜索不扫 `assets/`、不跑 `git log`。
-`db_seed` 有特化页（example / dry_run / cleanup）。
+本机工作台：把目录切片（`apps/*/tool.py` 的 `@tool` + 类别目录上的 kit `@register`，
+含子目录如 `db_seed/audit/*.py`）渲染成表单，按 `argv_plan` 或
+`tuner-action-words run` 执行，产物落 `artifacts/runs/<run_id>/`。
+列表/搜索不扫 `assets/`、不跑 `git log`。`db_seed` 有特化页（example / dry_run / cleanup）。
 
 ## 需求背景
 

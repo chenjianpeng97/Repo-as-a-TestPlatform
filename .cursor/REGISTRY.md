@@ -32,7 +32,7 @@
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
 | `analyze-mcp-network` | on-demand | - | 1.0.0 | Turn a persisted artifacts/evidence/<run_id>/network.jsonl into a unique method+path route table (JSON) for freeze-api-… | `.cursor/skills/analyze-mcp-network/SKILL.md` |
-| `create-action-word` | on-demand | - | 1.1.3 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
+| `create-action-word` | on-demand | - | 1.1.4 | Creates or updates action words under packages/action_words/ following action-words-syntax.md | `.cursor/skills/create-action-word/SKILL.md` |
 | `create-app` | on-demand | - | 1.2.1 | Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business as… | `.cursor/skills/create-app/SKILL.md` |
 | `derive-design-knowledge` | on-demand | - | 0.2.0 | Compile assets/design/<app>/<route-slug>.md from open evidence channels (MCP network, DDL, SUT source, optional logs) | `.cursor/skills/derive-design-knowledge/SKILL.md` |
 | `derive-feature-sets` | on-demand | - | 1.0.0 | Turn assets/explore capability notes (plus usecases/domain-notes) into behave Feature Sets under tests/features/ | `.cursor/skills/derive-feature-sets/SKILL.md` |

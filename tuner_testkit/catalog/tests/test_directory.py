@@ -128,6 +128,40 @@ class HiddenSeed(ActionWord):
     assert payload["counts_by_kind"]["db_seed"] == 1
 
 
+def test_directory_discovers_nested_category_modules(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("TUNER_ROOT", str(tmp_path))
+    _write(tmp_path / "packages" / "__init__.py", "")
+    _write(
+        tmp_path / "packages" / "action_words" / "__init__.py",
+        "from tuner_testkit.action_words import ActionCategory, ActionResult, ActionWord, register\n"
+        "__all__ = ['ActionCategory', 'ActionResult', 'ActionWord', 'register']\n",
+    )
+    _write(tmp_path / "packages" / "action_words" / "db_seed" / "__init__.py", "")
+    _write(tmp_path / "packages" / "action_words" / "db_seed" / "audit" / "__init__.py", "")
+    _write(
+        tmp_path / "packages" / "action_words" / "db_seed" / "audit" / "create_audit.py",
+        "from pydantic import BaseModel, ConfigDict, Field\n"
+        "from tuner_testkit.action_words import ActionCategory, ActionResult, ActionWord, register\n\n"
+        "@register\n"
+        "class NestedAudit(ActionWord):\n"
+        "    \"\"\"嵌套子目录造数词，工作台必须能发现。\"\"\"\n"
+        "    word_id = 'db_seed.nested_audit'\n"
+        "    name = '嵌套审计造数'\n"
+        "    category = ActionCategory.DB_SEED\n"
+        "    example_params = {'n': 1}\n\n"
+        "    class Params(BaseModel):\n"
+        "        model_config = ConfigDict(extra='forbid')\n"
+        "        n: int = Field(1, description='数量')\n\n"
+        "    def run(self, params):\n"
+        "        return ActionResult()\n",
+    )
+    stamp = entry_mtimes(tmp_path)
+    assert any("create_audit.py" in path for path, _ in stamp)
+    payload = build_directory(tmp_path, include_kit_tools=False, refresh=True)
+    ids = {row["word_id"] for row in payload["action_words"]}
+    assert "db_seed.nested_audit" in ids
+
+
 def test_directory_dogfood_sample_seed() -> None:
     payload = build_directory(DOGFOOD, include_kit_tools=True, refresh=True)
     words = {row["word_id"]: row for row in payload["action_words"]}

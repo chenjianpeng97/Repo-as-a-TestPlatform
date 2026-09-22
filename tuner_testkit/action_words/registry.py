@@ -67,8 +67,22 @@ def iter_ids() -> Iterable[str]:
 _discovered = False
 
 
+def _import_word_package(pkg: Any) -> None:
+    """递归导入类别子包（含 ``db_seed/audit`` 这类业务子目录）。跳过 ``_`` 前缀。"""
+    paths = getattr(pkg, "__path__", None)
+    if not paths:
+        return
+    for mod_info in pkgutil.iter_modules(paths, prefix=f"{pkg.__name__}."):
+        short = mod_info.name.rsplit(".", 1)[-1]
+        if short.startswith("_"):
+            continue
+        module = importlib.import_module(mod_info.name)
+        if mod_info.ispkg:
+            _import_word_package(module)
+
+
 def discover() -> None:
-    """导入全部类别子包下的模块，触发 ``@register`` 副作用。幂等。"""
+    """导入全部类别子包下的模块（含子目录），触发 ``@register`` 副作用。幂等。"""
     global _discovered
     if _discovered:
         return
@@ -83,8 +97,7 @@ def discover() -> None:
             pkg = importlib.import_module(f"{root_pkg.__name__}.{sub}")
         except ModuleNotFoundError:
             continue  # 预留类别（如 ui_action）尚未建目录
-        for mod_info in pkgutil.iter_modules(pkg.__path__):
-            importlib.import_module(f"{pkg.__name__}.{mod_info.name}")
+        _import_word_package(pkg)
 
 
 def export_catalog() -> list[dict[str, Any]]:

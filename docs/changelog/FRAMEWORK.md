@@ -44,6 +44,19 @@
 
 ---
 
+## 2026-09-22 — action word 嵌套子包发现
+
+- **commit**: `TBD`
+- **目的**: 下游仓把 `db_seed` 按业务域分子目录（`db_seed/audit/*.py`）时，kit `discover` 与工作台 `entry_mtimes` 原先只扫一层，词条进不了 `/words/db_seed`。改为递归导入 + `rglob`。
+- **路径**:
+  - `tuner_testkit/action_words/registry.py`（`_import_word_package`）
+  - `tuner_testkit/catalog/directory.py`（类别目录 `rglob`，跳过 `_` / `__pycache__`）
+  - `tuner_testkit/catalog/tests/test_directory.py`
+  - `docs/spec/action-words-syntax.md`
+  - `.cursor/skills/create-action-word/SKILL.md`（1.1.4：必须接到 kit `@register`，允许嵌套）
+- **不在同步范围**: 下游本地 `packages.action_words.registry` 若不双写 kit，仍不可见
+- **验证**: `uv run python -m pytest tuner_testkit/catalog/tests/test_directory.py`；innovamed-standard `build_directory` 扫到 63 个 `db_seed`（9 个业务子目录）
+
 ## 2026-09-22 — 工作台目录切片 + db_seed 特化页
 
 - **commit**: `6d79804`

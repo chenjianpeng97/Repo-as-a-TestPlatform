@@ -34,8 +34,11 @@ def entry_mtimes(root: Path) -> tuple[tuple[str, int], ...]:
             folder = words / sub
             if not folder.is_dir():
                 continue
-            for path in sorted(folder.glob("*.py")):
+            for path in sorted(folder.rglob("*.py")):
+                rel_parts = path.relative_to(folder).parts
                 if path.name.startswith("_"):
+                    continue
+                if any(part.startswith("_") or part == "__pycache__" for part in rel_parts):
                     continue
                 stamps.append((str(path), path.stat().st_mtime_ns))
     return tuple(stamps)

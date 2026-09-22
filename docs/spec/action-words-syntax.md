@@ -46,8 +46,11 @@ packages/action_words/
 - 新增类别子包后无需注册：`registry.discover()` 会自动扫描
   `_WORD_SUBPACKAGES` 中列出的子包。
 - **工作台入口**：发现器只扫
-  `packages/action_words/{db_seed,db_assert,api_request,api_assert,ui_action,ui_assert}/*.py`。
-  其它路径（`_internal/`、`models.py`、随意 `rglob`）不会出现在工作台。没有入口文件 = 工作台当它不存在。
+  `packages/action_words/{db_seed,db_assert,api_request,api_assert,ui_action,ui_assert}/`
+  下的模块（允许业务子目录，如 `db_seed/audit/*.py`）。
+  `_internal/`、`models.py`、类别目录之外的路径不会出现在工作台。没有入口文件 = 工作台当它不存在。
+  `@register` 必须落到 **kit** registry（`packages.action_words` re-export
+  `tuner_testkit.action_words.register`，或本仓装饰器双写 kit）。本仓自建表不算登记。
 
 ## 类模板（强制）
 
