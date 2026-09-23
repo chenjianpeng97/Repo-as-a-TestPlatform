@@ -9,7 +9,8 @@ from __future__ import annotations
 import json
 import pathlib
 import re
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
+from typing import Any
 
 from tuner_testkit.project import project_root
 
@@ -125,7 +126,7 @@ def collect_rules() -> list[Component]:
             name=path.stem,
             trigger=trigger,
             scope=scope,
-            description=_first_sentence(fm.get("description", "")),
+            description=(fm.get("description") or "").strip() or "-",
             version=fm.get("version", "-").strip() or "-",
             path=str(path.relative_to(_repo_root())).replace("\\", "/"),
         ))
@@ -141,7 +142,7 @@ def _collect_named(subdir: str, pattern: str, kind: str, trigger: str) -> list[C
             name=fm.get("name", path.parent.name if path.name == "SKILL.md" else path.stem),
             trigger=trigger,
             scope="-",
-            description=_first_sentence(fm.get("description", "")),
+            description=(fm.get("description") or "").strip() or "-",
             version=fm.get("version", "-").strip() or "-",
             path=str(path.relative_to(_repo_root())).replace("\\", "/"),
         ))
@@ -209,7 +210,7 @@ def _render_table(title: str, comps: list[Component]) -> str:
     lines.append("| --- | --- | --- | --- | --- | --- |")
     for c in comps:
         scope = c.scope.replace("|", "\\|")
-        desc = c.description.replace("|", "\\|")
+        desc = _first_sentence(c.description).replace("|", "\\|")
         lines.append(
             f"| `{c.name}` | {c.trigger} | {scope} | {c.version} | {desc} | `{c.path}` |"
         )
@@ -255,3 +256,97 @@ def is_current() -> bool:
     if not _registry_path().exists():
         return False
     return _registry_path().read_text(encoding="utf-8") == render()
+
+
+KIND_META: tuple[tuple[str, str, str], ...] = (
+    ("rule", "规则", "约束/边界。能写成确定性约束的用 rule，不用 skill。"),
+    ("skill", "技能", "操作流程。按需触发，教 LLM 怎么做一件事。"),
+    ("agent", "编排", "Playbook。把多步 skill/rule 串成一条任务。"),
+    ("hook", "钩子", "事件驱动脚本。能脚本化的不要交给 LLM。"),
+)
+
+
+def resolve_cursor_root(root: pathlib.Path) -> pathlib.Path:
+    """Workspace with `.cursor/`, or parent (dogfood shares platform DNA)."""
+    workspace = pathlib.Path(root).resolve()
+    if (workspace / ".cursor").is_dir():
+        return workspace
+    parent = workspace.parent
+    if (parent / ".cursor").is_dir():
+        return parent
+    return workspace
+
+
+def _component_row(comp: Component) -> dict[str, Any]:
+    row = asdict(comp)
+    row["id"] = f"{comp.kind}:{comp.name}"
+    row["summary"] = _first_sentence(comp.description)
+    row["href"] = f"/ai/{comp.kind}/{comp.name}"
+    return row
+
+
+def collect_catalog(root: pathlib.Path | None = None) -> dict[str, Any]:
+    """Structured AI-component catalog for workbench / API (same scan as REGISTRY.md)."""
+    workspace = pathlib.Path(root).resolve() if root is not None else _repo_root()
+    dna = resolve_cursor_root(workspace)
+    set_root(dna)
+    try:
+        by_kind = {
+            "rule": collect_rules(),
+            "skill": collect_skills(),
+            "agent": collect_agents(),
+            "hook": collect_hooks(),
+        }
+        groups: list[dict[str, Any]] = []
+        items: list[dict[str, Any]] = []
+        counts: dict[str, int] = {}
+        for kind, title, blurb in KIND_META:
+            comps = by_kind[kind]
+            rows = [_component_row(c) for c in comps]
+            counts[kind] = len(rows)
+            groups.append({"kind": kind, "title": title, "blurb": blurb, "entries": rows})
+            items.extend(rows)
+        return {
+            "workspace": str(workspace),
+            "dna_root": str(dna),
+            "counts": counts,
+            "total": len(items),
+            "groups": groups,
+            "items": items,
+        }
+    finally:
+        set_root(None)
+
+
+def find_component(
+    kind: str,
+    name: str,
+    root: pathlib.Path | None = None,
+) -> dict[str, Any] | None:
+    catalog = collect_catalog(root)
+    for row in catalog["items"]:
+        if row["kind"] == kind and row["name"] == name:
+            return row
+    return None
+
+
+def read_component_intro(root: pathlib.Path, rel_path: str, *, limit: int = 1200) -> str:
+    """Plain-text body after front-matter; never follow paths outside ``root``."""
+    dna = resolve_cursor_root(pathlib.Path(root))
+    path = (dna / rel_path).resolve()
+    try:
+        path.relative_to(dna)
+    except ValueError:
+        return ""
+    if not path.is_file():
+        return ""
+    text = path.read_text(encoding="utf-8")
+    body = text
+    if text.startswith("---"):
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            body = parts[2]
+    body = body.strip()
+    if len(body) > limit:
+        return body[: limit - 1] + "…"
+    return body

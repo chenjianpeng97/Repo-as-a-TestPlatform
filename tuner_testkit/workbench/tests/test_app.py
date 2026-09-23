@@ -82,6 +82,36 @@ def test_api_words_lists_db_seed(client) -> None:
     assert sample["has_dry_run"] is True
 
 
+def test_api_ai_lists_platform_dna(client) -> None:
+    body = client.get("/api/ai").json()
+    assert body["total"] >= 4
+    kinds = {row["kind"] for row in body["items"]}
+    assert {"rule", "skill", "agent", "hook"} <= kinds
+    names = {row["name"] for row in body["items"]}
+    assert "create-action-word" in names
+    assert "sut-self-learning" in names
+    skill = next(row for row in body["items"] if row["name"] == "create-action-word")
+    assert skill["version"] != "-"
+    assert skill["kind"] == "skill"
+    html = client.get("/ai").text
+    assert "AI 组件" in html
+    assert "create-action-word" in html
+    assert "1.1.4" in html or skill["version"] in html
+
+
+def test_ai_detail_shows_version_and_role(client) -> None:
+    resp = client.get("/ai/skill/create-action-word")
+    assert resp.status_code == 200
+    text = resp.text
+    assert "create-action-word" in text
+    assert "v" in text
+    assert ".cursor/skills/create-action-word/SKILL.md" in text
+    skills = client.get("/api/ai", params={"kind": "skill"}).json()
+    assert skills["items"]
+    assert all(row["kind"] == "skill" for row in skills["items"])
+    assert client.get("/ai/skill/does-not-exist").status_code == 404
+
+
 def test_api_run_sample_tool(client) -> None:
     resp = client.post("/api/tools/sample_tool/run", json={"params": {"count": 1, "label": "wb", "json": True}})
     assert resp.status_code == 200

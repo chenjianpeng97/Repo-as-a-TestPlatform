@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}AI 组件 · tuner workbench{% endblock %}
+{% block body %}
+<h1>AI 组件</h1>
+<p class="muted">
+  与 <code>.cursor/REGISTRY.md</code> 同源：扫描本仓（或 dogfood 的上级平台仓）
+  <code>.cursor/</code> 的 rule / skill / agent / hook。只读，不执行。
+  刷新注册表：<code>uv run tuner-index-ai</code>。
+</p>
+<p>共 <strong>{{ catalog.total }}</strong> 个{% if catalog.shown != catalog.total %}，当前显示 {{ catalog.shown }}{% endif %}。</p>
+<div class="chips">
+  <a class="chip{% if not kind %} chip-on{% endif %}" href="/ai{% if q %}?q={{ q }}{% endif %}">全部</a>
+  {% for kid, title, blurb in kind_tabs %}
+  <a class="chip{% if kind == kid %} chip-on{% endif %}" href="/ai?kind={{ kid }}{% if q %}&amp;q={{ q }}{% endif %}">{{ title }} {{ catalog.counts.get(kid, 0) }}</a>
+  {% endfor %}
+</div>
+<form method="get" action="/ai" class="search">
+  {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
+  <input type="search" name="q" value="{{ q }}" placeholder="按名称、职责、路径或版本搜索">
+  <button type="submit">搜索</button>
+</form>
+{% for group in catalog.groups %}
+<section>
+  <h2>{{ group.title }} <code>{{ group.kind }}</code></h2>
+  <p class="muted">{{ group.blurb }}</p>
+  <table>
+    <thead>
+      <tr><th>名称</th><th>版本</th><th>触发</th><th>作用范围</th><th>职责</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for it in group.entries %}
+      <tr>
+        <td><code>{{ it.name }}</code></td>
+        <td>{{ it.version }}</td>
+        <td>{{ it.trigger }}</td>
+        <td>{{ it.scope }}</td>
+        <td>{{ it.summary }}</td>
+        <td><a href="{{ it.href }}">打开</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="muted">没有匹配的 {{ group.title }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+{% endblock %}

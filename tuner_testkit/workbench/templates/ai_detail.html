@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }} · AI 组件{% endblock %}
+{% block body %}
+<p class="muted"><a href="/ai">AI 组件</a> / {{ item.kind }}</p>
+<h1>{{ item.name }}</h1>
+<p>
+  <span class="chip">{{ item.kind }}</span>
+  <span class="chip">v{{ item.version }}</span>
+  <span class="chip">{{ item.trigger }}</span>
+</p>
+<p>{{ item.description }}</p>
+<table>
+  <tbody>
+    <tr><th>名称</th><td><code>{{ item.name }}</code></td></tr>
+    <tr><th>类型</th><td>{{ item.kind }}</td></tr>
+    <tr><th>版本</th><td>{{ item.version }}</td></tr>
+    <tr><th>触发</th><td>{{ item.trigger }}</td></tr>
+    <tr><th>作用范围</th><td>{{ item.scope }}</td></tr>
+    <tr><th>文件</th><td><code>{{ item.path }}</code></td></tr>
+  </tbody>
+</table>
+{% if intro %}
+<h2>介绍</h2>
+<pre class="doc">{{ intro }}</pre>
+{% endif %}
+<p class="muted">正文以仓库文件为准。版本来自 front-matter 的 <code>version</code>。</p>
+{% endblock %}

@@ -16,6 +16,12 @@ from tuner_testkit.catalog.directory import build_directory
 from tuner_testkit.catalog.scan import read_git_meta
 from tuner_testkit.project import project_root
 from tuner_testkit.tools.runner import DestructiveNotConfirmed, RunRequest, run_tool
+from tuner_testkit.apps.index_ai.registry import (
+    KIND_META,
+    collect_catalog,
+    find_component,
+    read_component_intro,
+)
 from tuner_testkit.workbench.kinds import home_cards, known_word_kind
 
 PACKAGE_DIR = Path(__file__).resolve().parent
@@ -43,10 +49,12 @@ def create_app(*, root: Path | None = None) -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def home(request: Request, refresh: bool = False) -> HTMLResponse:
         payload = directory(refresh=refresh)
+        ai = collect_catalog(repo)
         return _render(
             request,
             "home.html",
             cards=home_cards(payload.get("counts_by_kind") or {}),
+            ai_total=ai.get("total") or 0,
             git=read_git_meta(repo),
         )
 
@@ -128,6 +136,26 @@ def create_app(*, root: Path | None = None) -> FastAPI:
             raise HTTPException(400, error)
         return RedirectResponse(url="/env", status_code=303)
 
+    @app.get("/ai", response_class=HTMLResponse)
+    def ai_page(request: Request, kind: str = "", q: str = "") -> HTMLResponse:
+        catalog = _ai_catalog(repo, kind=kind, q=q)
+        return _render(
+            request,
+            "ai.html",
+            catalog=catalog,
+            kind=kind,
+            q=q,
+            kind_tabs=KIND_META,
+        )
+
+    @app.get("/ai/{kind}/{name}", response_class=HTMLResponse)
+    def ai_detail(request: Request, kind: str, name: str) -> HTMLResponse:
+        item = find_component(kind, name, root=repo)
+        if item is None:
+            raise HTTPException(404, f"unknown AI component {kind}:{name}")
+        intro = read_component_intro(repo, item.get("path") or "")
+        return _render(request, "ai_detail.html", item=item, intro=intro)
+
     @app.get("/knowledge", response_class=HTMLResponse)
     def knowledge(request: Request) -> HTMLResponse:
         payload = catalog()
@@ -185,6 +213,10 @@ def create_app(*, root: Path | None = None) -> FastAPI:
     @app.get("/api/runs")
     def api_runs() -> JSONResponse:
         return JSONResponse({"runs": _list_runs(repo)})
+
+    @app.get("/api/ai")
+    def api_ai(kind: str = Query(""), q: str = Query("")) -> JSONResponse:
+        return JSONResponse(_ai_catalog(repo, kind=kind, q=q))
 
     @app.get("/api/env")
     def api_env() -> JSONResponse:
@@ -292,6 +324,35 @@ def _find_item(payload: dict[str, Any], item_id: str) -> dict[str, Any] | None:
         if it["id"] == item_id:
             return it
     return None
+
+
+def _ai_catalog(root: Path, *, kind: str = "", q: str = "") -> dict[str, Any]:
+    payload = collect_catalog(root)
+    needle = (q or "").strip().lower()
+    wanted = (kind or "").strip().lower()
+    filtered: list[dict[str, Any]] = []
+    for row in payload.get("items") or []:
+        if wanted and row.get("kind") != wanted:
+            continue
+        if needle:
+            hay = " ".join(
+                str(row.get(key) or "")
+                for key in ("name", "kind", "version", "trigger", "scope", "description", "path")
+            ).lower()
+            if needle not in hay:
+                continue
+        filtered.append(row)
+    groups: list[dict[str, Any]] = []
+    for meta in KIND_META:
+        kid, title, blurb = meta
+        if wanted and kid != wanted:
+            continue
+        items = [row for row in filtered if row.get("kind") == kid]
+        groups.append({"kind": kid, "title": title, "blurb": blurb, "entries": items})
+    payload["groups"] = groups
+    payload["items"] = filtered
+    payload["shown"] = len(filtered)
+    return payload
 
 
 def _env_view(root: Path) -> dict[str, Any]:

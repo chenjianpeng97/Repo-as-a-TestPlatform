@@ -31,3 +31,4 @@ python -m tuner_testkit.apps.index_ai
 ```
 
 组件的 `version` 取自各文件 front-matter 的 `version` 字段（rules/skills/agents）；缺失显示 `-`。
+同一套扫描也供工作台 `/ai` 与 `GET /api/ai` 使用（`collect_catalog`）。

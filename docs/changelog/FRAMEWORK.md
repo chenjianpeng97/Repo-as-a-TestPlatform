@@ -44,6 +44,16 @@
 
 ---
 
+## 2026-09-23 — 工作台展示 AI 组件注册表
+
+- **commit**: `TBD`
+- **目的**: 非编码成员在工作台能看到当前 rule / skill / agent / hook 的名称、版本、触发与职责，不必打开 IDE 读 REGISTRY.md。
+- **路径**:
+  - `tuner_testkit/apps/index_ai/registry.py`（`collect_catalog`，与 REGISTRY 同源扫描）
+  - `tuner_testkit/workbench/app.py`、`templates/ai.html`、`templates/ai_detail.html`、`/api/ai`
+  - `tuner_testkit/workbench/tests/test_app.py`
+- **验证**: `uv run python -m pytest tuner_testkit/workbench/tests/test_app.py`
+
 ## 2026-09-22 — action word 嵌套子包发现
 
 - **commit**: `213eb39`

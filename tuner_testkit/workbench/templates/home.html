@@ -10,10 +10,15 @@
     <span>{{ card.label }}</span>
   </a>
   {% endfor %}
+  <a class="card" href="/ai">
+    <strong>{{ ai_total }}</strong>
+    <span>AI 组件</span>
+  </a>
 </section>
 <p>git：{{ git.branch or "—" }} @ {{ (git.sha or "—")[:8] }}</p>
 <p>
   <a class="btn" href="/tools">打开工具目录</a>
   <a class="btn" href="/words/db_seed">打开造数</a>
+  <a class="btn" href="/ai">打开 AI 组件</a>
 </p>
 {% endblock %}
