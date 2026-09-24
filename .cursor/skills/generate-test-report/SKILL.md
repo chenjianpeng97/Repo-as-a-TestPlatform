@@ -1,7 +1,7 @@
 ---
 name: generate-test-report
 description: Turn a regression run under artifacts/reports/<run_id>/ (plus inbox and optional design notes) into a curated Markdown test report at assets/testreport/<sut>/<yyyy-mm>/<slug>.md with metadata-conventions front-matter. Use when the user asks to 生成测试报告 / write a test report / 汇总回归结果.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Generate Test Report
@@ -35,6 +35,8 @@ period: <YYYY-MM>
 result: {total: 0, passed: 0, failed: 0}
 evidence: []
 features: []
+task_id:          # 有 work task 时填写
+design:           # test-execution 指向 assets/testdesign/...
 confidence: high
 source: artifacts/reports/<run_id>
 ---

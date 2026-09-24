@@ -1,6 +1,6 @@
 [project]
 name = "tuner-testkit"
-version = "5.1.0"
+version = "5.2.0"
 description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
 license = "MIT"
@@ -78,6 +78,7 @@ tuner-fake = "tuner_testkit.fake.cli:main"
 tuner-page-test = "tuner_testkit.page_test.__main__:main"
 tuner-action-words = "tuner_testkit.action_words.__main__:main"
 tuner-evidence = "tuner_testkit.apps.evidence.cli:main"
+tuner-task = "tuner_testkit.apps.task.cli:main"
 tuner-workbench = "tuner_testkit.workbench.cli:main"
 
 [build-system]

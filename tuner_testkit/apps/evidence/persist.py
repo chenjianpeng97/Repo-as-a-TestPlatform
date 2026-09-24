@@ -214,6 +214,83 @@ def _summary_markdown(
     return "\n".join(lines)
 
 
+_ASSIGNED_SECRET = re.compile(
+    r"(?i)((?:authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[-_]?key)\s*[:=]\s*)(\S+)"
+)
+_BEARER = re.compile(r"(?i)(bearer\s+)[A-Za-z0-9._\-]+")
+_SAFE_STEM = re.compile(r"[^A-Za-z0-9._-]+")
+_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
+
+
+def redact_text(text: str) -> str:
+    """Mask credential assignments and bearer tokens in log excerpts."""
+    text = _BEARER.sub(r"\1***", text)
+    return _ASSIGNED_SECRET.sub(r"\1***", text)
+
+
+def _safe_stem(path: Path) -> str:
+    stem = _SAFE_STEM.sub("-", path.stem).strip("-") or "file"
+    return stem[:80]
+
+
+def copy_evidence_files(
+    dest: Path,
+    *,
+    screenshots: Iterable[Path] = (),
+    logs: Iterable[Path] = (),
+    apis: Iterable[Path] = (),
+) -> list[str]:
+    """Copy screenshots and write redacted logs / API bodies under one evidence run."""
+    written: list[str] = []
+    for src in screenshots:
+        suffix = src.suffix.lower()
+        if suffix not in _IMAGE_SUFFIXES:
+            raise ValueError(f"screenshot must be an image, got {src.name}")
+        written.append(_copy_unique(dest / "screenshots", src, _safe_stem(src) + suffix))
+    for src in logs:
+        text = redact_text(src.read_text(encoding="utf-8", errors="replace"))
+        written.append(_write_unique(dest / "logs", _safe_stem(src) + ".log", text))
+    for src in apis:
+        payload = json.loads(src.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            safe: Any = sanitize_mapping(payload)
+        elif isinstance(payload, list):
+            safe = [sanitize_mapping(item) if isinstance(item, Mapping) else item for item in payload]
+        else:
+            raise ValueError(f"api evidence must be a JSON object or list, got {src.name}")
+        body = json.dumps(safe, ensure_ascii=False, indent=2) + "\n"
+        written.append(_write_unique(dest / "api", _safe_stem(src) + ".json", body))
+    return written
+
+
+def _copy_unique(folder: Path, src: Path, name: str) -> str:
+    folder.mkdir(parents=True, exist_ok=True)
+    target = _unique_path(folder, name)
+    target.write_bytes(src.read_bytes())
+    return target.relative_to(folder.parent).as_posix()
+
+
+def _write_unique(folder: Path, name: str, text: str) -> str:
+    folder.mkdir(parents=True, exist_ok=True)
+    target = _unique_path(folder, name)
+    target.write_text(text, encoding="utf-8", newline="\n")
+    return target.relative_to(folder.parent).as_posix()
+
+
+def _unique_path(folder: Path, name: str) -> Path:
+    candidate = folder / name
+    if not candidate.exists():
+        return candidate
+    stem = Path(name).stem
+    suffix = Path(name).suffix
+    index = 2
+    while True:
+        candidate = folder / f"{stem}-{index}{suffix}"
+        if not candidate.exists():
+            return candidate
+        index += 1
+
+
 def _write_manifest(
     dest: Path,
     *,
@@ -223,15 +300,19 @@ def _write_manifest(
     count: int,
     routes: list[dict[str, Any]],
     root: Path | None,
+    task_id: str = "",
 ) -> None:
     """Run-level manifest (docs/spec/artifacts-layout.md §2) so catalogs and the workbench can list evidence runs."""
     from tuner_testkit.artifacts import RunManifest, default_producer
 
+    params: dict[str, Any] = {"scenario_id": scenario_id, "intent": intent}
+    if task_id:
+        params["task_id"] = task_id
     manifest = RunManifest(
         kind="evidence",
         run_id=run_id,
         producer=default_producer(root, suite="tuner-evidence persist"),
-        params={"scenario_id": scenario_id, "intent": intent},
+        params=params,
         dir=dest,
     )
     manifest.finish("succeeded", exit_code=0, summary={"captures": count, "routes": len(routes)})
@@ -247,6 +328,10 @@ def persist(
     summary_text: str | None = None,
     root: Path | None = None,
     timestamp: str | None = None,
+    task_id: str = "",
+    screenshots: Iterable[Path] = (),
+    logs: Iterable[Path] = (),
+    apis: Iterable[Path] = (),
 ) -> dict[str, Any]:
     """Write sanitized evidence files. Return a JSON-serialisable summary."""
     ts = timestamp or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -261,6 +346,7 @@ def persist(
         safe_actions = [sanitize_mapping(dict(row)) for row in actions]
         write_jsonl(dest / "actions.jsonl", safe_actions)
         files.append("actions.jsonl")
+    files.extend(copy_evidence_files(dest, screenshots=screenshots, logs=logs, apis=apis))
     routes = unique_routes(rows)
     summary = summary_text if summary_text is not None else _summary_markdown(
         run_id=run_id,
@@ -270,7 +356,16 @@ def persist(
     )
     (dest / "run_summary.md").write_text(summary, encoding="utf-8", newline="\n")
     files.append("run_summary.md")
-    _write_manifest(dest, run_id=run_id, scenario_id=scenario_id, intent=intent, count=len(rows), routes=routes, root=root)
+    _write_manifest(
+        dest,
+        run_id=run_id,
+        scenario_id=scenario_id,
+        intent=intent,
+        count=len(rows),
+        routes=routes,
+        root=root,
+        task_id=task_id,
+    )
     files.append("manifest.json")
     payload = {
         "run_id": run_id,
@@ -278,10 +373,56 @@ def persist(
         "files": files,
         "count": len(rows),
         "routes": routes,
+        "task_id": task_id or None,
         "sanitizer": "tuner_testkit.api_objects.recording.sanitize",
     }
     log_info("evidence persisted", run_id=run_id, count=len(rows), dir=str(dest))
     return payload
+
+
+def attach(
+    *,
+    run_id: str,
+    root: Path | None = None,
+    scenario_id: str = "attach",
+    intent: str = "",
+    task_id: str = "",
+    screenshots: Iterable[Path] = (),
+    logs: Iterable[Path] = (),
+    apis: Iterable[Path] = (),
+) -> dict[str, Any]:
+    """Add screenshots, logs, or API bodies to an evidence run (creating it if needed)."""
+    from tuner_testkit.artifacts import MANIFEST_NAME, RunManifest
+
+    dest = run_dir(run_id, root=root)
+    files = copy_evidence_files(dest, screenshots=screenshots, logs=logs, apis=apis)
+    if not files:
+        raise ValueError("attach requires at least one --screenshot, --log, or --api")
+    manifest_path = dest / MANIFEST_NAME
+    if manifest_path.is_file():
+        manifest = RunManifest.load(dest)
+        if task_id:
+            manifest.params["task_id"] = task_id
+        summary = dict(manifest.summary)
+        summary["attached"] = len(files)
+        manifest.finish("succeeded", exit_code=0, summary=summary)
+    else:
+        _write_manifest(
+            dest,
+            run_id=run_id,
+            scenario_id=scenario_id,
+            intent=intent,
+            count=0,
+            routes=[],
+            root=root,
+            task_id=task_id,
+        )
+    return {
+        "run_id": run_id,
+        "dir": dest.as_posix(),
+        "files": files,
+        "task_id": task_id or None,
+    }
 
 
 def load_run(run_id: str, *, root: Path | None = None) -> dict[str, Any]:

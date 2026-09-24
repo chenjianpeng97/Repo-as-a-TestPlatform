@@ -1,4 +1,4 @@
-<!-- version: 1.5.0 -->
+<!-- version: 1.6.0 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -16,6 +16,8 @@
 SUT 自学习：`docs/spec/sut-self-learning.md`（编排 `.cursor/agents/sut-self-learning.md`）。
 design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
 agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
+入库任务与人类提问：`docs/spec/work-task.md` → `work/tasks/`、`artifacts/inbox/questions/`。
+测试设计：`docs/spec/test-design-syntax.md` → `assets/testdesign/`。
 交付物目录与 run manifest：`docs/spec/artifacts-layout.md`（`artifacts/{evidence,inbox,runs,reports,catalogs,exports,playwright}`；`tuner_testkit.artifacts`）。
 探索账号模板：scaffold 写入 `data/sut-accounts.example.yaml`；本机副本 `data/sut-accounts.local.yaml`（gitignore）。
 
@@ -101,7 +103,8 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：目录切片（`@tool` / kit `@register`，含 `db_seed/<域>/*.py`）/ `db_seed` 特化页 / 表单运行 / 运行历史 / AI 组件 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
 | `tools`（库） | `from tuner_testkit.tools import tool` | `apps/<name>/tool.py` 的 `@tool` 清单：argparse → `params_schema` + `argv_plan`，供 catalog / 工作台 / 运行器 | `docs/spec/apps-authoring-syntax.md` §5 |
 | `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
-| `evidence` | `tuner-evidence persist` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，stdout JSON | `tuner_testkit/apps/evidence/README.md` |
+| `evidence` | `tuner-evidence persist` / `attach` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，并可挂上截图、脱敏日志、接口 JSON 与 `task_id` | `tuner_testkit/apps/evidence/README.md` |
+| `task` | `tuner-task create` / `ask` / `answer` / `finish` | 入库任务 `work/tasks/`；缺人答的通道写入 `artifacts/inbox/questions/` 并阻塞任务 | `tuner_testkit/apps/task/README.md` |
 
 ## 4. 测试层（tests/）
 

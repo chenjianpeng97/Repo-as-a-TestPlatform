@@ -64,7 +64,17 @@ evidence:
 
 对照两轮 dogfood 时，另写 `## Loop delta`：相对上一份 inbox，少了哪些手工步骤、多了哪些平台能力。
 
-## 4. 密钥
+## 4. 人类提问（阻塞）
+
+必须由人选择的缺口（仓库没写明的后端日志来源等）不写进会话流水，立刻另存：
+
+```text
+artifacts/inbox/questions/Q-<YYYYMMDD>-<nnn>.md
+```
+
+字段与命令见 `docs/spec/work-task.md`。提问后把对应 `work/tasks` 标为 `blocked`。回答写入任务的 `## Decisions`；可复用的通道说明策展到 `assets/domain-notes/`。
+
+## 5. 密钥
 
 - 可用 `account_id` 指向 `data/sut-accounts.local.yaml` 的条目。
 - 禁止密码、token、Cookie、Authorization 原文。

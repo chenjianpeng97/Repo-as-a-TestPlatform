@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**38**（rules 14 · skills 17 · agents 3 · hooks 4）
+> 组件总数：**41**（rules 15 · skills 19 · agents 3 · hooks 4）
 
 ## Rules（约束/边界）
 
@@ -19,13 +19,14 @@
 | `bdd-asset-layering` | glob | **/*.py | 1.4.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime | `.cursor/rules/bdd-asset-layering.mdc` |
 | `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/**,assets/design/** | 3.0.0 | Three gates for the BDD/self-learning asset pipeline (evidence capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
-| `commit-convention` | always | all files | 1.1.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
+| `commit-convention` | always | all files | 1.2.0 | Commits must follow Conventional Commits with a layer-aligned scope | `.cursor/rules/commit-convention.mdc` |
 | `explore-safety` | glob | artifacts/evidence/**,assets/explore/**,assets/design/** | 1.0.0 | Safety rails for live-SUT explore sessions (Playwright MCP) | `.cursor/rules/explore-safety.mdc` |
 | `index-hygiene` | glob | assets/**,packages/api_objects/**,packages/page_objects/**,apps/**,tuner_testkit/apps/**,dogfood/assets/**,dogfood/packages/**,dogfood/apps/**,dogfood/INDEX.project.md | 1.3.0 | Keep the repo-level INDEX.md current and require managed assets to leave a changelog trail | `.cursor/rules/index-hygiene.mdc` |
 | `packages-db` | glob | **/*.py | 1.3.1 | Require all DB access to go through tuner_testkit.db.DbClient with named datasources (MySQL / SQL Server / PostgreSQL c… | `.cursor/rules/packages-db.mdc` |
 | `packages-fake` | glob | **/*.py | 1.0.0 | Require business random/fake values to go through tuner_testkit.fake | `.cursor/rules/packages-fake.mdc` |
 | `packages-logging` | glob | **/*.py | 1.0.0 | Require all run-time logging to go through tuner_testkit.logging | `.cursor/rules/packages-logging.mdc` |
 | `packages-page-test` | glob | packages/page_objects/**,tests/features/**,packages/action_words/** | 1.0.0 | Require all UI locators to live in tuner_testkit.page_test ElementSpec declarations with multiple fallback candidates | `.cursor/rules/packages-page-test.mdc` |
+| `work-task` | always | all files | 1.0.0 | Work tasks live in work/tasks | `.cursor/rules/work-task.mdc` |
 
 ## Skills（操作流程）
 
@@ -36,18 +37,20 @@
 | `create-app` | on-demand | - | 1.2.1 | Scaffolds a new standalone SUT-private tool under apps/ that reuses tuner_testkit plus this repo's packages business as… | `.cursor/skills/create-app/SKILL.md` |
 | `derive-design-knowledge` | on-demand | - | 0.2.0 | Compile assets/design/<app>/<route-slug>.md from open evidence channels (MCP network, DDL, SUT source, optional logs) | `.cursor/skills/derive-design-knowledge/SKILL.md` |
 | `derive-feature-sets` | on-demand | - | 1.0.0 | Turn assets/explore capability notes (plus usecases/domain-notes) into behave Feature Sets under tests/features/ | `.cursor/skills/derive-feature-sets/SKILL.md` |
+| `derive-test-design` | on-demand | - | 1.0.0 | Write assets/testdesign/<sut>/<slug>.md from a work task plus usecases, domain-notes, explore, or design notes | `.cursor/skills/derive-test-design/SKILL.md` |
 | `dump-ddl` | on-demand | - | 1.2.0 | Dumps live table DDL into assets/ddl/<datasource>/ via tuner_testkit/apps/dump_ddl.py, then updates the knowledge index… | `.cursor/skills/dump-ddl/SKILL.md` |
 | `explore-sut` | on-demand | - | 1.2.0 | Explore-first Playwright MCP session against a live SUT | `.cursor/skills/explore-sut/SKILL.md` |
 | `feature-authoring` | on-demand | - | 1.0.0 | Creates or rewrites behave Gherkin .feature files following behave-gerkin-syntax.md | `.cursor/skills/feature-authoring/SKILL.md` |
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
-| `generate-test-report` | on-demand | - | 1.0.0 | Turn a regression run under artifacts/reports/<run_id>/ (plus inbox and optional design notes) into a curated Markdown … | `.cursor/skills/generate-test-report/SKILL.md` |
+| `generate-test-report` | on-demand | - | 1.1.0 | Turn a regression run under artifacts/reports/<run_id>/ (plus inbox and optional design notes) into a curated Markdown … | `.cursor/skills/generate-test-report/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.2.0 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
 | `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
 | `release-template` | on-demand | - | 1.0.1 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
 | `reuse-analysis` | on-demand | - | 1.0.0 | Analyzes whether to reuse/add/update Feature steps, Page Objects, and API Objects by searching for existing assets, mat… | `.cursor/skills/reuse-analysis/SKILL.md` |
 | `run-feature-playwright-mcp` | on-demand | - | 1.2.0 | Runs behave Gherkin scenarios (or records an explore session) via Playwright MCP with Run→Capture→Freeze workflow and s… | `.cursor/skills/run-feature-playwright-mcp/SKILL.md` |
+| `run-test-execution` | on-demand | - | 1.0.0 | Run the click paths in a test design, attach screenshots and sanitized API or log evidence, and write a curated test re… | `.cursor/skills/run-test-execution/SKILL.md` |
 
 ## Agents（编排 playbook）
 

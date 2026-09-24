@@ -1,4 +1,4 @@
-<!-- version: 1.5.0 -->
+<!-- version: 1.6.0 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -13,7 +13,7 @@
 
 | 层 | 目录 | 职责 | 谁运行 |
 | --- | --- | --- | --- |
-| 知识层 | `assets/` | 给人和 LLM 阅读、生成测试代码的基础知识（ddl / sql / usecases / domain-notes / explore / design / testreport）。见 `docs/spec/assets-knowledge-syntax.md`。 | 只读引用 |
+| 知识层 | `assets/` | 给人和 LLM 阅读、生成测试代码的基础知识（ddl / sql / usecases / domain-notes / explore / design / testdesign / testreport）。见 `docs/spec/assets-knowledge-syntax.md`。 | 只读引用 |
 | 运行库 | `tuner_testkit/`（PyPI：`tuner-testkit`） | 公共运行时与 CLI（db / logging / api_test / page_test / fake / recorders / dna）。SUT 用 `uv` 锁版本。 | `import tuner_testkit`；`tuner-recorder` 等 scripts |
 | 组件层 | `packages/` | **本仓业务资产**（api_objects / page_objects / action_words），不是 kit 运行库。 | 被 import |
 | 工具层 | `apps/` | **本仓私有**工具。公共工具在 `tuner_testkit.apps`。见 `docs/spec/apps-authoring-syntax.md`。 | `python -m apps.<name>`（仅项目工具） |
@@ -21,7 +21,7 @@
 | 测试层 | `tests/` | 自动化测试代码（behave `features/` + `pytest/`）。 | behave / pytest |
 | 文档层 | `docs/` | 仓库使用说明与规范（`docs/spec/**`）。 | 只读 |
 
-配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`artifacts/`·`logs/`（运行产出，规范 `docs/spec/artifacts-layout.md`：MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`；工具运行落 `artifacts/runs/<run_id>/`；回归报告落 `artifacts/reports/<run_id>/`，每个 run 目录带 `manifest.json`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
+配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`work/tasks/`（入库的任务上下文，规范 `docs/spec/work-task.md`）、`artifacts/`·`logs/`（运行产出，规范 `docs/spec/artifacts-layout.md`：MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`；阻塞式人类提问落 `artifacts/inbox/questions/`；工具运行落 `artifacts/runs/<run_id>/`；回归报告落 `artifacts/reports/<run_id>/`，每个 run 目录带 `manifest.json`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
 
 ## 2. 三角色
 
@@ -50,6 +50,7 @@ flowchart TD
   Q -->|"缺少知识(ddl/api/用例)"| Know["先跑 kit CLI 回填 assets\n再走生成"]
   Q -->|"新建/更新项目仓"| Init["tuner-init / tuner-dna / release-template"]
   Q -->|"读/策展/索引知识"| Idx["查 INDEX.md + maintain-index skill"]
+  Q -->|"发布任务 / 测试设计 / 端到端执行"| Task["work/tasks + tuner-task\ndocs/spec/work-task.md"]
 ```
 
 - **学习被测系统** → `.cursor/agents/sut-self-learning.md`（编排 explore → freeze → design；规格 `docs/spec/sut-self-learning.md`；任务 log 见 `docs/spec/agent-task-log.md`）。
@@ -59,6 +60,7 @@ flowchart TD
 - **补知识** → 用 `tuner-dump-ddl`、Playwright MCP 探索（落盘 `artifacts/evidence/`）、`tuner-recorder` / `tuner-api-recorder` / `tuner-page-recorder` 等回填，再进入生成。
 - **仓库初始化/发布** → `tuner-init scaffold`（骨架 + 依赖 `tuner-testkit` + 一次 `tuner-dna sync`）+ `release-template` skill。下游升 kit：`uv add tuner-testkit==x.y.z` 然后 `tuner-dna sync`，再提交。
 - **读/索引知识** → 先查 `INDEX.md`；若存在 `INDEX.project.md` 则一并查。索引维护用 `maintain-index` skill。
+- **发布任务** → `tuner-task create` 写入 `work/tasks/`。测试设计走 `derive-test-design`；端到端点击报告走 `run-test-execution`。缺人才能决定的通道（如后端日志）用 `tuner-task ask`，不要猜。
 
 ## 5. 全程硬约束（跨分支）
 

@@ -30,7 +30,7 @@ ALLOWED_TYPES = {
 
 ALLOWED_SCOPES = {
     "assets", "apps", "packages", "api_objects", "page_objects", "action_words",
-    "tests", "docs", "rules", "skills", "agents", "hooks", "init_repo", "index",
+    "tests", "docs", "rules", "skills", "agents", "hooks", "init_repo", "index", "work",
     # in-repo dogfood workspace (scaffolded from this platform repo)
     "dogfood",
     # fine-grained package aliases also accepted
@@ -84,6 +84,8 @@ def _path_to_layer(path: str) -> str | None:
         return "packages"
     if p.startswith("apps/"):
         return "apps"
+    if p.startswith("work/"):
+        return "work"
     if p.startswith("assets/"):
         return "assets"
     if p.startswith("tests/"):

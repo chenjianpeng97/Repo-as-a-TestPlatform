@@ -16,6 +16,7 @@ description: 交付物目录 artifacts/ 的子目录职责、run 级 manifest.js
 artifacts/
 ├── evidence/<run_id>/     # Playwright MCP / 网络 dump（tuner-evidence persist）；脱敏；gitignore
 ├── inbox/<utc>-<agent>-<slice>.md   # agent 任务记录（agent-task-log.md）；gitignore
+├── inbox/questions/Q-<YYYYMMDD>-<nnn>.md # 阻塞式人类提问（work-task.md）；gitignore
 ├── runs/<run_id>/         # 工具 / 动作词的一次运行（tuner-workspace run、工作台）；gitignore
 ├── reports/<run_id>/      # 一次回归（behave / pytest）的报告与摘要；gitignore
 ├── catalogs/workspace.json          # tuner-workspace catalog 产物；gitignore
@@ -66,8 +67,8 @@ artifacts/
 | `tuner-workspace run` / 工作台 | `runs/<run_id>/` | `stdout.log`、`stderr.log`、`envelope.json`（工具 `--json` 输出）、`manifest.json` |
 | behave（`*_environment.py` 钩子） | `reports/<run_id>/` | `summary.json`（feature/scenario 状态）、`manifest.json`；`-f html-pretty -o $TUNER_REPORT_DIR/report.html` 时 html 同目录 |
 | pytest | `reports/<run_id>/` | `pytest --junitxml artifacts/reports/<run_id>/junit.xml`，再 `tuner_testkit.artifacts.finish_run` 写 manifest |
-| `tuner-evidence persist` | `evidence/<run_id>/` | `network.jsonl` / `actions.jsonl` / `run_summary.md`（4.3.0 起）；5.x 起补 `manifest.json` |
-| agent（编排） | `inbox/` | 见 `agent-task-log.md` |
+| `tuner-evidence persist` / `attach` | `evidence/<run_id>/` | `network.jsonl` / `actions.jsonl` / `run_summary.md` / `screenshots/` / `logs/` / `api/`；`manifest.params.task_id` 指向 `work/tasks` |
+| agent（编排） | `inbox/` | 会话流水见 `agent-task-log.md`；人类提问见 `inbox/questions/` 与 `work-task.md` |
 | `tuner-workspace catalog` | `catalogs/workspace.json` | 见 `tuner_testkit/workspace/README.md` |
 
 环境变量 `TUNER_REPORT_DIR` 指定本次回归的 run 目录（不设则钩子自动生成 `reports/<run_id>/`）；
@@ -92,3 +93,4 @@ artifacts/
 - `artifacts/reports/<run_id>/` 是**原始交付物**；人工或 `generate-test-report` skill 整理后的报告落
   `assets/testreport/<sut>/<yyyy-mm>/<slug>.md`，front-matter 用 `evidence: [artifacts/reports/<run_id>]` 指回来源。
 - `artifacts/inbox/` 不是 evidence；evidence 只认 `artifacts/evidence/<run_id>/`。
+- 入库的任务在 `work/tasks/`，不在 inbox。inbox 里的 question 只是本机待答消息。

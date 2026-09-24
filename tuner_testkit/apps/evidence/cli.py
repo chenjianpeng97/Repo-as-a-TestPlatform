@@ -14,7 +14,7 @@ from pathlib import Path
 from tuner_testkit.logging import log_error
 from tuner_testkit.project import ensure_project_on_path, project_root
 
-from .persist import load_jsonl, load_run, persist
+from .persist import attach, load_jsonl, load_run, persist
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,12 +34,26 @@ def build_parser() -> argparse.ArgumentParser:
     persist_p.add_argument("--actions", type=Path, default=None, help="optional actions JSONL")
     persist_p.add_argument("--intent", default="", help="short intent blurb for generated run_summary.md")
     persist_p.add_argument("--summary", type=Path, default=None, help="optional run_summary.md to copy")
+    persist_p.add_argument("--task-id", default="", help="work task id, stored on the run manifest")
+    persist_p.add_argument("--screenshot", type=Path, action="append", default=[], help="image copied under screenshots/")
+    persist_p.add_argument("--log", type=Path, action="append", default=[], help="log excerpt, redacted, under logs/")
+    persist_p.add_argument("--api", type=Path, action="append", default=[], help="JSON response, sanitized, under api/")
     persist_p.add_argument(
         "--root",
         type=Path,
         default=None,
         help="project root (default: tuner project_root())",
     )
+
+    attach_p = sub.add_parser("attach", help="add screenshots, logs, or API JSON to a run")
+    attach_p.add_argument("--run-id", required=True)
+    attach_p.add_argument("--scenario", default="attach")
+    attach_p.add_argument("--intent", default="")
+    attach_p.add_argument("--task-id", default="")
+    attach_p.add_argument("--screenshot", type=Path, action="append", default=[])
+    attach_p.add_argument("--log", type=Path, action="append", default=[])
+    attach_p.add_argument("--api", type=Path, action="append", default=[])
+    attach_p.add_argument("--root", type=Path, default=None)
 
     routes_p = sub.add_parser("routes", help="print unique method+path from an existing run")
     routes_p.add_argument("--run-id", required=True)
@@ -73,8 +87,24 @@ def main(argv: list[str] | None = None) -> int:
                 intent=ns.intent,
                 summary_text=summary,
                 root=root,
+                task_id=ns.task_id,
+                screenshots=ns.screenshot,
+                logs=ns.log,
+                apis=ns.api,
             )
             _print_json(payload)
+            return 0
+        if ns.cmd == "attach":
+            _print_json(attach(
+                run_id=ns.run_id,
+                root=root,
+                scenario_id=ns.scenario,
+                intent=ns.intent,
+                task_id=ns.task_id,
+                screenshots=ns.screenshot,
+                logs=ns.log,
+                apis=ns.api,
+            ))
             return 0
         if ns.cmd == "routes":
             _print_json(load_run(ns.run_id, root=root))

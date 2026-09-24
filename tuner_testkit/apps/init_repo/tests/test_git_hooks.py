@@ -66,5 +66,8 @@ def test_validate_commit_msg_scope_coverage(tmp_path: Path) -> None:
         assert validate.main(["x", str(msg)]) == 0
         msg.write_text("added stuff\n", encoding="utf-8")
         assert validate.main(["x", str(msg)]) == 1
+        os.environ["TUNER_COMMIT_STAGED"] = "work/tasks/TASK-20260924-001.md"
+        msg.write_text("feat(work): record order test task\n", encoding="utf-8")
+        assert validate.main(["x", str(msg)]) == 0
     finally:
         os.environ.pop("TUNER_COMMIT_STAGED", None)

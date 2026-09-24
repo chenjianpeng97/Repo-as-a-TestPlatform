@@ -64,7 +64,7 @@ artifacts/evidence/<run_id>/     ← 统一落盘（强制）
 | MCP 网络 + DOM | Playwright MCP；必须落盘 evidence | `artifacts/evidence/` |
 | DDL | `tuner-dump-ddl` | `assets/ddl/` |
 | 源码 | 工程师给出前后端路径，LLM 读 models/views/urls | `assets/design/`（inferred） |
-| 应用日志 | 用户按 `create-app` 写 log fetcher，CLI + JSON | `apps/<name>/` |
+| 应用日志 | 仓库已有说明时按 `create-app` 写 log fetcher；没有说明时 `tuner-task ask --topic sut-log-source`，等人在 SSH 目录、日志接口、Rancher API 中选一个 | `apps/<name>/`；决定记在 `work/tasks` 与 `assets/domain-notes` |
 | DB 日志 / diff | 用户自建，或后续参考 `tuner-db-diff` | `apps/` 或 kit |
 | 人工文档 | 原样放入，只补 front-matter | `assets/usecases` / `domain-notes` |
 

@@ -13,7 +13,7 @@ description: 统一 front-matter / run manifest 字段家族，供 catalog、工
 
 | 字段 | 类型 | 含义 |
 | --- | --- | --- |
-| `kind` | string | `app` / `action_word` / `testreport` / `inbox` / `explore` / `design` / `usecase` / `domain-note` |
+| `kind` | string | `app` / `action_word` / `testreport` / `inbox` / `question` / `task` / `testdesign` / `explore` / `design` / `usecase` / `domain-note` |
 | `id` | string | 稳定标识（`tool_id` / `word_id` / 报告 slug） |
 | `title` | string | 短标题 |
 | `author` | email | 创建者，来自 `git config user.email` |
@@ -43,12 +43,19 @@ catalog 同时用 `git log --diff-filter=A --format=%ae -- <path>` 算首次提�
 落点：`assets/testreport/<sut>/<yyyy-mm>/<slug>.md`。
 
 额外：`run_id` / `period` / `result`（`{total,passed,failed}`）/ `evidence[]` / `features[]`。
+端到端执行报告再加 `task_id` / `design`（指向 `work/tasks` 与 `assets/testdesign`）。
 
 正文固定章节：范围 / 环境 / 结果 / 缺陷 / 风险 / 证据链接。见 skill `generate-test-report`。
 
 ### inbox
 
 沿用 `docs/spec/agent-task-log.md`，再加 `author`。
+
+### 任务与测试设计
+
+- `kind: task` 落在 `work/tasks/TASK-*.md`，字段见 `docs/spec/work-task.md`。
+- `kind: question` 落在 `artifacts/inbox/questions/Q-*.md`（不入库）。
+- `kind: testdesign` 落在 `assets/testdesign/<sut>/<slug>.md`，字段见 `docs/spec/test-design-syntax.md`。
 
 ### run manifest
 

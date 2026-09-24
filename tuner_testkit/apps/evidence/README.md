@@ -28,6 +28,9 @@ uv run python -m tuner_testkit.apps.evidence persist \
 uv run python -m tuner_testkit.apps.evidence routes --run-id 20260913T134137Z-issue-slice
 # 或
 tuner-evidence persist --run-id ... --scenario explore:x --network captures.jsonl
+
+# 同一次 run 挂上任务、截图、脱敏日志、接口响应
+tuner-evidence attach --run-id ... --task-id TASK-20260924-001 --screenshot fail.png --log app.log --api response.json
 ```
 
 ## 运行示例
@@ -38,4 +41,6 @@ tuner-evidence persist --run-id ... --scenario explore:x --network captures.json
 
 - `artifacts/evidence/<run_id>/network.jsonl`（脱敏）
 - `artifacts/evidence/<run_id>/run_summary.md`
+- 可选 `screenshots/`、`logs/`（赋值与 Bearer 已掩码）、`api/*.json`（敏感键掩码）
+- `manifest.json` 的 `params.task_id`（传入 `--task-id` 时）
 - stdout JSON：`{run_id, dir, routes, count, sanitizer}`
