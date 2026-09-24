@@ -46,7 +46,7 @@
 
 ## 2026-09-24 — tuner-testkit 5.2.0（work task、测试设计、证据附件、人类提问）
 
-- **commit**: `TBD`
+- **commit**: `74b1aa8`
 - **目的**: 把一次人工发布的任务收成可入库的 `work/tasks`，测试设计与端到端执行互相引用；证据 run 能挂上截图、脱敏日志和接口响应；缺日志来源时立刻写 inbox 问题并挡住任务，等人异步回答。
 - **路径**:
   - `docs/spec/work-task.md`、`docs/spec/test-design-syntax.md`
