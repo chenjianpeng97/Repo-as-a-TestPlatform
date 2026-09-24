@@ -24,7 +24,17 @@ MAX_PARSE_BYTES = 256_000
 _SKIP_API_OBJECT_FILES = {"__init__.py", "conftest.py", "auth.py", "registry.py"}
 _SKIP_API_OBJECT_DIRS = {"recording", "tests"}
 _SKIP_PAGE_OBJECT_FILES = {"__init__.py", "conftest.py", "session.py", "pages.py"}
-ASSET_CATEGORIES: tuple[str, ...] = ("ddl", "sql", "usecases", "domain-notes", "explore", "design", "testreport")
+ASSET_CATEGORIES: tuple[str, ...] = (
+    "ddl",
+    "sql",
+    "usecases",
+    "domain-notes",
+    "explore",
+    "design",
+    "testdesign",
+    "testcases",
+    "testreport",
+)
 
 
 # ---------------------------------------------------------------------------

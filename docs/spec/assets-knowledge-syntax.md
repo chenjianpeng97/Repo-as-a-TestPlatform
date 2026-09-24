@@ -17,13 +17,16 @@ assets/
 ├── explore/<app>/<name>.md        # 探索式测试产出的能力清单 / 站点地图（半自动）
 ├── design/<app>/<route-slug>.md   # API↔DB effects 收敛知识（见 design-knowledge-syntax）
 ├── testdesign/<sut>/<slug>.md     # 测试设计（见 test-design-syntax）；执行反馈回写在此
+├── testcases/README.md            # 功能用例集总索引（见 testcase-syntax）
+├── testcases/<模块>/README.md     # 模块范围与功能清单
+├── testcases/<模块>/<功能>.md     # 该功能的全部用例（四级标题 + CASE ID）
 ├── testreport/<name>.md           # 测试报告类原始资产
 └── CHANGELOG.md                   # 自动区变更流水(供 maintain-index 读取 delta)
 ```
 
 - **自动区**（工具产出，可被覆盖重写）：`ddl/`、以及每次生成会追加 `CHANGELOG.md`。
   人不手改这些文件的内容语义；要更新就重跑工具。
-- **人工/半自动区**：`sql/`、`usecases/`、`domain-notes/`、`explore/`、`design/`、`testdesign/`、`testreport/`。
+- **人工/半自动区**：`sql/`、`usecases/`、`domain-notes/`、`explore/`、`design/`、`testdesign/`、`testcases/`、`testreport/`。
 - `apidoc/` **不单列**：人工导入的接口说明放 `domain-notes/` 或 `usecases/`；
   运行时冻结的契约在 `packages/api_objects/`。是否再拆目录留给下游实践决定。
 

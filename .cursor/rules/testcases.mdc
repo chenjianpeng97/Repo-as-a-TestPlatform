@@ -1,0 +1,29 @@
+---
+description: Functional testcases live under assets/testcases/<module>/<feature>.md with four heading levels and stable CASE IDs
+globs: assets/testcases/**
+alwaysApply: false
+version: 1.1.0
+---
+
+# testcases — 功能用例集
+
+完整规范：`docs/spec/testcase-syntax.md`。生成或改写走 skill `maintain-testcases`。
+
+## 位置
+
+- 总索引：`assets/testcases/README.md`
+- 模块说明：`assets/testcases/<模块>/README.md`
+- 一个功能一个文件：`assets/testcases/<模块>/<功能>.md`
+- 不要写到 `usecases/`、`testdesign/` 或 `tests/features/`。
+
+## 功能文件
+
+- `# 测试用例` → `## <模块>` → `### <功能>` → `#### <缩写><四位序号> 正向-|反向-<测试点>`
+- 二级标题等于目录名，三级标题等于文件名。
+- 每条用例必填 `- 步骤：` 与 `- 预期：`。
+- ID 形如 `User-Login0001`：`id_prefix` 是功能英文缩写，后接 4 位序号。全库唯一；不改号、不复用、不重排。
+
+## 禁止
+
+- 密码、token、Cookie、Authorization。账号只写 `account_id`。
+- 没有出处的业务规则。出处是用户本次说明，或索引能指向的知识。

@@ -44,6 +44,17 @@
 
 ---
 
+## 2026-09-24 — tuner-testkit 5.3.0（功能用例集）
+
+- **commit**: `TBD`
+- **目的**: 给 workspace 一套可维护的功能用例目录：模块 README、按功能分文件、四级标题和稳定 CASE ID。
+- **路径**:
+  - `docs/spec/testcase-syntax.md`
+  - `.cursor/skills/maintain-testcases/SKILL.md`、`.cursor/rules/testcases.mdc`
+  - `tuner_testkit/testcases/**`
+  - `assets/testcases/README.md`
+- **验证**: `uv run pytest tuner_testkit/testcases/tests`；`python -m tuner_testkit.testcases`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-09-24 — tuner-testkit 5.2.0（work task、测试设计、证据附件、人类提问）
 
 - **commit**: `74b1aa8`

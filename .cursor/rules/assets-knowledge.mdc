@@ -2,7 +2,7 @@
 description: assets/ is the knowledge base for humans and the LLM; enforce provenance metadata, raw-vs-curated boundaries, and grounding (consult INDEX before generating)
 globs: assets/**
 alwaysApply: false
-version: 1.1.0
+version: 1.2.0
 ---
 
 # assets — 知识层硬约束
@@ -25,8 +25,9 @@ SUT 自学习见 `docs/spec/sut-self-learning.md`；design schema 见
 ## 目录与元数据
 
 - 目录分类固定：`ddl/<datasource>/`、`sql/`、`usecases/<domain>/`、
-  `domain-notes/<domain>/`、`explore/<app>/`、`design/<app>/`、`testreport/`
-  （新增类别前先改 spec，再改本 rule）。
+  `domain-notes/<domain>/`、`explore/<app>/`、`design/<app>/`、`testdesign/`、
+  `testcases/<模块>/`、`testreport/`
+  （新增类别前先改 spec，再改本 rule）。功能用例集见 `docs/spec/testcase-syntax.md`。
 - 人工/半自动区文件头必须带元数据：`domain / source / date / version / confidence`
   （Markdown 用 YAML front-matter，SQL 用顶部 `--` 注释）。
 - `explore/` 与 `design/` 还应填 `evidence`（run_id 列表）。

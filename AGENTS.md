@@ -1,4 +1,4 @@
-<!-- version: 1.6.0 -->
+<!-- version: 1.7.0 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -13,7 +13,7 @@
 
 | 层 | 目录 | 职责 | 谁运行 |
 | --- | --- | --- | --- |
-| 知识层 | `assets/` | 给人和 LLM 阅读、生成测试代码的基础知识（ddl / sql / usecases / domain-notes / explore / design / testdesign / testreport）。见 `docs/spec/assets-knowledge-syntax.md`。 | 只读引用 |
+| 知识层 | `assets/` | 给人和 LLM 阅读、生成测试代码的基础知识（ddl / sql / usecases / domain-notes / explore / design / testdesign / testcases / testreport）。见 `docs/spec/assets-knowledge-syntax.md`。 | 只读引用 |
 | 运行库 | `tuner_testkit/`（PyPI：`tuner-testkit`） | 公共运行时与 CLI（db / logging / api_test / page_test / fake / recorders / dna）。SUT 用 `uv` 锁版本。 | `import tuner_testkit`；`tuner-recorder` 等 scripts |
 | 组件层 | `packages/` | **本仓业务资产**（api_objects / page_objects / action_words），不是 kit 运行库。 | 被 import |
 | 工具层 | `apps/` | **本仓私有**工具。公共工具在 `tuner_testkit.apps`。见 `docs/spec/apps-authoring-syntax.md`。 | `python -m apps.<name>`（仅项目工具） |
@@ -51,6 +51,7 @@ flowchart TD
   Q -->|"新建/更新项目仓"| Init["tuner-init / tuner-dna / release-template"]
   Q -->|"读/策展/索引知识"| Idx["查 INDEX.md + maintain-index skill"]
   Q -->|"发布任务 / 测试设计 / 端到端执行"| Task["work/tasks + tuner-task\ndocs/spec/work-task.md"]
+  Q -->|"生成或维护功能测试用例"| Cases["maintain-testcases skill\ndocs/spec/testcase-syntax.md"]
 ```
 
 - **学习被测系统** → `.cursor/agents/sut-self-learning.md`（编排 explore → freeze → design；规格 `docs/spec/sut-self-learning.md`；任务 log 见 `docs/spec/agent-task-log.md`）。
@@ -61,6 +62,7 @@ flowchart TD
 - **仓库初始化/发布** → `tuner-init scaffold`（骨架 + 依赖 `tuner-testkit` + 一次 `tuner-dna sync`）+ `release-template` skill。下游升 kit：`uv add tuner-testkit==x.y.z` 然后 `tuner-dna sync`，再提交。
 - **读/索引知识** → 先查 `INDEX.md`；若存在 `INDEX.project.md` 则一并查。索引维护用 `maintain-index` skill。
 - **发布任务** → `tuner-task create` 写入 `work/tasks/`。测试设计走 `derive-test-design`；端到端点击报告走 `run-test-execution`。缺人才能决定的通道（如后端日志）用 `tuner-task ask`，不要猜。
+- **功能测试用例** → skill `maintain-testcases`，落在 `assets/testcases/<模块>/<功能>.md`（规格 `docs/spec/testcase-syntax.md`）。这不是测试设计，也不直接产出 `.feature`。
 
 ## 5. 全程硬约束（跨分支）
 
