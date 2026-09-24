@@ -16,7 +16,7 @@
 SUT 自学习：`docs/spec/sut-self-learning.md`（编排 `.cursor/agents/sut-self-learning.md`）。
 design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
 agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
-入库任务与人类提问：`docs/spec/work-task.md` → `work/tasks/`、`artifacts/inbox/questions/`。
+入库任务与人类提问：`docs/spec/work-task.md` → `work/tasks/`、`artifacts/inbox/questions/`（已回答在 `archived-question/`）。
 测试设计：`docs/spec/test-design-syntax.md` → `assets/testdesign/`。
 功能用例集：`docs/spec/testcase-syntax.md` → `assets/testcases/<模块>/<功能>.md`（skill `maintain-testcases`）。
 交付物目录与 run manifest：`docs/spec/artifacts-layout.md`（`artifacts/{evidence,inbox,runs,reports,catalogs,exports,playwright}`；`tuner_testkit.artifacts`）。

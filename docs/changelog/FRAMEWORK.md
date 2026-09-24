@@ -44,6 +44,16 @@
 
 ---
 
+## 2026-09-24 — tuner-testkit 5.3.1（已回答提问归档）
+
+- **commit**: `TBD`
+- **目的**: 回答后的问题离开未回答信箱，避免和待回答的问题混在一起。
+- **路径**:
+  - `tuner_testkit/apps/task/store.py`
+  - `docs/spec/work-task.md`、`artifacts-layout.md`
+  - `.cursor/rules/work-task.mdc`
+- **验证**: `uv run pytest tuner_testkit/apps/task/tests`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-09-24 — tuner-testkit 5.3.0（功能用例集）
 
 - **commit**: `TBD`

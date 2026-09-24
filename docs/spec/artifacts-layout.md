@@ -16,7 +16,8 @@ description: 交付物目录 artifacts/ 的子目录职责、run 级 manifest.js
 artifacts/
 ├── evidence/<run_id>/     # Playwright MCP / 网络 dump（tuner-evidence persist）；脱敏；gitignore
 ├── inbox/<utc>-<agent>-<slice>.md   # agent 任务记录（agent-task-log.md）；gitignore
-├── inbox/questions/Q-<YYYYMMDD>-<nnn>.md # 阻塞式人类提问（work-task.md）；gitignore
+├── inbox/questions/Q-<YYYYMMDD>-<nnn>.md # 未回答的人类提问（work-task.md）；gitignore
+├── inbox/archived-question/Q-<YYYYMMDD>-<nnn>.md # 已回答的提问；gitignore
 ├── runs/<run_id>/         # 工具 / 动作词的一次运行（tuner-workspace run、工作台）；gitignore
 ├── reports/<run_id>/      # 一次回归（behave / pytest）的报告与摘要；gitignore
 ├── catalogs/workspace.json          # tuner-workspace catalog 产物；gitignore
@@ -68,7 +69,7 @@ artifacts/
 | behave（`*_environment.py` 钩子） | `reports/<run_id>/` | `summary.json`（feature/scenario 状态）、`manifest.json`；`-f html-pretty -o $TUNER_REPORT_DIR/report.html` 时 html 同目录 |
 | pytest | `reports/<run_id>/` | `pytest --junitxml artifacts/reports/<run_id>/junit.xml`，再 `tuner_testkit.artifacts.finish_run` 写 manifest |
 | `tuner-evidence persist` / `attach` | `evidence/<run_id>/` | `network.jsonl` / `actions.jsonl` / `run_summary.md` / `screenshots/` / `logs/` / `api/`；`manifest.params.task_id` 指向 `work/tasks` |
-| agent（编排） | `inbox/` | 会话流水见 `agent-task-log.md`；人类提问见 `inbox/questions/` 与 `work-task.md` |
+| agent（编排） | `inbox/` | 会话流水见 `agent-task-log.md`；未回答提问见 `inbox/questions/`，已回答见 `inbox/archived-question/` |
 | `tuner-workspace catalog` | `catalogs/workspace.json` | 见 `tuner_testkit/workspace/README.md` |
 
 环境变量 `TUNER_REPORT_DIR` 指定本次回归的 run 目录（不设则钩子自动生成 `reports/<run_id>/`）；

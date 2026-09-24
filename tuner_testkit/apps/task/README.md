@@ -1,7 +1,7 @@
 # task
 
 把人发布的任务写进 Git（`work/tasks/TASK-*.md`），并把必须由人回答的问题写进本机信箱
-`artifacts/inbox/questions/`。规范：`docs/spec/work-task.md`。
+`artifacts/inbox/questions/`。回答后移到 `artifacts/inbox/archived-question/`。规范：`docs/spec/work-task.md`。
 
 ## 运行方式
 

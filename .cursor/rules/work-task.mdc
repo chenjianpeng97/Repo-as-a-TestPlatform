@@ -1,7 +1,7 @@
 ---
 description: Work tasks live in work/tasks. When a human must choose a missing evidence channel, write an inbox question and block the task instead of inventing the channel.
 alwaysApply: true
-version: 1.0.0
+version: 1.1.0
 ---
 
 # 工作任务与人类提问
@@ -15,7 +15,7 @@ version: 1.0.0
 - 端到端点击用 `type: test-execution`，`design` 指向已有测试设计；报告写入 `assets/testreport/`，证据用 `tuner-evidence persist` 或 `attach` 挂上 `task_id`、截图、脱敏日志、接口 JSON。
 - 执行结束后把结果写入该测试设计的「执行反馈」，只引用证据路径。
 - 仓库没有写明的证据通道（典型是后端日志：SSH 目录、日志接口、Rancher API）立刻 `tuner-task ask`。日志主题用 `sut-log-source`。
-- 提问写入 `artifacts/inbox/questions/` 后停止这一支，把任务保持在 `blocked`，直到 `tuner-task answer`。
+- 提问写入 `artifacts/inbox/questions/` 后停止这一支，把任务保持在 `blocked`，直到 `tuner-task answer`。回答后的问题文件在 `artifacts/inbox/archived-question/`。
 
 ## Must not
 

@@ -1,4 +1,4 @@
-<!-- version: 1.7.0 -->
+<!-- version: 1.7.1 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -21,7 +21,7 @@
 | 测试层 | `tests/` | 自动化测试代码（behave `features/` + `pytest/`）。 | behave / pytest |
 | 文档层 | `docs/` | 仓库使用说明与规范（`docs/spec/**`）。 | 只读 |
 
-配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`work/tasks/`（入库的任务上下文，规范 `docs/spec/work-task.md`）、`artifacts/`·`logs/`（运行产出，规范 `docs/spec/artifacts-layout.md`：MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`；阻塞式人类提问落 `artifacts/inbox/questions/`；工具运行落 `artifacts/runs/<run_id>/`；回归报告落 `artifacts/reports/<run_id>/`，每个 run 目录带 `manifest.json`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
+配套：`config/`（环境/数据源）、`.cursor/`（AI 组件，见下）、`work/tasks/`（入库的任务上下文，规范 `docs/spec/work-task.md`）、`artifacts/`·`logs/`（运行产出，规范 `docs/spec/artifacts-layout.md`：MCP evidence 落 `artifacts/evidence/<run_id>/`；agent 任务记录落 `artifacts/inbox/`；阻塞式人类提问未回答时落 `artifacts/inbox/questions/`，回答后移到 `artifacts/inbox/archived-question/`；工具运行落 `artifacts/runs/<run_id>/`；回归报告落 `artifacts/reports/<run_id>/`，每个 run 目录带 `manifest.json`）。SUT 登录本机文件：`data/sut-accounts.local.yaml`（gitignore）。
 
 ## 2. 三角色
 

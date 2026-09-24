@@ -27,7 +27,7 @@
 | `packages-logging` | glob | **/*.py | 1.0.0 | Require all run-time logging to go through tuner_testkit.logging | `.cursor/rules/packages-logging.mdc` |
 | `packages-page-test` | glob | packages/page_objects/**,tests/features/**,packages/action_words/** | 1.0.0 | Require all UI locators to live in tuner_testkit.page_test ElementSpec declarations with multiple fallback candidates | `.cursor/rules/packages-page-test.mdc` |
 | `testcases` | glob | assets/testcases/** | 1.1.0 | Functional testcases live under assets/testcases/<module>/<feature>.md with four heading levels and stable CASE IDs | `.cursor/rules/testcases.mdc` |
-| `work-task` | always | all files | 1.0.0 | Work tasks live in work/tasks | `.cursor/rules/work-task.mdc` |
+| `work-task` | always | all files | 1.1.0 | Work tasks live in work/tasks | `.cursor/rules/work-task.mdc` |
 
 ## Skills（操作流程）
 

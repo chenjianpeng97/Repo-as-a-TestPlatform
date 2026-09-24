@@ -14,7 +14,8 @@ description: 入库任务 work/tasks、阻塞式人类提问，以及和测试�
 
 ```text
 work/tasks/TASK-<YYYYMMDD>-<nnn>.md          # 入库
-artifacts/inbox/questions/Q-<YYYYMMDD>-<nnn>.md   # gitignore，本机异步信箱
+artifacts/inbox/questions/Q-<YYYYMMDD>-<nnn>.md        # 未回答；gitignore
+artifacts/inbox/archived-question/Q-<YYYYMMDD>-<nnn>.md # 已回答；gitignore
 ```
 
 `work/**` 的提交 scope 是 `work`。问题文件不入库；人答完后的结论写回任务的 `## Decisions`，需要留下的通道说明再策展到 `assets/domain-notes/`。
@@ -73,6 +74,7 @@ tuner-task answer Q-20260924-001 --option rancher-api \
 ```
 
 - 提问立刻落盘，并把任务标为 `blocked`。只挡住依赖该答案的回写；不依赖日志的点击可以先做完，但在回答前不要编写取日志实现，也不要选定通道。
+- `tuner-task answer` 把问题文件从 `questions/` 移到 `archived-question/`，未回答的问题仍只留在 `questions/`。同一天的新问题编号会计入归档，避免复用已回答的 ID。
 - `--note` 只留可入库的指向。CLI 拒绝 `password=` / `token:` / `Bearer …` 这类赋值。
 - `skip` 表示报告里日志证据写「无」，设计上的日志断言保持未验证。
 - `tuner-task finish` 在仍有 `status: open` 且 `blocking: true` 的问题时失败。

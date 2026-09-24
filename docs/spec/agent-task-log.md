@@ -72,7 +72,7 @@ evidence:
 artifacts/inbox/questions/Q-<YYYYMMDD>-<nnn>.md
 ```
 
-字段与命令见 `docs/spec/work-task.md`。提问后把对应 `work/tasks` 标为 `blocked`。回答写入任务的 `## Decisions`；可复用的通道说明策展到 `assets/domain-notes/`。
+回答后同一文件移到 `artifacts/inbox/archived-question/`。字段与命令见 `docs/spec/work-task.md`。提问后把对应 `work/tasks` 标为 `blocked`。回答写入任务的 `## Decisions`；可复用的通道说明策展到 `assets/domain-notes/`。
 
 ## 5. 密钥
 

@@ -49,12 +49,29 @@ def questions_dir(root: Path) -> Path:
     return root / "artifacts" / "inbox" / "questions"
 
 
+def archived_questions_dir(root: Path) -> Path:
+    return root / "artifacts" / "inbox" / "archived-question"
+
+
 def _utc_day() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%d")
 
 
 def _today() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def _next_question_id(repo: Path) -> str:
+    """Next Q-id for today, counting both the open inbox and the archive."""
+    day = _utc_day()
+    pat = re.compile(rf"^Q-{day}-(\d+)$")
+    nums: list[int] = []
+    for directory in (questions_dir(repo), archived_questions_dir(repo)):
+        if not directory.is_dir():
+            continue
+        nums.extend(int(m.group(1)) for path in directory.glob(f"Q-{day}-*.md") if (m := pat.match(path.stem)))
+    questions_dir(repo).mkdir(parents=True, exist_ok=True)
+    return f"Q-{day}-{max(nums, default=0) + 1:03d}"
 
 
 def _next_seq(directory: Path, prefix: str, day: str) -> str:
@@ -300,7 +317,7 @@ def ask_question(
     ids = [item["id"] for item in chosen]
     if len(ids) != len(set(ids)):
         raise ValueError("option ids must be unique")
-    question_id = _next_seq(questions_dir(repo), "Q", _utc_day())
+    question_id = _next_question_id(repo)
     prompt_one = " ".join(prompt.split())
     meta: dict[str, Any] = {
         "kind": "question",
@@ -347,25 +364,31 @@ def ask_question(
 
 def list_questions(*, root: Path | None = None, status: str | None = "open") -> list[dict[str, Any]]:
     repo = Path(root) if root is not None else project_root()
-    directory = questions_dir(repo)
-    if not directory.is_dir():
-        return []
+    if status == "answered":
+        directories = [archived_questions_dir(repo)]
+    elif status == "open":
+        directories = [questions_dir(repo)]
+    else:
+        directories = [questions_dir(repo), archived_questions_dir(repo)]
     rows = []
-    for path in sorted(directory.glob("Q-*.md")):
-        meta, _ = _read(path)
-        if status and meta.get("status") != status:
+    for directory in directories:
+        if not directory.is_dir():
             continue
-        rows.append(
-            {
-                "id": meta.get("id"),
-                "task_id": meta.get("task_id"),
-                "topic": meta.get("topic"),
-                "status": meta.get("status"),
-                "blocking": meta.get("blocking"),
-                "prompt": meta.get("prompt"),
-                "path": path.relative_to(repo).as_posix(),
-            }
-        )
+        for path in sorted(directory.glob("Q-*.md")):
+            meta, _ = _read(path)
+            if status and meta.get("status") != status:
+                continue
+            rows.append(
+                {
+                    "id": meta.get("id"),
+                    "task_id": meta.get("task_id"),
+                    "topic": meta.get("topic"),
+                    "status": meta.get("status"),
+                    "blocking": meta.get("blocking"),
+                    "prompt": meta.get("prompt"),
+                    "path": path.relative_to(repo).as_posix(),
+                }
+            )
     return rows
 
 
@@ -432,6 +455,10 @@ def answer_question(
         "answered": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     _write(path, meta, text)
+    dest = archived_questions_dir(repo) / path.name
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    path.replace(dest)
+    path = dest
     task_id = str(meta.get("task_id") or "")
     task_path = _task_path(repo, task_id)
     task_meta, task_text = _read(task_path)
@@ -454,6 +481,7 @@ def answer_question(
         "id": question_id,
         "status": "answered",
         "option": option,
+        "path": path.relative_to(repo).as_posix(),
         "task_id": task_id,
         "task_status": task_meta.get("status"),
         "curated": curated or None,

@@ -51,6 +51,10 @@ def test_ask_blocks_until_answer_then_curates(tmp_path: Path):
         root=tmp_path,
     )
     assert answered["task_status"] == "in_progress"
+    assert answered["path"].startswith("artifacts/inbox/archived-question/")
+    assert not (tmp_path / "artifacts" / "inbox" / "questions" / f"{asked['id']}.md").is_file()
+    archived = tmp_path / answered["path"]
+    assert "status: answered" in archived.read_text(encoding="utf-8")
     note = (tmp_path / answered["curated"]).read_text(encoding="utf-8")
     assert "rancher-api" in note
     assert parse_front_matter(note)["kind"] == "domain-note"
@@ -95,6 +99,25 @@ def test_bind_appends_output(tmp_path: Path):
     shown = show_task(created["id"], root=tmp_path)
     assert shown["outputs"] == ["assets/explore/web/home.md"]
     assert shown["evidence"] == ["artifacts/evidence/20260924T000000Z-home"]
+
+
+def test_answer_archives_question_and_keeps_id(tmp_path: Path):
+    created = create_task(task_type="explore", title="看日志", root=tmp_path, author="qa@example.com")
+    first = ask_question(
+        task_id=created["id"],
+        topic="sut-log-source",
+        prompt="日志从哪取",
+        root=tmp_path,
+    )
+    answer_question(first["id"], option="skip", root=tmp_path)
+    second = ask_question(
+        task_id=created["id"],
+        topic="sut-log-source",
+        prompt="再确认一次通道",
+        root=tmp_path,
+    )
+    assert second["id"] != first["id"]
+    assert int(second["id"].rsplit("-", 1)[-1]) == int(first["id"].rsplit("-", 1)[-1]) + 1
 
 
 def test_finish_refuses_open_question(tmp_path: Path):
