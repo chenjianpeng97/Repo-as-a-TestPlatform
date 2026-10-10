@@ -1,8 +1,8 @@
 ---
-description: Functional testcases live under assets/testcases/<module>/<feature>.md with four heading levels and stable CASE IDs
+description: Functional testcases live one case per file under assets/testcases/<module>/<suite>/<Case-ID>.md; suite notes live in that folder's README
 globs: assets/testcases/**
 alwaysApply: false
-version: 1.1.0
+version: 1.3.0
 ---
 
 # testcases — 功能用例集
@@ -13,15 +13,17 @@ version: 1.1.0
 
 - 总索引：`assets/testcases/README.md`
 - 模块说明：`assets/testcases/<模块>/README.md`
-- 一个功能一个文件：`assets/testcases/<模块>/<功能>.md`
+- 一个套件一个目录：`assets/testcases/<模块>/<套件>/README.md`
+- 一条用例一个文件：`assets/testcases/<模块>/<套件>/<用例ID>.md`
 - 不要写到 `usecases/`、`testdesign/` 或 `tests/features/`。
 
-## 功能文件
+## 用例文件
 
-- `# 测试用例` → `## <模块>` → `### <功能>` → `#### <缩写><四位序号> 正向-|反向-<测试点>`
-- 二级标题等于目录名，三级标题等于文件名。
-- 每条用例必填 `- 步骤：` 与 `- 预期：`。
-- ID 形如 `User-Login0001`：`id_prefix` 是功能英文缩写，后接 4 位序号。全库唯一；不改号、不复用、不重排。
+- 文件名等于 `id`。一级标题是 `<id> <title>`。
+- `type` 为 `正向` 或 `反向`。`status` 为 `就绪` 或 `废弃`。`execution` 为 `手工` 或 `自动`。
+- `## 步骤` 从 `### 1` 连续编号。每步有 `- 操作：` 和 `- 预期：`。
+- 套件级、不属于单条用例的说明写在套件 README 的 `## 详情`。
+- ID 形如 `User-Login-valid-credentials`：`id_prefix` 加小写 kebab-case slug（2–5 个词）。全库唯一；不改、不复用。删除一条不改其余 ID。
 
 ## 禁止
 

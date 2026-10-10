@@ -1,6 +1,6 @@
 ---
 name: metadata-conventions
-version: 1.0.0
+version: 1.1.0
 description: 统一 front-matter / run manifest 字段家族，供 catalog、工作台与未来企业平台解析「谁在何时创建了什么」。
 ---
 
@@ -13,7 +13,7 @@ description: 统一 front-matter / run manifest 字段家族，供 catalog、工
 
 | 字段 | 类型 | 含义 |
 | --- | --- | --- |
-| `kind` | string | `app` / `action_word` / `testreport` / `inbox` / `question` / `task` / `testdesign` / `testcase` / `testcase-module` / `testcase-index` / `explore` / `design` / `usecase` / `domain-note` |
+| `kind` | string | `app` / `action_word` / `testreport` / `inbox` / `question` / `task` / `testdesign` / `testcase` / `testcase-suite` / `testcase-module` / `testcase-index` / `explore` / `design` / `usecase` / `domain-note` |
 | `id` | string | 稳定标识（`tool_id` / `word_id` / 报告 slug） |
 | `title` | string | 短标题 |
 | `author` | email | 创建者，来自 `git config user.email` |
@@ -56,7 +56,7 @@ catalog 同时用 `git log --diff-filter=A --format=%ae -- <path>` 算首次提�
 - `kind: task` 落在 `work/tasks/TASK-*.md`，字段见 `docs/spec/work-task.md`。
 - `kind: question` 未回答落在 `artifacts/inbox/questions/Q-*.md`，回答后移到 `artifacts/inbox/archived-question/`（不入库）。
 - `kind: testdesign` 落在 `assets/testdesign/<sut>/<slug>.md`，字段见 `docs/spec/test-design-syntax.md`。
-- `kind: testcase` 落在 `assets/testcases/<模块>/<功能>.md`；模块说明是 `testcase-module`，总索引是 `testcase-index`。字段见 `docs/spec/testcase-syntax.md`。
+- `kind: testcase` 落在 `assets/testcases/<模块>/<套件>/<用例ID>.md`；套件说明是 `testcase-suite`，模块说明是 `testcase-module`，总索引是 `testcase-index`。字段见 `docs/spec/testcase-syntax.md`。
 
 ### run manifest
 

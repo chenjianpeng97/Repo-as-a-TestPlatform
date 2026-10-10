@@ -44,6 +44,19 @@
 
 ---
 
+## 2026-10-10 — tuner-testkit 6.0.0（功能用例改为一条一个文件）
+
+- **commit**: `TBD`
+- **来源**: `jnj` 的 `maintain-testcases` 1.3.0（套件目录 + `<id_prefix>-<slug>`）
+- **目的**: 功能用例集与下游试验田对齐。5.3.0 的「一个功能一个文件、四级标题、`User-Login0001`」不再新发。
+- **路径**:
+  - `docs/spec/testcase-syntax.md`
+  - `.cursor/skills/maintain-testcases/SKILL.md`、`.cursor/rules/testcases.mdc`
+  - `tuner_testkit/testcases/**`
+  - `assets/testcases/README.md`
+- **不在同步范围**: `jnj` 里的业务用例正文
+- **验证**: `uv run pytest tuner_testkit/testcases/tests`；`python -m tuner_testkit.testcases`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-09-24 — tuner-testkit 5.3.1（已回答提问归档）
 
 - **commit**: `TBD`

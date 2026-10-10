@@ -62,7 +62,7 @@ flowchart TD
 - **仓库初始化/发布** → `tuner-init scaffold`（骨架 + 依赖 `tuner-testkit` + 一次 `tuner-dna sync`）+ `release-template` skill。下游升 kit：`uv add tuner-testkit==x.y.z` 然后 `tuner-dna sync`，再提交。
 - **读/索引知识** → 先查 `INDEX.md`；若存在 `INDEX.project.md` 则一并查。索引维护用 `maintain-index` skill。
 - **发布任务** → `tuner-task create` 写入 `work/tasks/`。测试设计走 `derive-test-design`；端到端点击报告走 `run-test-execution`。缺人才能决定的通道（如后端日志）用 `tuner-task ask`，不要猜。
-- **功能测试用例** → skill `maintain-testcases`，落在 `assets/testcases/<模块>/<功能>.md`（规格 `docs/spec/testcase-syntax.md`）。这不是测试设计，也不直接产出 `.feature`。
+- **功能测试用例** → skill `maintain-testcases`，落在 `assets/testcases/<模块>/<套件>/<用例ID>.md`（规格 `docs/spec/testcase-syntax.md`）。这不是测试设计，也不直接产出 `.feature`。
 
 ## 5. 全程硬约束（跨分支）
 

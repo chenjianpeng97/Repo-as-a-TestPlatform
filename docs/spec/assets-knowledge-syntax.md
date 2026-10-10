@@ -17,9 +17,10 @@ assets/
 ├── explore/<app>/<name>.md        # 探索式测试产出的能力清单 / 站点地图（半自动）
 ├── design/<app>/<route-slug>.md   # API↔DB effects 收敛知识（见 design-knowledge-syntax）
 ├── testdesign/<sut>/<slug>.md     # 测试设计（见 test-design-syntax）；执行反馈回写在此
-├── testcases/README.md            # 功能用例集总索引（见 testcase-syntax）
-├── testcases/<模块>/README.md     # 模块范围与功能清单
-├── testcases/<模块>/<功能>.md     # 该功能的全部用例（四级标题 + CASE ID）
+├── testcases/README.md                         # 功能用例集总索引（见 testcase-syntax）
+├── testcases/<模块>/README.md                  # 模块范围与套件清单
+├── testcases/<模块>/<套件>/README.md           # 套件说明与用例索引
+├── testcases/<模块>/<套件>/<用例ID>.md         # 一条用例一个文件
 ├── testreport/<name>.md           # 测试报告类原始资产
 └── CHANGELOG.md                   # 自动区变更流水(供 maintain-index 读取 delta)
 ```

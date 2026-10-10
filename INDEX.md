@@ -1,4 +1,4 @@
-<!-- version: 1.6.0 -->
+<!-- version: 1.6.1 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -18,7 +18,7 @@ design schema（v0.1 草案）：`docs/spec/design-knowledge-syntax.md`。
 agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
 入库任务与人类提问：`docs/spec/work-task.md` → `work/tasks/`、`artifacts/inbox/questions/`（已回答在 `archived-question/`）。
 测试设计：`docs/spec/test-design-syntax.md` → `assets/testdesign/`。
-功能用例集：`docs/spec/testcase-syntax.md` → `assets/testcases/<模块>/<功能>.md`（skill `maintain-testcases`）。
+功能用例集：`docs/spec/testcase-syntax.md` → `assets/testcases/<模块>/<套件>/<用例ID>.md`（skill `maintain-testcases`）。
 交付物目录与 run manifest：`docs/spec/artifacts-layout.md`（`artifacts/{evidence,inbox,runs,reports,catalogs,exports,playwright}`；`tuner_testkit.artifacts`）。
 探索账号模板：scaffold 写入 `data/sut-accounts.example.yaml`；本机副本 `data/sut-accounts.local.yaml`（gitignore）。
 
