@@ -44,6 +44,15 @@
 
 ---
 
+## 2026-10-12 — tuner-testkit 6.1.0（scaffold 项目名跟随文件夹）
+
+- **commit**: `TBD`
+- **目的**: 新建业务仓时可以指定项目名；省略时用目标文件夹名。依赖下限改为执行 scaffold 的 kit 版本，避免新仓再锁在已过期的 `>=4.3.0`。
+- **路径**:
+  - `tuner_testkit/apps/init_repo/scaffold.py`
+  - `tuner_testkit/apps/init_repo/__main__.py`
+- **验证**: `uv run pytest tuner_testkit/apps/init_repo/tests/test_scaffold.py`；`manifest --check`
+
 ## 2026-10-10 — tuner-testkit 6.0.0（功能用例改为一条一个文件）
 
 - **commit**: `TBD`

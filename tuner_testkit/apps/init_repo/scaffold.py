@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pathlib
+import re
 import shutil
 import textwrap
 
@@ -88,6 +89,39 @@ def _stub_root() -> pathlib.Path | None:
     return None
 
 
+# PEP 503 / 426 name: start and end with an alphanumeric; dots, underscores, hyphens inside.
+_PROJECT_NAME_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
+
+
+def project_name_from_directory(directory_name: str) -> str:
+    """Turn a generated folder name into a ``pyproject.toml`` project name.
+
+    ``Balance`` becomes ``balance``. Characters outside the project-name
+    alphabet become hyphens. Pass ``--name`` when the folder name cannot
+    produce a valid name.
+    """
+    slug = directory_name.strip().lower()
+    slug = re.sub(r"[^a-z0-9._-]+", "-", slug)
+    slug = re.sub(r"[-_.]{2,}", "-", slug).strip("-._")
+    if not slug:
+        raise ValueError(
+            f"cannot derive a project name from directory {directory_name!r}; pass --name"
+        )
+    return normalize_project_name(slug)
+
+
+def normalize_project_name(raw: str) -> str:
+    """Accept an explicit ``--name`` or raise ``ValueError``."""
+    name = raw.strip()
+    if not _PROJECT_NAME_RE.fullmatch(name):
+        raise ValueError(
+            "invalid project name "
+            f"{raw!r}: use letters, digits, '.', '_' or '-', "
+            "and do not start or end with punctuation"
+        )
+    return name
+
+
 def _copy_file(src: pathlib.Path, dst: pathlib.Path, *, overwrite: bool) -> bool:
     if dst.exists() and not overwrite:
         return False
@@ -96,20 +130,26 @@ def _copy_file(src: pathlib.Path, dst: pathlib.Path, *, overwrite: bool) -> bool
     return True
 
 
-def _write_pyproject(target: pathlib.Path, *, overwrite: bool) -> bool:
+def _write_pyproject(
+    target: pathlib.Path,
+    *,
+    overwrite: bool,
+    project_name: str,
+    kit_version: str,
+) -> bool:
     dest = target / "pyproject.toml"
     if dest.exists() and not overwrite:
         return False
     dest.write_text(
         textwrap.dedent(
-            """\
+            f"""\
             [project]
-            name = "sut-test-repo"
+            name = "{project_name}"
             version = "0.1.0"
             description = "Test repo created from tuner-testkit"
             requires-python = ">=3.12,<3.14"
             dependencies = [
-                "tuner-testkit[db,api]>=4.3.0",
+                "tuner-testkit[db,api]>={kit_version}",
             ]
 
             [project.optional-dependencies]
@@ -139,9 +179,29 @@ def _write_pyproject(target: pathlib.Path, *, overwrite: bool) -> bool:
     return True
 
 
-def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = False) -> list[str]:
+def scaffold(
+    target: pathlib.Path,
+    *,
+    with_ai: bool = True,
+    overwrite: bool = False,
+    project_name: str | None = None,
+) -> list[str]:
+    """Create a SUT test repo at ``target``.
+
+    The directory's own name is the generated folder name. ``project_name``
+    (CLI ``--name``) is the ``[project] name`` written into ``pyproject.toml``.
+    When omitted, that name is derived from the folder name.
+    """
     actions: list[str] = []
     target = target.resolve()
+    explicit = (project_name or "").strip()
+    resolved_name = (
+        normalize_project_name(explicit)
+        if explicit
+        else project_name_from_directory(target.name)
+    )
+    from tuner_testkit import __version__
+
     target.mkdir(parents=True, exist_ok=True)
     src_root = _stub_root()
 
@@ -153,8 +213,13 @@ def scaffold(target: pathlib.Path, *, with_ai: bool = True, overwrite: bool = Fa
             keep.write_text("", encoding="utf-8")
         actions.append(f"dir  {rel}")
 
-    if _write_pyproject(target, overwrite=overwrite):
-        actions.append("write pyproject.toml")
+    if _write_pyproject(
+        target,
+        overwrite=overwrite,
+        project_name=resolved_name,
+        kit_version=__version__,
+    ):
+        actions.append(f"write pyproject.toml ({resolved_name})")
     else:
         actions.append("skip pyproject.toml (exists)")
 

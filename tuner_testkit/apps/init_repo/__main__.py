@@ -1,6 +1,6 @@
 """CLI for init_repo: scaffold a new repo or manage the release manifest.
 
-    python -m tuner_testkit.apps.init_repo scaffold <target> [--no-ai] [--overwrite]
+    python -m tuner_testkit.apps.init_repo scaffold <target> [--name NAME] [--no-ai] [--overwrite]
     python -m tuner_testkit.apps.init_repo manifest --write [--version X.Y.Z]
     python -m tuner_testkit.apps.init_repo manifest --check
 """
@@ -15,11 +15,16 @@ from tuner_testkit.apps.init_repo import scaffold as sc
 
 
 def _cmd_scaffold(args: argparse.Namespace) -> int:
-    actions = sc.scaffold(
-        pathlib.Path(args.target),
-        with_ai=not args.no_ai,
-        overwrite=args.overwrite,
-    )
+    try:
+        actions = sc.scaffold(
+            pathlib.Path(args.target),
+            with_ai=not args.no_ai,
+            overwrite=args.overwrite,
+            project_name=args.name,
+        )
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     for line in actions:
         print(line)
     print(f"\nScaffolded {len(actions)} entries into {args.target}")
@@ -68,7 +73,15 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p_sc = sub.add_parser("scaffold", help="create six-layer skeleton (+ platform DNA)")
-    p_sc.add_argument("target", help="target directory for the new project repo")
+    p_sc.add_argument(
+        "target",
+        help="directory to create; its name is the generated folder name and the default project name",
+    )
+    p_sc.add_argument(
+        "--name",
+        default=None,
+        help="pyproject project name (default: normalized target folder name, e.g. Balance -> balance)",
+    )
     p_sc.add_argument("--no-ai", action="store_true", help="do not copy .cursor/docs-spec/packages DNA")
     p_sc.add_argument("--overwrite", action="store_true", help="overwrite existing files when copying DNA")
     p_sc.set_defaults(func=_cmd_scaffold)

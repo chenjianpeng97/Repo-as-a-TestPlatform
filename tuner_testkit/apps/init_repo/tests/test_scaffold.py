@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+from tuner_testkit import __version__
+from tuner_testkit.apps.init_repo.__main__ import main
 from tuner_testkit.apps.init_repo.scaffold import scaffold
 
 _REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -21,7 +25,10 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
     actions = scaffold(dest, with_ai=True, overwrite=False)
     assert dest.is_dir()
     assert (dest / "pyproject.toml").is_file()
-    assert "[tool.tuner-testkit]" in (dest / "pyproject.toml").read_text(encoding="utf-8")
+    pyproject = (dest / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'name = "new-sut"' in pyproject
+    assert f'"tuner-testkit[db,api]>={__version__}"' in pyproject
+    assert "[tool.tuner-testkit]" in pyproject
     assert 'requires-python = ">=3.12,<3.14"' in (dest / "pyproject.toml").read_text(encoding="utf-8")
     assert (dest / ".python-version").read_text(encoding="utf-8") == "3.12\n"
     assert (dest / "config" / "env.py").is_file()
@@ -45,6 +52,46 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
     assert (dest / "workbench.sh").is_file()
     assert (dest / ".cursor" / "REGISTRY.md").is_file()
     assert any(line.startswith("write .cursor/REGISTRY.md") for line in actions)
+
+
+def test_scaffold_project_name_follows_folder(tmp_path: Path):
+    dest = tmp_path / "Balance"
+    actions = scaffold(dest, with_ai=False)
+    text = (dest / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'name = "balance"' in text
+    assert any(line == "write pyproject.toml (balance)" for line in actions)
+
+
+def test_scaffold_name_override(tmp_path: Path):
+    dest = tmp_path / "clients"
+    scaffold(dest, with_ai=False, project_name="Hospital-Billing")
+    text = (dest / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'name = "Hospital-Billing"' in text
+
+
+def test_scaffold_rejects_invalid_name_before_creating_the_folder(tmp_path: Path):
+    dest = tmp_path / "balance"
+    with pytest.raises(ValueError, match="invalid project name"):
+        scaffold(dest, with_ai=False, project_name="bad name")
+    assert not dest.exists()
+
+
+def test_cli_name_flag(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    dest = tmp_path / "Balance"
+    code = main(["scaffold", str(dest), "--name", "balance", "--no-ai"])
+    captured = capsys.readouterr()
+    assert code == 0
+    assert "write pyproject.toml (balance)" in captured.out
+    assert 'name = "balance"' in (dest / "pyproject.toml").read_text(encoding="utf-8")
+
+
+def test_cli_rejects_invalid_name(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    dest = tmp_path / "balance"
+    code = main(["scaffold", str(dest), "--name", "bad name", "--no-ai"])
+    captured = capsys.readouterr()
+    assert code == 2
+    assert "invalid project name" in captured.err
+    assert not dest.exists()
 
 
 def test_scaffold_uses_packaged_stubs_when_not_editable(tmp_path: Path, monkeypatch):

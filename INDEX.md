@@ -100,7 +100,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `page_recorder` | `tuner-page-recorder --app <app>` | headed 仅冻 Page | `tuner_testkit/apps/page_recorder/README.md` |
 | `dna` | `tuner-dna sync` / `check` / `targets`（`--ide cursor,claude,agents,codex,all`） | 把 kit 所带 DNA merge 进项目 `.cursor/` / `docs/spec/` / git-hooks；`--ide` 渲染到 `.claude/`、`.agents/`、`CLAUDE.md` | `tuner-dna --help` |
 | `index_ai` | `tuner-index-ai` | 生成 `.cursor/REGISTRY.md` | `tuner_testkit/apps/index_ai/README.md` |
-| `init_repo` | `tuner-init scaffold <dir>` | 任意目录铺新仓骨架 + 一次 `dna sync`（wheel 带 `stubs/`；**不再拷**运行库源码） | `tuner_testkit/apps/init_repo/README.md` |
+| `init_repo` | `tuner-init scaffold <dir> [--name <project>]` | 任意目录铺新仓骨架 + 一次 `dna sync`。项目名默认取文件夹名（可用 `--name` 覆盖）。wheel 带 `stubs/`；**不再拷**运行库源码 | `tuner_testkit/apps/init_repo/README.md` |
 | `workspace` | `tuner-workspace catalog` / `index render\|check` / `run` / `meta stamp` | 确定性 workspace catalog（`artifacts/catalogs/workspace.json`）、INDEX 自动区渲染、按清单运行工具、front-matter 署名 | `tuner_testkit/workspace/README.md` |
 | `workbench` | `tuner-workbench` | 本机 127.0.0.1 工作台：目录切片（`@tool` / kit `@register`，含 `db_seed/<域>/*.py`）/ `db_seed` 特化页 / 表单运行 / 运行历史 / AI 组件 / 知识浏览（`[workbench]` extra） | `tuner_testkit/workbench/README.md` |
 | `tools`（库） | `from tuner_testkit.tools import tool` | `apps/<name>/tool.py` 的 `@tool` 清单：argparse → `params_schema` + `argv_plan`，供 catalog / 工作台 / 运行器 | `docs/spec/apps-authoring-syntax.md` §5 |
