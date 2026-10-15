@@ -15,6 +15,7 @@ SKELETON_DIRS: tuple[str, ...] = (
     "assets/design",
     "assets/testreport",
     "assets/testcases",
+    "assets/testsheet",
     "packages/action_words/db_seed",
     "packages/action_words/db_assert",
     "packages/action_words/api_request",

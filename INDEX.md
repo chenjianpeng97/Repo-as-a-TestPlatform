@@ -1,4 +1,4 @@
-<!-- version: 1.6.1 -->
+<!-- version: 1.6.2 -->
 # INDEX — 仓库知识 / 能力地图
 
 > 平台的**当前状态与能力**总览。LLM 生成任何测试/工具前先来这里检索依据（grounding）；
@@ -19,6 +19,7 @@ agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
 入库任务与人类提问：`docs/spec/work-task.md` → `work/tasks/`、`artifacts/inbox/questions/`（已回答在 `archived-question/`）。
 测试设计：`docs/spec/test-design-syntax.md` → `assets/testdesign/`。
 功能用例集：`docs/spec/testcase-syntax.md` → `assets/testcases/<模块>/<套件>/<用例ID>.md`（skill `maintain-testcases`）。
+测试单：skill `maintain-testsheet` → `assets/testsheet/<轮次>/testsheet.md`，步骤链同目录 `testcase/` 副本。
 交付物目录与 run manifest：`docs/spec/artifacts-layout.md`（`artifacts/{evidence,inbox,runs,reports,catalogs,exports,playwright}`；`tuner_testkit.artifacts`）。
 探索账号模板：scaffold 写入 `data/sut-accounts.example.yaml`；本机副本 `data/sut-accounts.local.yaml`（gitignore）。
 
@@ -41,7 +42,8 @@ agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
 | 路径 | domain | source | confidence | 一句话用途 |
 | --- | --- | --- | --- | --- |
 | `assets/testcases/README.md` | testcases | testcase-syntax | high | 功能用例集的模块总索引；业务模块写在下游仓或 dogfood |
-| _(暂无平台内置业务知识)_ | | | | 业务仓写 `INDEX.project.md`。平台约定目录：`usecases/` `domain-notes/` `explore/` `design/` `testdesign/` `testcases/` `testreport/` |
+| `assets/testsheet/` | testsheet | maintain-testsheet | high | 一轮测试单的目录约定；业务测试单写在下游仓 |
+| _(暂无平台内置业务知识)_ | | | | 业务仓写 `INDEX.project.md`。平台约定目录：`usecases/` `domain-notes/` `explore/` `design/` `testdesign/` `testcases/` `testsheet/` `testreport/` |
 
 ## 2. 运行库（`tuner_testkit/`，PyPI：`tuner-testkit`）与本仓资产（`packages/`）
 

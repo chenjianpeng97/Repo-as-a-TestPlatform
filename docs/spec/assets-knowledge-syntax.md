@@ -21,13 +21,16 @@ assets/
 ├── testcases/<模块>/README.md                  # 模块范围与套件清单
 ├── testcases/<模块>/<套件>/README.md           # 套件说明与用例索引
 ├── testcases/<模块>/<套件>/<用例ID>.md         # 一条用例一个文件
+├── testsheet/<轮次>/testsheet.md              # 一次测试单。步骤链接本目录副本
+├── testsheet/<轮次>/testcase/<模块>/<套件>/<用例ID>.md  # 从用例库复制的本次步骤
 ├── testreport/<name>.md           # 测试报告类原始资产
 └── CHANGELOG.md                   # 自动区变更流水(供 maintain-index 读取 delta)
 ```
 
 - **自动区**（工具产出，可被覆盖重写）：`ddl/`、以及每次生成会追加 `CHANGELOG.md`。
   人不手改这些文件的内容语义；要更新就重跑工具。
-- **人工/半自动区**：`sql/`、`usecases/`、`domain-notes/`、`explore/`、`design/`、`testdesign/`、`testcases/`、`testreport/`。
+- **人工/半自动区**：`sql/`、`usecases/`、`domain-notes/`、`explore/`、`design/`、`testdesign/`、`testcases/`、`testsheet/`、`testreport/`。
+- `testsheet/<轮次>/testsheet.md` 不写 YAML 头，正文按测试单格式。同目录 `testcase/` 是用例库的原样副本，保留复制时的文件头。维护方式见 skill `maintain-testsheet`。
 - `apidoc/` **不单列**：人工导入的接口说明放 `domain-notes/` 或 `usecases/`；
   运行时冻结的契约在 `packages/api_objects/`。是否再拆目录留给下游实践决定。
 

@@ -1,7 +1,7 @@
 ---
 name: maintain-testcases
-version: 1.3.0
-description: Creates and updates functional testcases so each case is its own Markdown file under assets/testcases/<module>/<suite>/<Case-ID>.md, with suite notes in that folder's README. Uses a TestLink-style template (summary, preconditions, numbered steps, expected results, status). Use when the user asks to 编写/生成/维护测试用例, add a module or suite, or mentions assets/testcases or a case ID. Do not use for testdesign click-paths or behave .feature files.
+version: 1.5.0
+description: Creates and updates functional testcases so each case is its own Markdown file under assets/testcases/<module>/<suite>/<Case-ID>.md, with suite notes in that folder's README. Uses a TestLink-style template (summary, preconditions, numbered steps, expected results, status). One maintain-testcases session is one git commit; the body lists each case as 首次创建 or 变更原因 so the IDE Timeline on that file shows the changelog. Use when the user asks to 编写/生成/维护测试用例, add a module or suite, or mentions assets/testcases or a case ID. Do not use for testdesign click-paths or behave .feature files.
 ---
 
 # Maintain testcases
@@ -156,6 +156,54 @@ confidence: high
 - 删除：删掉该 `<用例ID>.md`，并从套件用例表去掉这一行。不改其他用例的 ID。
 - 废弃：`status` 改为 `废弃`，在备注写原因。不删除文件，不把 ID 让给新用例，标题不加 `（废弃）`。
 - 拆套件或改套件名：用例带着原 ID 搬家，并改两边 README 的链接。每条用例的 `suite` 改成新目录名。
+- 上面每一种落盘（新建、修改、废弃、删除、搬家）都记在同一次维护的那一个提交里。文件变更日志以 git 为准，不要另写变更日志。
+
+## Commit
+
+同一次 `maintain-testcases` 工作只做 **一个** commit。目的是让每个被改到的用例文件，在 IDE 的 Timeline 里都能看到这次变更日志。用户没有再说「提交」也要做。不要 push。不要改 git config，不要 `--no-verify`。不要按用例拆成多次提交。
+
+校验前的来回修改并进这一个提交。没有文件变化就不提交。
+
+这次提交只暂存本次维护动过的路径：
+
+- 新建或修改的 `<用例ID>.md`（含删除）
+- 因此改动的套件 `README.md`、模块 `README.md`、`assets/testcases/README.md`
+- 因此在 `INDEX.project.md` 新增或修改的行
+
+工作区里其他改动不要放进来。
+
+提交信息遵循 `docs/spec/commit-convention.md`。`scope` 必须盖住暂存路径：只有 `assets/testcases/**` 时用 `assets`；同一次还改了 `INDEX.project.md` 时用 `assets,index`。subject 概括这一次（套件或模块，加上新建或更新）。全是新建用 `feat`；只改正错误的操作或预期用 `fix`；只做废弃、删除、搬家或索引调整用 `chore`；几种混在一起用 `feat`。
+
+正文每个用例文件一段，打开该文件的 Timeline 时能对上自己的那一段。原词不要改：
+
+- 新文件：`<用例ID>：首次创建。<一句测试点>`。换 slug 的新文件在这句里写 `曾用：<旧 ID>`。
+- 已有文件：`<用例ID>：变更原因：<改了什么、为什么>`。
+- 只改了套件详情或索引、没有动用例正文：`<套件名>：变更原因：<改了什么、为什么>`。
+
+```bash
+git add -- <本次维护相关路径>
+git commit -m "<type>(<scope>): <subject>" -m "<用例ID>：首次创建。<测试点>" -m "<用例ID>：变更原因：<改了什么、为什么>"
+```
+
+多个用例就多个 `-m`，一段一个文件。只有一条时保留一段即可。
+
+例子：
+
+```text
+feat(assets): 新增用户登录用例 2 条
+
+User-Login-valid-credentials：首次创建。已注册账号与正确密码可以登录。
+
+User-Login-wrong-password：首次创建。错误密码不能登录。
+```
+
+```text
+fix(assets): 更新 User-Login-valid-credentials 正确账号密码
+
+User-Login-valid-credentials：变更原因：登录成功后的预期由首页改为个人中心。
+```
+
+提交前看 `git status` 和 `git diff --cached`，确认暂存只有这次维护的文件。`commit-msg` 失败就改正后再提交一次，不要 amend 那次失败的提交。说明里不写密码、token、Cookie。
 
 ## Finish
 
@@ -164,4 +212,4 @@ python -m tuner_testkit.testcases assets/testcases
 uv run tuner-workspace meta stamp <改过的.md> --kind <testcase|testcase-suite|testcase-module|testcase-index>
 ```
 
-校验失败就改文件再跑，通过后再停。有 `INDEX.project.md` 时在其知识表登记新套件 README 的路径（只读 front-matter）；平台仓没有业务用例时不要往根 `INDEX.md` 填模块明细。
+校验失败就改文件再跑。本次要写的用例都通过后，按 Commit 做这一个提交，然后停。有 `INDEX.project.md` 时在其知识表登记新套件 README 的路径（只读 front-matter），放进同一次提交；平台仓没有业务用例时不要往根 `INDEX.md` 填模块明细。

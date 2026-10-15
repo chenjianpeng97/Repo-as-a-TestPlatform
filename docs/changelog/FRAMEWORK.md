@@ -44,6 +44,20 @@
 
 ---
 
+## 2026-10-15 — tuner-testkit 6.2.0（测试单 skill，用例维护一次一个提交）
+
+- **commit**: `TBD`
+- **来源**: `jnj` 的 `maintain-testcases` 1.5.0、`maintain-testsheet` 1.0.0
+- **目的**: 一轮测试单从用例库复制步骤，不链回用例库。维护用例时一次工作只做一个提交，正文按用例写下首次创建或变更原因。
+- **路径**:
+  - `.cursor/skills/maintain-testcases/SKILL.md`
+  - `.cursor/skills/maintain-testsheet/SKILL.md`
+  - `.cursor/rules/assets-knowledge.mdc`
+  - `docs/spec/assets-knowledge-syntax.md`
+  - `tuner_testkit/apps/init_repo/scaffold.py`
+- **不在同步范围**: `jnj` 的业务测试单 `assets/testsheet/**`
+- **验证**: `uv run pytest tuner_testkit/apps/init_repo/tests/test_scaffold.py`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-10-12 — tuner-testkit 6.1.0（scaffold 项目名跟随文件夹）
 
 - **commit**: `2919822`

@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**43**（rules 16 · skills 20 · agents 3 · hooks 4）
+> 组件总数：**44**（rules 16 · skills 21 · agents 3 · hooks 4）
 
 ## Rules（约束/边界）
 
@@ -15,7 +15,7 @@
 | `agent-task-log` | always | all files | 1.0.0 | Every agent run must leave a task log under artifacts/inbox/ (no secrets). | `.cursor/rules/agent-task-log.mdc` |
 | `apps-authoring` | glob | apps/**,tuner_testkit/apps/** | 2.0.1 | SUT apps/ and kit tuner_testkit.apps tools must be standalone-runnable and reuse tuner_testkit plus this repo's package… | `.cursor/rules/apps-authoring.mdc` |
 | `apps-handover` | glob | apps/**,tuner_testkit/apps/** | 1.1.0 | When an apps/ or tuner_testkit.apps tool is created or changed, it must ship a handover doc (requirement background, tr… | `.cursor/rules/apps-handover.mdc` |
-| `assets-knowledge` | glob | assets/** | 1.2.1 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
+| `assets-knowledge` | glob | assets/** | 1.2.2 | assets/ is the knowledge base for humans and the LLM | `.cursor/rules/assets-knowledge.mdc` |
 | `bdd-asset-layering` | glob | **/*.py | 1.4.0 | Enforce layered boundaries between feature/steps/action_words/page_objects/api_objects and tuner_testkit runtime | `.cursor/rules/bdd-asset-layering.mdc` |
 | `bdd-pipeline-gates` | glob | tests/features/**,packages/api_objects/**,packages/page_objects/**,assets/design/** | 3.0.0 | Three gates for the BDD/self-learning asset pipeline (evidence capture, API-object freeze, stage regression) | `.cursor/rules/bdd-pipeline-gates.mdc` |
 | `bdd-stage-layout` | glob | tests/features/**/*.py | 1.0.0 | Enforce behave --stage layout conventions - tests/features/{ui,api}_steps + tests/features/{ui,api}_environment with Gi… | `.cursor/rules/bdd-stage-layout.mdc` |
@@ -48,7 +48,8 @@
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.2.0 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
 | `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
-| `maintain-testcases` | on-demand | - | 1.3.0 | Creates and updates functional testcases so each case is its own Markdown file under assets/testcases/<module>/<suite>/… | `.cursor/skills/maintain-testcases/SKILL.md` |
+| `maintain-testcases` | on-demand | - | 1.5.0 | Creates and updates functional testcases so each case is its own Markdown file under assets/testcases/<module>/<suite>/… | `.cursor/skills/maintain-testcases/SKILL.md` |
+| `maintain-testsheet` | on-demand | - | 1.0.0 | Builds and updates a test sheet under assets/testsheet/<round>/testsheet.md, copying the selected ready cases from asse… | `.cursor/skills/maintain-testsheet/SKILL.md` |
 | `release-template` | on-demand | - | 1.0.1 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
 | `reuse-analysis` | on-demand | - | 1.0.0 | Analyzes whether to reuse/add/update Feature steps, Page Objects, and API Objects by searching for existing assets, mat… | `.cursor/skills/reuse-analysis/SKILL.md` |
 | `run-feature-playwright-mcp` | on-demand | - | 1.2.0 | Runs behave Gherkin scenarios (or records an explore session) via Playwright MCP with Run→Capture→Freeze workflow and s… | `.cursor/skills/run-feature-playwright-mcp/SKILL.md` |
