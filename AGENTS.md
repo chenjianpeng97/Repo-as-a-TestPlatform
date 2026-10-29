@@ -1,4 +1,4 @@
-<!-- version: 1.7.2 -->
+<!-- version: 1.7.3 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -48,7 +48,7 @@ flowchart TD
   Q -->|"明确要求 pytest / 性能 / DB 核对"| Pytest["pytest 路径\n复用 tuner_testkit + packages，不产出 .feature"]
   Q -->|"需要一个新的独立工具"| App["create-app skill\napps-authoring / apps-handover 规则"]
   Q -->|"缺少知识(ddl/api/用例)"| Know["先跑 kit CLI 回填 assets\n再走生成"]
-  Q -->|"新建/更新项目仓"| Init["tuner-init / tuner-dna / release-template"]
+  Q -->|"新建/更新项目仓"| Init["tuner-init / init-content\ntuner-dna / release-template"]
   Q -->|"读/策展/索引知识"| Idx["查 INDEX.md + maintain-index skill"]
   Q -->|"发布任务 / 测试设计 / 端到端执行"| Task["work/tasks + tuner-task\ndocs/spec/work-task.md"]
   Q -->|"生成或维护功能测试用例"| Cases["maintain-testcases skill\ndocs/spec/testcase-syntax.md"]
@@ -60,7 +60,7 @@ flowchart TD
 - **明确 pytest** → 直接写 pytest，复用 `tuner_testkit` 与本仓 `packages/**` 业务资产，不要为满足分层而硬造 Gherkin。
 - **造工具** → `create-app` skill；工具做好按 `apps-handover.mdc` 补交接文档。证据通道（日志/DB 日志取数）也落 `apps/`，遵守 CLI + JSON 输出约定。
 - **补知识** → 用 `tuner-dump-ddl`、Playwright MCP 探索（落盘 `artifacts/evidence/`）、`tuner-recorder` / `tuner-api-recorder` / `tuner-page-recorder` 等回填，再进入生成。
-- **仓库初始化/发布** → `tuner-init scaffold`（骨架 + 依赖 `tuner-testkit` + 一次 `tuner-dna sync`）+ `release-template` skill。下游升 kit：`uv add tuner-testkit==x.y.z` 然后 `tuner-dna sync`，再提交。
+- **仓库初始化/发布** → `tuner-init scaffold`（骨架 + 依赖 `tuner-testkit` + 一次 `tuner-dna sync`）。开场配置走 `init-content` skill（系统身份、URL、账号、数据库、源码根、日志通道）。发版走 `release-template` skill。下游升 kit：`uv add tuner-testkit==x.y.z` 然后 `tuner-dna sync`，再提交。
 - **读/索引知识** → 先查 `INDEX.md`；若存在 `INDEX.project.md` 则一并查。索引维护用 `maintain-index` skill。
 - **发布任务** → `tuner-task create` 写入 `work/tasks/`。测试设计走 `derive-test-design`；端到端点击报告走 `run-test-execution`。缺人才能决定的通道（如后端日志）用 `tuner-task ask`，不要猜。
 - **功能测试用例** → skill `maintain-testcases`，落在 `assets/testcases/<模块>/<套件>/<用例ID>.md`（规格 `docs/spec/testcase-syntax.md`）。这不是测试设计，也不直接产出 `.feature`。

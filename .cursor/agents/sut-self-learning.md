@@ -1,6 +1,6 @@
 ---
 name: sut-self-learning
-version: 1.0.0
+version: 1.0.1
 description: Orchestrate explore-first SUT self-learning — accounts → Playwright MCP explore → evidence → freeze API/page objects → design knowledge → index, with an artifacts/inbox task log. Hand off to bdd-asset-pipeline only when Feature Sets are in scope. Do NOT use when the user explicitly requests pytest-only work.
 ---
 
@@ -26,8 +26,8 @@ description: Orchestrate explore-first SUT self-learning — accounts → Playwr
    1. `data/sut-accounts.local.yaml`（gitignore，首选）
    2. 否则 `config/env_local.py` 的 `TEST_ACCOUNT`
    3. 都没有则停，让工程师按 `data/sut-accounts.example.yaml` 补本机文件
-3. 垂直切片（一个模块，不是全站爬）。
-4. 可选：SUT 源码根（如 Plane `apps/api`）——有则跑 `sut-source-to-design`。
+3. 垂直切片：优先 `assets/domain-notes/<sut>/profile.md` 的「先学切片」；没有再问工程师。一个模块，不是全站爬。
+4. 源码根：优先 `data/source-roots.local.yaml` 的本机绝对路径，仓内相对根见 `assets/domain-notes/<sut>/source-roots.md`。两处都没有再问。有路径则跑 `sut-source-to-design`。
 
 ## Skills / agents（顺序）
 

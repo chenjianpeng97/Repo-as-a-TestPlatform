@@ -1,6 +1,6 @@
 ---
 name: sut-source-to-design
-version: 1.0.1
+version: 1.0.2
 description: Walk SUT backend source (Django models/views/serializers, or equivalent) plus assets/ddl to draft assets/design/<app>/<route-slug>.md. Use when the engineer points at a source tree. Do not invent tables. Complements derive-design-knowledge; this agent is the source-channel playbook.
 ---
 
@@ -12,7 +12,7 @@ Highest-quality `writes` / `noise` / `reads` often come from **models.save / vie
 
 ## Inputs
 
-- Source root the user named (e.g. `C:\dev\repo\plane\apps\api`)
+- Source root: `data/source-roots.local.yaml` backend path when present, otherwise the path the user named this session. In-repo relative root is `assets/domain-notes/<sut>/source-roots.md`.
 - Matching `assets/ddl/<datasource>/` if present (dump missing tables rather than hallucinate)
 - Optional `artifacts/evidence/<run_id>/` to fill `api_object_ref` / `page_ref`
 

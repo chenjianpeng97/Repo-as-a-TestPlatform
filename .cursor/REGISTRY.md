@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**44**（rules 16 · skills 21 · agents 3 · hooks 4）
+> 组件总数：**45**（rules 16 · skills 22 · agents 3 · hooks 4）
 
 ## Rules（约束/边界）
 
@@ -45,6 +45,7 @@
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
 | `generate-test-report` | on-demand | - | 1.1.0 | Turn a regression run under artifacts/reports/<run_id>/ (plus inbox and optional design notes) into a curated Markdown … | `.cursor/skills/generate-test-report/SKILL.md` |
+| `init-content` | on-demand | - | 1.0.0 | Audits a scaffolded test workspace and writes the missing copilot basics (SUT identity, UI/API hosts, explore account, … | `.cursor/skills/init-content/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.2.0 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
 | `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
@@ -60,8 +61,8 @@
 | 名称 | 触发 | 作用范围 | 版本 | 职责 | 文件 |
 | --- | --- | --- | --- | --- | --- |
 | `bdd-asset-pipeline` | orchestration | - | 2.0.1 | Lower-half of SUT self-learning — Feature Sets + design knowledge → Reuse Analysis → Freeze API Objects → Maintain Page… | `.cursor/agents/bdd-asset-pipeline.md` |
-| `sut-self-learning` | orchestration | - | 1.0.0 | Orchestrate explore-first SUT self-learning — accounts → Playwright MCP explore → evidence → freeze API/page objects → … | `.cursor/agents/sut-self-learning.md` |
-| `sut-source-to-design` | orchestration | - | 1.0.1 | Walk SUT backend source (Django models/views/serializers, or equivalent) plus assets/ddl to draft assets/design/<app>/<… | `.cursor/agents/sut-source-to-design.md` |
+| `sut-self-learning` | orchestration | - | 1.0.1 | Orchestrate explore-first SUT self-learning — accounts → Playwright MCP explore → evidence → freeze API/page objects → … | `.cursor/agents/sut-self-learning.md` |
+| `sut-source-to-design` | orchestration | - | 1.0.2 | Walk SUT backend source (Django models/views/serializers, or equivalent) plus assets/ddl to draft assets/design/<app>/<… | `.cursor/agents/sut-source-to-design.md` |
 
 ## Hooks（事件驱动脚本）
 
