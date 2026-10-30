@@ -11,12 +11,12 @@
 ## 运行方式
 
 ```bash
-python -m tuner_testkit.apps.init_repo scaffold ../balance
+python -m tuner_testkit.apps.init_repo scaffold ../acme
 # 或
-tuner-init scaffold ../balance
+tuner-init scaffold ../acme
 
 # 文件夹名是 target 的最后一段。pyproject 的 name 默认由文件夹名规范化而来
-# （Balance -> balance）。依赖钉在执行 scaffold 的这份 kit 版本上。
+# （Acme -> acme）。依赖钉在执行 scaffold 的这份 kit 版本上。
 tuner-init scaffold ../clients/acme --name acme-billing
 
 python -m tuner_testkit.apps.init_repo scaffold ../my-new-project --no-ai

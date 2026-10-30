@@ -6,7 +6,7 @@
 > 确定性生成，供人类工程师一眼看全当前能力与版本。稳定世界观见 `AGENTS.md`；
 > 知识/能力地图见 `INDEX.md`。
 
-> 组件总数：**45**（rules 16 · skills 22 · agents 3 · hooks 4）
+> 组件总数：**46**（rules 16 · skills 23 · agents 3 · hooks 4）
 
 ## Rules（约束/边界）
 
@@ -45,12 +45,13 @@
 | `feature-review-lint` | on-demand | - | 1.0.0 | Reviews and lints behave .feature files against behave-gerkin-syntax.md with actionable rewrite suggestions | `.cursor/skills/feature-review-lint/SKILL.md` |
 | `freeze-api-objects` | on-demand | - | 1.1.0 | Freezes sanitized Playwright MCP network captures into route-aligned, deduped API Objects under packages/api_objects/ f… | `.cursor/skills/freeze-api-objects/SKILL.md` |
 | `generate-test-report` | on-demand | - | 1.1.0 | Turn a regression run under artifacts/reports/<run_id>/ (plus inbox and optional design notes) into a curated Markdown … | `.cursor/skills/generate-test-report/SKILL.md` |
+| `generate-testsheet-report` | on-demand | - | 1.1.0 | Turns one or more filled test sheets under assets/testsheet/<round>/ into a GJB438B software test report — a reviewed M… | `.cursor/skills/generate-testsheet-report/SKILL.md` |
 | `init-content` | on-demand | - | 1.0.0 | Audits a scaffolded test workspace and writes the missing copilot basics (SUT identity, UI/API hosts, explore account, … | `.cursor/skills/init-content/SKILL.md` |
 | `maintain-behave-steps` | on-demand | - | 1.0.0 | Creates or updates behave step definitions under tests/features/ui_steps and tests/features/api_steps following behave-… | `.cursor/skills/maintain-behave-steps/SKILL.md` |
 | `maintain-index` | on-demand | - | 1.2.0 | Updates the repo-level INDEX.md (knowledge/capability map) incrementally by reading changelog deltas, not full asset bo… | `.cursor/skills/maintain-index/SKILL.md` |
 | `maintain-page-objects` | on-demand | - | 2.1.0 | Creates or updates page assets under packages/page_objects/ on the tuner_testkit.page_test runtime (PageModel element t… | `.cursor/skills/maintain-page-objects/SKILL.md` |
 | `maintain-testcases` | on-demand | - | 1.5.0 | Creates and updates functional testcases so each case is its own Markdown file under assets/testcases/<module>/<suite>/… | `.cursor/skills/maintain-testcases/SKILL.md` |
-| `maintain-testsheet` | on-demand | - | 1.0.0 | Builds and updates a test sheet under assets/testsheet/<round>/testsheet.md, copying the selected ready cases from asse… | `.cursor/skills/maintain-testsheet/SKILL.md` |
+| `maintain-testsheet` | on-demand | - | 1.1.0 | Builds and updates a test sheet under assets/testsheet/<round>/testsheet.md, copying the selected ready cases from asse… | `.cursor/skills/maintain-testsheet/SKILL.md` |
 | `release-template` | on-demand | - | 1.0.1 | Versions the template's shared platform assets | `.cursor/skills/release-template/SKILL.md` |
 | `reuse-analysis` | on-demand | - | 1.0.0 | Analyzes whether to reuse/add/update Feature steps, Page Objects, and API Objects by searching for existing assets, mat… | `.cursor/skills/reuse-analysis/SKILL.md` |
 | `run-feature-playwright-mcp` | on-demand | - | 1.2.0 | Runs behave Gherkin scenarios (or records an explore session) via Playwright MCP with Run→Capture→Freeze workflow and s… | `.cursor/skills/run-feature-playwright-mcp/SKILL.md` |

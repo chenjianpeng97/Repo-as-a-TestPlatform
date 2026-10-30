@@ -55,12 +55,13 @@ def _staged_files() -> list[str]:
         return [line.strip() for line in injected.splitlines() if line.strip()]
     try:
         out = subprocess.run(
-            ["git", "diff", "--cached", "--name-only"],
-            capture_output=True, text=True, check=True,
+            ["git", "diff", "--cached", "--name-only", "-z"],
+            capture_output=True, check=True,
         )
     except (OSError, subprocess.CalledProcessError):
         return []
-    return [line.strip() for line in out.stdout.splitlines() if line.strip()]
+    # -z: NUL-separated and unquoted, so non-ASCII paths arrive as real UTF-8 names.
+    return [p for p in out.stdout.decode("utf-8", errors="replace").split("\0") if p.strip()]
 
 
 def _path_to_layer(path: str) -> str | None:

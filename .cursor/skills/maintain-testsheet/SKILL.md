@@ -1,6 +1,6 @@
 ---
 name: maintain-testsheet
-version: 1.0.0
+version: 1.1.0
 description: Builds and updates a test sheet under assets/testsheet/<round>/testsheet.md, copying the selected ready cases from assets/testcases into that round's testcase/ folder and linking only those copies. Use when the user asks to 生成测试单, 维护测试单, 测试单, or mentions assets/testsheet or testsheet.md. Do not use to edit the case library, write a testdesign, or curate assets/testreport.
 ---
 
@@ -10,7 +10,7 @@ description: Builds and updates a test sheet under assets/testsheet/<round>/test
 
 - **Write**: `assets/testsheet/<轮次>/testsheet.md`，以及同目录 `testcase/` 里的用例副本。
 - **Read**: `assets/testcases/`。有 `INDEX.project.md` 时先读，只采用已有事实。
-- **Out of scope**: 改 `assets/testcases/`（用 `maintain-testcases`）、写 `assets/testdesign/`、写 `assets/testreport/`（用 `generate-test-report`）。已有的 `assets/testreports/**/测试单.md` 不搬，除非用户明确要求迁移。
+- **Out of scope**: 改 `assets/testcases/`（用 `maintain-testcases`）、写 `assets/testdesign/`、写 `assets/testreport/`（测试单出报告用 `generate-testsheet-report`）。已有的 `assets/testreports/**/测试单.md` 不搬，除非用户明确要求迁移。
 
 ## Layout
 
@@ -23,7 +23,7 @@ assets/testsheet/<轮次>/
   evidence/
 ```
 
-`<轮次>` 用用户给的目录名。没给就用 `yyMMdd` 加模块名，例如 `261015预入库管控`。一轮一个目录。
+`<轮次>` 用用户给的目录名。没给就用 `yyMMdd` 加模块名，例如 `260101登录`。一轮一个目录。
 
 ## Generate
 
@@ -32,7 +32,7 @@ assets/testsheet/<轮次>/
 3. 写 `testsheet.md`。不写 YAML 头。用例列只链副本：
 
 ```text
-[Admin-View-columns-shown](testcase/预入库管控/管控情况查看/Admin-View-columns-shown.md)
+[User-Login-open](testcase/登录/登录页/User-Login-open.md)
 ```
 
 不要链 `assets/testcases/` 或 `../../testcases/`。
@@ -42,7 +42,7 @@ assets/testsheet/<轮次>/
 | 列 | 来源 |
 | --- | --- |
 | 用例 | 副本文件名，链到副本 |
-| 测试点 | `<type>-<title>`，如 `正向-清单展示约定列` |
+| 测试点 | `<type>-<title>`，如 `正向-打开登录页` |
 | 数据 | `## 测试数据` 的第一句。没有则用 `## 前置条件` 的第一句 |
 | 预期要点 | 第一步 `预期` 收成一句 |
 | 结果 | `未执行` |
@@ -64,6 +64,7 @@ assets/testsheet/<轮次>/
 - 「结果」只写：通过、失败、部分通过、未执行、阻塞。
 - 「实测记录」写看到的文案、单号、库存状态。不写密码、token、Cookie。账号只写 `account_id` 或登录名。
 - 截图放本目录，文件名用用例 ID。
+- 缺陷「严重程度」只写：致命、严重、一般、轻微。「类型」只写：需求、设计、编码、文档、其它。「状态」只写：激活、已解决、关闭。
 
 ## 本轮信息
 
@@ -71,6 +72,7 @@ assets/testsheet/<轮次>/
 | --- | --- |
 | 测试人 | |
 | 日期 | |
+| 版本 | |
 | 环境 | |
 | 证据 | 本目录 `evidence/` |
 | 通过 | 0 |
@@ -93,17 +95,33 @@ assets/testsheet/<轮次>/
 
 ## 缺陷
 
-| 编号 | 用例 | 现象 | 是否阻塞后续 |
-| --- | --- | --- | --- |
-| 无 | | | |
+| 编号 | 用例 | 现象 | 严重程度 | 类型 | 状态 | 是否阻塞后续 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 无 | | | | | | |
 ```
 
 五个计数之和等于表内行数。新建时未执行等于 N，其余为 0。
 
+「日期」写起止，例如 `2026-10-21 ~ 2026-10-23`，只测一天写一个日期。「版本」写被测版本号，不知道留空。
+
+缺陷表各列：
+
+| 列 | 写法 |
+| --- | --- |
+| 编号 | `D1`、`D2` 按出现顺序编，删掉的编号不复用。没有缺陷时只留一行 `无`，其余格子空着 |
+| 用例 | 用例 ID。不对应任何一条用例时写 `/` |
+| 严重程度 | 致命、严重、一般、轻微。报告里依次是 1 到 4 级 |
+| 类型 | 需求、设计、编码、文档、其它 |
+| 状态 | 激活：待开发处理。已解决：开发已修复，等回归。关闭：回归通过，或确认不再跟踪 |
+| 是否阻塞后续 | 是、否 |
+
+报告里「关闭」算归零，「激活」「已解决」算遗留。用例的首轮结果不另记：出现在缺陷表里的用例，报告按首轮未通过统计；缺陷已解决或关闭后，按它现在的结果统计回归。
+
 ## Update
 
 - 回写时只改 `testsheet.md` 的结果、实测记录、计数和缺陷。结果只用那五个词。
-- 增删一行后立刻重算「共 N 条」和五个计数。
+- 增删一行或改了结果后，跑 `uv run tuner-testreport stats assets/testsheet/<轮次> --check`。「共 N 条」和五个计数按它输出的 `rows` 计数改，不手算。它报的取值或缺陷列问题一并改掉。
+- 缺陷修好并回归后，不要删缺陷行，把状态改为关闭，用例结果改成回归的结果。
 - 从本单移除一条：删表行，删 `testcase/` 里对应副本。开头写明 ID 和原因。菜单权限这类配置问题、以及改由别的页面跟踪的条目，是移除，不记失败，也不进缺陷表。
 - 缺陷只记产品行为。
 - 本轮步骤缺前置或判定规则：改 `testcase/` 里的副本。要沉淀回用例库时另走 `maintain-testcases`，改完不要把测试单的链接改回用例库。

@@ -46,11 +46,34 @@ def test_secret_scan_flags_values_not_words(tmp_path: Path) -> None:
 def test_secret_scan_cli_uses_injected_staged_list(tmp_path: Path) -> None:
     bad = tmp_path / "config.py"
     bad.write_text('DB_PASSWORD = "p@ssw0rd-real"\n', encoding="utf-8")  # fake fixture — secret-scan: allow
-    env = {**os.environ, "TUNER_COMMIT_STAGED": str(bad)}
-    proc = subprocess.run([sys.executable, str(HOOKS / "secret_scan.py")], env=env, capture_output=True, text=True, cwd=str(tmp_path))
+    env = {**os.environ, "TUNER_COMMIT_STAGED": str(bad), "PYTHONIOENCODING": "utf-8"}
+    proc = subprocess.run([sys.executable, str(HOOKS / "secret_scan.py")], env=env, capture_output=True, text=True, encoding="utf-8", cwd=str(tmp_path))
     assert proc.returncode == 1
     assert "credential-looking assignment `PASSWORD`" in proc.stderr
     assert "p@ssw0rd-real" not in proc.stderr  # never echo the secret
+
+
+def test_hooks_read_staged_non_ascii_paths(tmp_path: Path) -> None:
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=str(tmp_path), check=True, capture_output=True)
+
+    git("init", "-q")
+    sheet = tmp_path / "assets" / "testsheet" / "260101登录" / "testsheet.md"
+    sheet.parent.mkdir(parents=True)
+    sheet.write_text("Authorization: Bearer abcdefghijklmnopqrstuvwxyz0123456789\n", encoding="utf-8")  # fake fixture — secret-scan: allow
+    git("add", ".")
+    env = {key: value for key, value in os.environ.items() if key not in {"TUNER_COMMIT_STAGED", "GIT_CONFIG_PARAMETERS"}}
+    env.update(PYTHONIOENCODING="utf-8", GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="core.quotepath", GIT_CONFIG_VALUE_0="true")
+
+    scan = subprocess.run([sys.executable, str(HOOKS / "secret_scan.py")], env=env, capture_output=True, cwd=str(tmp_path))
+    assert scan.returncode == 1
+    assert "260101登录/testsheet.md" in scan.stderr.decode("utf-8")
+
+    msg = tmp_path / "msg.txt"
+    msg.write_text("feat(index): add sheet\n", encoding="utf-8")
+    check = subprocess.run([sys.executable, str(HOOKS / "validate_commit_msg.py"), str(msg)], env=env, capture_output=True, cwd=str(tmp_path))
+    assert check.returncode == 1
+    assert "assets" in check.stderr.decode("utf-8")
 
 
 def test_validate_commit_msg_scope_coverage(tmp_path: Path) -> None:

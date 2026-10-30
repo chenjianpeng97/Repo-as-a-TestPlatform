@@ -1,6 +1,6 @@
 [project]
 name = "tuner-testkit"
-version = "6.2.0"
+version = "6.3.0"
 description = "Shared test runtime, recorders, and DNA overlay for SUT test repos"
 readme = "README.md"
 license = "MIT"
@@ -55,9 +55,12 @@ bdd = [
     "playwright>=1.54.0",
     "behave-html-pretty-formatter>=1.16.1",
 ]
+report = [
+    "docxtpl>=0.19",
+]
 # Union of capability extras (excludes `dev` to avoid a cycle).
 all = [
-    "tuner-testkit[db,api,web-ui,phone-ui,excel,fake,mock,recorder,test,bdd,workbench]",
+    "tuner-testkit[db,api,web-ui,phone-ui,excel,fake,mock,recorder,test,bdd,workbench,report]",
 ]
 dev = [
     "tuner-testkit[all]",
@@ -79,6 +82,7 @@ tuner-page-test = "tuner_testkit.page_test.__main__:main"
 tuner-action-words = "tuner_testkit.action_words.__main__:main"
 tuner-evidence = "tuner_testkit.apps.evidence.cli:main"
 tuner-task = "tuner_testkit.apps.task.cli:main"
+tuner-testreport = "tuner_testkit.apps.testreport.cli:main"
 tuner-workbench = "tuner_testkit.workbench.cli:main"
 
 [build-system]
@@ -92,6 +96,7 @@ include = ["tuner_testkit*"]
 "tuner_testkit.apps.dna" = ["dna_payload/**/*"]
 "tuner_testkit.apps.init_repo" = ["stubs/**/*"]
 "tuner_testkit.workbench" = ["templates/**/*", "static/**/*"]
+"tuner_testkit.apps.testreport" = ["templates/*.docx"]
 
 [tool.setuptools.cmdclass]
 build_py = "tuner_testkit.apps.dna.build.BuildPyWithDna"

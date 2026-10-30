@@ -29,6 +29,7 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
     assert 'name = "new-sut"' in pyproject
     assert f'"tuner-testkit[db,api]>={__version__}"' in pyproject
     assert "[tool.tuner-testkit]" in pyproject
+    assert 'report = ["tuner-testkit[report]"]' in pyproject
     assert 'requires-python = ">=3.12,<3.14"' in (dest / "pyproject.toml").read_text(encoding="utf-8")
     assert (dest / ".python-version").read_text(encoding="utf-8") == "3.12\n"
     assert (dest / "config" / "env.py").is_file()
@@ -55,11 +56,11 @@ def test_scaffold_from_non_project_cwd(tmp_path: Path, monkeypatch):
 
 
 def test_scaffold_project_name_follows_folder(tmp_path: Path):
-    dest = tmp_path / "Balance"
+    dest = tmp_path / "Acme"
     actions = scaffold(dest, with_ai=False)
     text = (dest / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'name = "balance"' in text
-    assert any(line == "write pyproject.toml (balance)" for line in actions)
+    assert 'name = "acme"' in text
+    assert any(line == "write pyproject.toml (acme)" for line in actions)
 
 
 def test_scaffold_name_override(tmp_path: Path):
@@ -70,23 +71,23 @@ def test_scaffold_name_override(tmp_path: Path):
 
 
 def test_scaffold_rejects_invalid_name_before_creating_the_folder(tmp_path: Path):
-    dest = tmp_path / "balance"
+    dest = tmp_path / "acme"
     with pytest.raises(ValueError, match="invalid project name"):
         scaffold(dest, with_ai=False, project_name="bad name")
     assert not dest.exists()
 
 
 def test_cli_name_flag(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
-    dest = tmp_path / "Balance"
-    code = main(["scaffold", str(dest), "--name", "balance", "--no-ai"])
+    dest = tmp_path / "Acme"
+    code = main(["scaffold", str(dest), "--name", "acme", "--no-ai"])
     captured = capsys.readouterr()
     assert code == 0
-    assert "write pyproject.toml (balance)" in captured.out
-    assert 'name = "balance"' in (dest / "pyproject.toml").read_text(encoding="utf-8")
+    assert "write pyproject.toml (acme)" in captured.out
+    assert 'name = "acme"' in (dest / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_cli_rejects_invalid_name(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
-    dest = tmp_path / "balance"
+    dest = tmp_path / "acme"
     code = main(["scaffold", str(dest), "--name", "bad name", "--no-ai"])
     captured = capsys.readouterr()
     assert code == 2

@@ -97,7 +97,7 @@ _PROJECT_NAME_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$")
 def project_name_from_directory(directory_name: str) -> str:
     """Turn a generated folder name into a ``pyproject.toml`` project name.
 
-    ``Balance`` becomes ``balance``. Characters outside the project-name
+    ``Acme`` becomes ``acme``. Characters outside the project-name
     alphabet become hyphens. Pass ``--name`` when the folder name cannot
     produce a valid name.
     """
@@ -157,6 +157,7 @@ def _write_pyproject(
             web-ui = ["tuner-testkit[web-ui]"]
             recorder = ["tuner-testkit[recorder]"]
             mock = ["tuner-testkit[mock]"]
+            report = ["tuner-testkit[report]"]
             test = ["pytest>=9.0.3"]
             bdd = ["behave>=1.2.6", "playwright>=1.54.0"]
             dev = ["pytest>=9.0.3", "behave>=1.2.6", "playwright>=1.54.0"]

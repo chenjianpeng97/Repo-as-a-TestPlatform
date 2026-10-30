@@ -80,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
     p_sc.add_argument(
         "--name",
         default=None,
-        help="pyproject project name (default: normalized target folder name, e.g. Balance -> balance)",
+        help="pyproject project name (default: normalized target folder name, e.g. Acme -> acme)",
     )
     p_sc.add_argument("--no-ai", action="store_true", help="do not copy .cursor/docs-spec/packages DNA")
     p_sc.add_argument("--overwrite", action="store_true", help="overwrite existing files when copying DNA")

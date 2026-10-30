@@ -13,16 +13,16 @@ from tuner_testkit.fake.catalog import GS, register
 from tuner_testkit.fake.core import digits, random_future_date, random_past_date
 
 _DEVICE_STEMS = (
-    "一次性使用血液灌流器",
-    "一次性使用血浆胆红素吸附器",
-    "一次性使用体外循环血路",
-    "血液透析浓缩液",
     "一次性使用无菌注射器",
-    "医用外科口罩",
     "一次性使用输液器",
+    "医用外科口罩",
+    "一次性使用静脉留置针",
+    "医用纱布块",
+    "一次性使用导尿管",
+    "电子血压计",
 )
-_DEVICE_LANG = ("中文", "无菌液路", "MDR三年效期", "出口")
-_MODELS = ("HA100", "HA130", "HA150", "HA280", "HA330", "BS80", "BS330", "ET-2", "CAP")
+_DEVICE_LANG = ("中文", "无菌", "三年效期", "出口")
+_MODELS = ("A100", "A200", "B100", "B200", "C100", "D80", "D100", "E2", "F1")
 
 
 def _yyMMdd(d: date) -> str:
@@ -54,7 +54,7 @@ def sn_code(*, length: int = 21, alphabet: Literal["digits", "hex"] = "digits") 
 
 class UniqueCodeInputs(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    length: int = Field(10, ge=1, le=30, description="短唯一码位数（健帆库存多为 10）")
+    length: int = Field(10, ge=1, le=30, description="短唯一码位数（默认 10）")
     snowflake_id: int | None = Field(None, description="有则按雪花派生防撞；CLI 可空")
 
 
@@ -149,7 +149,7 @@ def serial_number(
     unique_serial: str | None = None,
     unique_serial_digits: int = 10,
 ) -> str:
-    """Jafron ``generators.serial_number`` alias → ``udi(with_gs=True)``."""
+    """Alias of :func:`udi` with ``with_gs=True``."""
     return udi(
         with_gs=True,
         di=di,

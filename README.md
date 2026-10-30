@@ -21,14 +21,14 @@ uv tool install tuner-testkit
 ### 2. 初始化测试仓
 
 ```bash
-tuner-init scaffold ../balance
-cd ../balance
+tuner-init scaffold ../acme
+cd ../acme
 uv sync
 ```
 
 `scaffold` 会铺六层目录、写入依赖 `tuner-testkit[db,api]>=<当前 kit 版本>` 的 `pyproject.toml`，并执行一次 `tuner-dna sync`（把 `.cursor/`、`docs/spec/`、`tools/git-hooks/` 放进**项目树**）。可在任意目录运行，不必先有测试仓。不要用 `tuner-testkit init repo`。
 
-生成的文件夹名就是 `target` 路径的最后一段。`pyproject.toml` 里的项目名默认取这个文件夹名（`Balance` 会写成 `balance`）。需要另起项目名时加 `--name`：
+生成的文件夹名就是 `target` 路径的最后一段。`pyproject.toml` 里的项目名默认取这个文件夹名（`Acme` 会写成 `acme`）。需要另起项目名时加 `--name`：
 
 ```bash
 tuner-init scaffold ../clients/acme --name acme-billing
@@ -150,6 +150,7 @@ git add -A && git commit
 | `[recorder]` | 合录 / 仅 UI / mitmproxy 代理 |
 | `[mock]` | 按冻结的 api_objects 回放 |
 | `[excel]` / `[fake]` | 表格 / 假数据 |
+| `[report]` | `tuner-testreport render`：测试单报告出 docx（docxtpl） |
 | `[bdd]` / `[test]` | behave / pytest |
 | `[all]` | 元 extra：上述能力 extra 的并集（不含 `[dev]`） |
 | `[dev]` | `tuner-testkit[all]`，给本仓 editable 开发 |
@@ -179,4 +180,4 @@ uv sync --extra all
 （被测系统 = 平台本身，uv workspace 成员，共用 `.venv`）：路线图在 `dogfood/assets/domain-notes/platform/roadmap.md`，
 验收活文档在 `dogfood/tests/features/`。见 [`dogfood/README.md`](dogfood/README.md)。
 
-6.2.0 发行说明（测试单）见 [`docs/changelog/TEMPLATE-6.2.0.md`](docs/changelog/TEMPLATE-6.2.0.md)；6.1.0 发行说明（scaffold 项目名）见 [`docs/changelog/TEMPLATE-6.1.0.md`](docs/changelog/TEMPLATE-6.1.0.md)；6.0.0 发行说明（一条用例一个文件）见 [`docs/changelog/TEMPLATE-6.0.0.md`](docs/changelog/TEMPLATE-6.0.0.md)；5.3.1 发行说明（已回答提问归档）见 [`docs/changelog/TEMPLATE-5.3.1.md`](docs/changelog/TEMPLATE-5.3.1.md)；5.3.0 发行说明（功能用例集 `assets/testcases/`）见 [`docs/changelog/TEMPLATE-5.3.0.md`](docs/changelog/TEMPLATE-5.3.0.md)；5.2.0 发行说明（work task / 测试设计 / 证据附件）见 [`docs/changelog/TEMPLATE-5.2.0.md`](docs/changelog/TEMPLATE-5.2.0.md)；5.1.0 发行说明（工作台 / meta stamp / `--json`）见 [`docs/changelog/TEMPLATE-5.1.0.md`](docs/changelog/TEMPLATE-5.1.0.md)；5.0.0（Plane Job 协议退场、`tuner-workspace`）见 [`TEMPLATE-5.0.0.md`](docs/changelog/TEMPLATE-5.0.0.md)；4.3.0 见 [`TEMPLATE-4.3.0.md`](docs/changelog/TEMPLATE-4.3.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。
+6.3.0 发行说明（测试单出 GJB438B 报告）见 [`docs/changelog/TEMPLATE-6.3.0.md`](docs/changelog/TEMPLATE-6.3.0.md)；6.2.0 发行说明（测试单）见 [`docs/changelog/TEMPLATE-6.2.0.md`](docs/changelog/TEMPLATE-6.2.0.md)；6.1.0 发行说明（scaffold 项目名）见 [`docs/changelog/TEMPLATE-6.1.0.md`](docs/changelog/TEMPLATE-6.1.0.md)；6.0.0 发行说明（一条用例一个文件）见 [`docs/changelog/TEMPLATE-6.0.0.md`](docs/changelog/TEMPLATE-6.0.0.md)；5.3.1 发行说明（已回答提问归档）见 [`docs/changelog/TEMPLATE-5.3.1.md`](docs/changelog/TEMPLATE-5.3.1.md)；5.3.0 发行说明（功能用例集 `assets/testcases/`）见 [`docs/changelog/TEMPLATE-5.3.0.md`](docs/changelog/TEMPLATE-5.3.0.md)；5.2.0 发行说明（work task / 测试设计 / 证据附件）见 [`docs/changelog/TEMPLATE-5.2.0.md`](docs/changelog/TEMPLATE-5.2.0.md)；5.1.0 发行说明（工作台 / meta stamp / `--json`）见 [`docs/changelog/TEMPLATE-5.1.0.md`](docs/changelog/TEMPLATE-5.1.0.md)；5.0.0（Plane Job 协议退场、`tuner-workspace`）见 [`TEMPLATE-5.0.0.md`](docs/changelog/TEMPLATE-5.0.0.md)；4.3.0 见 [`TEMPLATE-4.3.0.md`](docs/changelog/TEMPLATE-4.3.0.md)；3.x → 4.x 迁移见 [`TEMPLATE-4.0.0.md`](docs/changelog/TEMPLATE-4.0.0.md)。平台能力地图见 [`INDEX.md`](INDEX.md)。

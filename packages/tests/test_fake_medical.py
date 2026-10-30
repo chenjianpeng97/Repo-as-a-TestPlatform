@@ -8,23 +8,23 @@ from tuner_testkit.fake.medical import gtin14_check_digit, parse_udi, sn_code, s
 
 
 def test_udi_with_gs_inserts_separator_only_before_ai21():
-    code = udi(with_gs=True, di="06938450812307", serial="2510351968", serial_length=10)
+    code = udi(with_gs=True, di="12345678901231", serial="1000000001", serial_length=10)
     assert GS in code
     assert code.count(GS) == 1
     _before, after = code.split(GS)
     assert after.startswith("21")
     parts = parse_udi(code)
     assert parts.with_gs is True
-    assert parts.di == "06938450812307"
-    assert parts.serial == "2510351968"
+    assert parts.di == "12345678901231"
+    assert parts.serial == "1000000001"
 
 
 def test_udi_without_gs_same_payload_no_separator():
     kwargs = dict(
-        di="06938450812307",
-        serial="2510351968",
+        di="12345678901231",
+        serial="1000000001",
         serial_length=10,
-        batch_number="1025030713",
+        batch_number="0000000001",
         production_date=date(2025, 3, 7),
         expiry_date=date(2027, 3, 6),
     )
@@ -37,7 +37,7 @@ def test_udi_without_gs_same_payload_no_separator():
 
 
 def test_gtin14_check_digit_roundtrip():
-    body = "0693845081230"
+    body = "1234567890123"
     full = body + gtin14_check_digit(body)
     assert len(full) == 14
     assert gtin14_check_digit(full[:13]) == full[13]

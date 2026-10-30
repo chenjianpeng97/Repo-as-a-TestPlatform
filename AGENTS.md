@@ -1,4 +1,4 @@
-<!-- version: 1.7.3 -->
+<!-- version: 1.7.4 -->
 # AGENTS — 平台总入口（轻量 DM）
 
 > 本文件是"repo as a platform"的**稳定世界观**：只写不常变的分层结构与角色。
@@ -64,7 +64,7 @@ flowchart TD
 - **读/索引知识** → 先查 `INDEX.md`；若存在 `INDEX.project.md` 则一并查。索引维护用 `maintain-index` skill。
 - **发布任务** → `tuner-task create` 写入 `work/tasks/`。测试设计走 `derive-test-design`；端到端点击报告走 `run-test-execution`。缺人才能决定的通道（如后端日志）用 `tuner-task ask`，不要猜。
 - **功能测试用例** → skill `maintain-testcases`，落在 `assets/testcases/<模块>/<套件>/<用例ID>.md`（规格 `docs/spec/testcase-syntax.md`）。这不是测试设计，也不直接产出 `.feature`。
-- **测试单** → skill `maintain-testsheet`，落在 `assets/testsheet/<轮次>/`。步骤用该目录 `testcase/` 里的用例副本，不链回 `assets/testcases/`。
+- **测试单** → skill `maintain-testsheet`，落在 `assets/testsheet/<轮次>/`。步骤用该目录 `testcase/` 里的用例副本，不链回 `assets/testcases/`。测试单出 GJB438B 测试报告走 skill `generate-testsheet-report`（`tuner-testreport`）。
 
 ## 5. 全程硬约束（跨分支）
 

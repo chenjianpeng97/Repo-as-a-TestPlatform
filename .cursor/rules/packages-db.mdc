@@ -30,14 +30,14 @@ from tuner_testkit.db import DbClient
 # Default datasource ("main", MySQL)
 with DbClient.default() as db:
     rows   = db.fetch_all(
-        "SELECT id FROM sys_user WHERE position IN (%s, %s) AND del_flag = 0",
-        ("BUH", "DSM"),
+        "SELECT id FROM app_user WHERE role IN (%s, %s) AND deleted = 0",
+        ("admin", "editor"),
     )
     row    = db.fetch_one(
-        "SELECT COUNT(*) AS n FROM authorization_result_detail WHERE year = %s",
+        "SELECT COUNT(*) AS n FROM order_line WHERE year = %s",
         (year,),
     )
-    scalar = db.fetch_scalar("SELECT COUNT(*) FROM sys_user", ())
+    scalar = db.fetch_scalar("SELECT COUNT(*) FROM app_user", ())
     for r in db.iter_all("SELECT * FROM big_table", (), batch_size=500):
         ...
 
@@ -108,7 +108,7 @@ class SeedOnSqlServer(ActionWord):
 import pymysql
 conn = pymysql.connect(host="203.0.113.10", user="root", password="***", db="example")
 cur = conn.cursor()
-cur.execute(f"SELECT * FROM sys_user WHERE position = '{role}'")  # injection
+cur.execute(f"SELECT * FROM app_user WHERE role = '{role}'")  # injection
 ```
 
 ```python
@@ -124,8 +124,8 @@ from tuner_testkit.logging import log_data_setup
 
 with DbClient.default() as db:
     rows = db.fetch_all(
-        "SELECT user_id, position FROM sys_user WHERE position = %s AND del_flag = 0",
+        "SELECT user_id, role FROM app_user WHERE role = %s AND deleted = 0",
         (role,),
     )
-log_data_setup("users_by_position", role=role, count=len(rows))
+log_data_setup("users_by_role", role=role, count=len(rows))
 ```

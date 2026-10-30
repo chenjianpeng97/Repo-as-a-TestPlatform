@@ -19,7 +19,7 @@ agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
 入库任务与人类提问：`docs/spec/work-task.md` → `work/tasks/`、`artifacts/inbox/questions/`（已回答在 `archived-question/`）。
 测试设计：`docs/spec/test-design-syntax.md` → `assets/testdesign/`。
 功能用例集：`docs/spec/testcase-syntax.md` → `assets/testcases/<模块>/<套件>/<用例ID>.md`（skill `maintain-testcases`）。
-测试单：skill `maintain-testsheet` → `assets/testsheet/<轮次>/testsheet.md`，步骤链同目录 `testcase/` 副本。
+测试单：skill `maintain-testsheet` → `assets/testsheet/<轮次>/testsheet.md`，步骤链同目录 `testcase/` 副本。测试单出 GJB438B 报告：skill `generate-testsheet-report` → `assets/testreport/<sut>/<yyyy-mm>/<slug>.md`，画像 `assets/domain-notes/testreport/<sut>.md`，docx 落 `artifacts/runs/`。
 交付物目录与 run manifest：`docs/spec/artifacts-layout.md`（`artifacts/{evidence,inbox,runs,reports,catalogs,exports,playwright}`；`tuner_testkit.artifacts`）。
 探索账号模板：scaffold 写入 `data/sut-accounts.example.yaml`；本机副本 `data/sut-accounts.local.yaml`（gitignore）。
 
@@ -59,6 +59,7 @@ agent 任务 log：`docs/spec/agent-task-log.md` → `artifacts/inbox/`。
 | `[excel]` / `[fake]` / `[mock]` | 对应模块 | 表格 / 假数据 / api_mock |
 | `[workbench]` | `tuner_testkit.workbench` | 本机工作台（复用 `[mock]` 的 fastapi/uvicorn + jinja2） |
 | `[recorder]` | `tuner_testkit.apps.{recorder,page_recorder,api_recorder}` | 合录 / 仅 UI / 代理 |
+| `[report]` | `tuner_testkit.apps.testreport` | 测试报告 docx 渲染（docxtpl）；`stats` / `draft` 不需要 |
 | `[all]` | 元 extra | 能力 extra 并集（含 `workbench`） |
 | `[dev]` | 引用 `[all]` | 本仓 editable 开发别名 |
 | （默认 wheel） | `tuner_testkit.apps.dna` / dump_ddl / init_repo | `tuner-init` / `tuner-dna` 可在 tool 域裸装使用；`tuner-dump-ddl` 等需业务仓 `[db]` 后 `uv run` |
@@ -109,6 +110,7 @@ console_scripts：`tuner-config`、`tuner-recorder`、`tuner-dna`、`tuner-init`
 | `mock_server` | `tuner-mock-server serve` | 按 `data/mocks` 回放（需 `[mock]`） | `tuner_testkit/apps/mock_server/README.md` |
 | `evidence` | `tuner-evidence persist` / `attach` / `routes` | MCP/网络 dump 脱敏落盘 `artifacts/evidence/<run_id>/`，并可挂上截图、脱敏日志、接口 JSON 与 `task_id` | `tuner_testkit/apps/evidence/README.md` |
 | `task` | `tuner-task create` / `ask` / `answer` / `finish` | 入库任务 `work/tasks/`；缺人答的通道写入 `artifacts/inbox/questions/` 并阻塞任务 | `tuner_testkit/apps/task/README.md` |
+| `testreport` | `tuner-testreport stats` / `draft` / `render` / `build-template` | 测试单计数与一致性检查；按画像起草 GJB438B 报告 Markdown；套模板出 docx 并自检（`render` 需 `[report]`） | `tuner_testkit/apps/testreport/README.md` |
 
 ## 4. 测试层（tests/）
 

@@ -44,10 +44,26 @@
 
 ---
 
+## 2026-10-29 — tuner-testkit 6.3.0（测试单出 GJB438B 测试报告）
+
+- **commit**: `TBD`
+- **来源**: `trial-repo@4d1b1a3` 的 `apps/testreport`、`generate-testsheet-report` 1.1.0、`maintain-testsheet` 1.1.0；在两份下游试验田各出过一份报告
+- **目的**: 测试单填完后直接出 GJB438B 软件测试报告。数字从测试单算，不随轮次变化的信息放画像，报告 Markdown 入库审阅，docx 每次重渲染。
+- **路径**:
+  - `tuner_testkit/apps/testreport/**`（`tuner-testreport`，extra `[report]`）
+  - `.cursor/skills/generate-testsheet-report/SKILL.md`
+  - `.cursor/skills/maintain-testsheet/SKILL.md`
+  - `tuner_testkit/apps/init_repo/scaffold.py`
+  - `tools/git-hooks/secret_scan.py`、`tools/git-hooks/validate_commit_msg.py`
+  - `AGENTS.md`、`INDEX.md`、`README.md`
+- **同版发布**: `4d1dd24` 的 skill `init-content` 1.0.0、`sut-self-learning` 1.0.1、`sut-source-to-design` 1.0.2
+- **不在同步范围**: 下游的画像 `assets/domain-notes/testreport/*.md`、报告 `assets/testreport/**`、测试单
+- **验证**: `uv run --extra test --extra report pytest tuner_testkit/apps/testreport tuner_testkit/apps/init_repo`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
+
 ## 2026-10-15 — tuner-testkit 6.2.0（测试单 skill，用例维护一次一个提交）
 
 - **commit**: `ab75e96`
-- **来源**: `jnj` 的 `maintain-testcases` 1.5.0、`maintain-testsheet` 1.0.0
+- **来源**: 试验田的 `maintain-testcases` 1.5.0、`maintain-testsheet` 1.0.0
 - **目的**: 一轮测试单从用例库复制步骤，不链回用例库。维护用例时一次工作只做一个提交，正文按用例写下首次创建或变更原因。
 - **路径**:
   - `.cursor/skills/maintain-testcases/SKILL.md`
@@ -55,7 +71,7 @@
   - `.cursor/rules/assets-knowledge.mdc`
   - `docs/spec/assets-knowledge-syntax.md`
   - `tuner_testkit/apps/init_repo/scaffold.py`
-- **不在同步范围**: `jnj` 的业务测试单 `assets/testsheet/**`
+- **不在同步范围**: 试验田的业务测试单 `assets/testsheet/**`
 - **验证**: `uv run pytest tuner_testkit/apps/init_repo/tests/test_scaffold.py`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
 
 ## 2026-10-12 — tuner-testkit 6.1.0（scaffold 项目名跟随文件夹）
@@ -70,14 +86,14 @@
 ## 2026-10-10 — tuner-testkit 6.0.0（功能用例改为一条一个文件）
 
 - **commit**: `TBD`
-- **来源**: `jnj` 的 `maintain-testcases` 1.3.0（套件目录 + `<id_prefix>-<slug>`）
+- **来源**: 试验田的 `maintain-testcases` 1.3.0（套件目录 + `<id_prefix>-<slug>`）
 - **目的**: 功能用例集与下游试验田对齐。5.3.0 的「一个功能一个文件、四级标题、`User-Login0001`」不再新发。
 - **路径**:
   - `docs/spec/testcase-syntax.md`
   - `.cursor/skills/maintain-testcases/SKILL.md`、`.cursor/rules/testcases.mdc`
   - `tuner_testkit/testcases/**`
   - `assets/testcases/README.md`
-- **不在同步范围**: `jnj` 里的业务用例正文
+- **不在同步范围**: 试验田里的业务用例正文
 - **验证**: `uv run pytest tuner_testkit/testcases/tests`；`python -m tuner_testkit.testcases`；`tuner-index-ai --check`；`python -m tuner_testkit.apps.init_repo manifest --check`
 
 ## 2026-09-24 — tuner-testkit 5.3.1（已回答提问归档）
@@ -383,7 +399,7 @@
   - `.cursor/rules/bdd-asset-layering.mdc`
   - `.cursor/skills/create-action-word/SKILL.md`
   - `INDEX.md` / `AGENTS.md` / `docs/spec/action-words-syntax.md`
-- **不在同步范围**: jafron 业务 db_seed 换 import（后续合并后再改）
+- **不在同步范围**: 试验田业务 db_seed 换 import（后续合并后再改）
 - **验证**: `uv run --extra test pytest packages/tests/test_fake_medical.py packages/tests/test_fake_china.py packages/tests/test_fake_core.py packages/tests/test_fake_cli.py -q`；`python -m tuner_testkit.fake list`
 
 ## 2026-08-29 — page_test 运行库：PageModel 资产 + 多定位器备用 + doctor 体检
