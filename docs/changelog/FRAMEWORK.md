@@ -46,7 +46,7 @@
 
 ## 2026-10-29 — tuner-testkit 6.3.0（测试单出 GJB438B 测试报告）
 
-- **commit**: `TBD`
+- **commit**: `5f13876`
 - **来源**: `trial-repo@4d1b1a3` 的 `apps/testreport`、`generate-testsheet-report` 1.1.0、`maintain-testsheet` 1.1.0；在两份下游试验田各出过一份报告
 - **目的**: 测试单填完后直接出 GJB438B 软件测试报告。数字从测试单算，不随轮次变化的信息放画像，报告 Markdown 入库审阅，docx 每次重渲染。
 - **路径**:
